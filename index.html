@@ -90,6 +90,10 @@
         .dark .dropdown-item:hover { background-color: #333; }
 
         #brand-logo-container { cursor: pointer; }
+
+        /* Resizable Image Styling */
+        .resizable-img { cursor: ew-resize; user-select: none; -webkit-user-drag: none; transition: box-shadow 0.2s ease; }
+        .resizable-img:active { cursor: ew-resize; box-shadow: 0 0 0 4px rgba(172, 135, 102, 0.3); }
     </style>
     <style id="dynamic-card-styles"></style>
 </head>
@@ -166,7 +170,7 @@
                     </div>
 
                     <div class="flex items-center gap-3">
-                        <!-- Category Button Dropdown -->
+                        <!-- Category Button Dropdown (Fixed width applied) -->
                         <div class="relative">
                             <button id="categoryBtn" class="w-44 px-4 py-3 bg-[#F3EBE3] dark:bg-[#222] text-[#AC8766] text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all shadow-sm flex items-center justify-between gap-2 outline-none group">
                                 <span id="currentCategoryText" class="truncate">Category</span>
@@ -252,6 +256,7 @@
                                 </div>
                             </div>
                         </div>
+                        <p class="text-[9px] text-gray-400 mt-2 italic font-medium uppercase tracking-widest text-center">* Hint: Swipe horizontally on images in preview to resize</p>
                     </div>
 
                     <div class="bg-[#FAFAFA] rounded-[2.5rem] p-8 border border-gray-200">
@@ -317,7 +322,7 @@
             </section>
 
             <section class="lg:sticky lg:top-8 animate-fade-in flex justify-center overflow-x-auto p-4">
-                <!-- Enlarged card container: 1050px width, 600px min-height -->
+                <!-- Enlarged card container -->
                 <div id="cardContainer" class="rounded-[3rem] card-shadow overflow-hidden border-[6px] border-[#AC8766] relative transition-all duration-500 min-h-[600px]" style="width: 1050px; background-color: #ffffff;">
                     <div class="p-16 md:p-20">
                         <div class="flex items-center flex-wrap gap-6 mb-8">
@@ -358,7 +363,7 @@
         let hue = 28;
         let saturation = 40;
         let brightness = 67;
-        let uploadedImages = [];
+        let uploadedImages = []; // Now stores { src, scale }
 
         let cards = [];
         let activeCardId = null;
@@ -367,6 +372,12 @@
         let currentSelectedSize = 32;
         let currentImageBorder = 2;
         let currentImageCols = 0;
+
+        // Interaction state for image resizing
+        let isDraggingImage = false;
+        let dragStartX = 0;
+        let dragImageIdx = -1;
+        let dragStartScale = 100;
 
         initColorPicker();
         initCategoryDropdown();
@@ -378,7 +389,7 @@
         initNotepad();
         if (typeof lucide !== 'undefined') lucide.createIcons();
 
-        // Logo handles Notepad opening now
+        // Logo handles Notepad opening
         document.getElementById('brand-logo-container').addEventListener('click', () => {
             const overlay = document.getElementById('notepad-overlay');
             const main = document.getElementById('mainLayout');
@@ -387,7 +398,7 @@
             if (typeof lucide !== 'undefined') lucide.createIcons();
         });
 
-        // Main Theme Toggle (next to download)
+        // Main Theme Toggle
         document.getElementById('main-theme-toggle').addEventListener('click', () => {
             document.documentElement.classList.toggle('dark');
         });
@@ -478,6 +489,7 @@
             document.getElementById('inputBlend').addEventListener('input', (e) => { document.getElementById('blendValueLabel').innerText = e.target.value + '%'; updatePreview(); });
             document.getElementById('btnRandomColor').addEventListener('click', () => { setManualColor('#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')); });
             document.getElementById('inputFileDesc').addEventListener('input', updatePreview);
+
             document.addEventListener('paste', (event) => {
                 const items = (event.clipboardData || event.originalEvent.clipboardData).items;
                 for (let index in items) {
@@ -485,6 +497,52 @@
                     if (item.kind === 'file' && item.type.includes('image')) { processFile(item.getAsFile()); }
                 }
             });
+
+            // Global move/up events for image resizing
+            window.addEventListener('mousemove', handleImageResizeMove);
+            window.addEventListener('mouseup', handleImageResizeEnd);
+            window.addEventListener('touchmove', handleImageResizeMove, { passive: false });
+            window.addEventListener('touchend', handleImageResizeEnd);
+        }
+
+        // Swipe-to-resize logic handlers
+        function handleImageResizeStart(e, idx) {
+            isDraggingImage = true;
+            dragImageIdx = idx;
+            dragStartX = (e.type === 'touchstart') ? e.touches[0].clientX : e.clientX;
+            dragStartScale = uploadedImages[idx].scale;
+            // Prevent default drag behaviors
+            if (e.type === 'mousedown') e.preventDefault();
+        }
+
+        function handleImageResizeMove(e) {
+            if (!isDraggingImage || dragImageIdx === -1) return;
+            
+            const currentX = (e.type === 'touchmove') ? e.touches[0].clientX : e.clientX;
+            const deltaX = currentX - dragStartX;
+            
+            // Adjust scale based on horizontal delta (drag right to increase, left to decrease)
+            // 1 pixel = 0.5% scale change
+            let newScale = dragStartScale + (deltaX * 0.5);
+            newScale = Math.max(10, Math.min(200, newScale)); // Clamp between 10% and 200%
+
+            uploadedImages[dragImageIdx].scale = newScale;
+            
+            // Update preview in real-time
+            const imgEl = document.getElementById(`preview-img-${dragImageIdx}`);
+            if (imgEl) {
+                imgEl.style.width = newScale + '%';
+            }
+
+            if (e.type === 'touchmove') e.preventDefault();
+        }
+
+        function handleImageResizeEnd() {
+            if (isDraggingImage) {
+                isDraggingImage = false;
+                dragImageIdx = -1;
+                updatePreview(); // Trigger full update to sync state
+            }
         }
 
         function initColorPicker() {
@@ -536,14 +594,18 @@
         function rgbToHsb(r, g, b) { r /= 255; g /= 255; b /= 255; const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min; let h, s, v = max; s = max === 0 ? 0 : d / max; if (max === min) h = 0; else { switch(max) { case r: h = (g - b) / d + (g < b ? 6 : 0); break; case g: h = (b - r) / d + 2; break; case b: h = (r - g) / d + 4; break; } h /= 6; } return { h: h * 360, s: s * 100, b: v * 100 }; }
 
         function handleImageUpload(e) { Array.from(e.target.files).forEach(processFile); e.target.value = ''; }
-        function processFile(file) { const reader = new FileReader(); reader.onload = (e) => { uploadedImages.push(e.target.result); renderUploadPreviews(); updatePreview(); }; reader.readAsDataURL(file); }
+        function processFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => { uploadedImages.push({ src: e.target.result, scale: 100 }); renderUploadPreviews(); updatePreview(); };
+            reader.readAsDataURL(file);
+        }
 
         function renderUploadPreviews() {
             const container = document.getElementById('uploadPreviewContainer'); container.innerHTML = '';
-            uploadedImages.forEach((src, idx) => {
+            uploadedImages.forEach((imgObj, idx) => {
                 const div = document.createElement('div');
                 div.className = "relative group w-24 h-14 rounded-lg overflow-hidden border border-gray-300 bg-white shrink-0";
-                div.innerHTML = `<img src="${src}" class="w-full h-full object-cover">
+                div.innerHTML = `<img src="${imgObj.src}" class="w-full h-full object-cover">
                     <div class="absolute inset-0 bg-white/85 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-1 transition-opacity">
                         ${idx > 0 ? `<button onclick="moveImageLeft(${idx})" class="p-1 hover:bg-gray-100 rounded text-gray-800"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></button>` : `<div class="w-[26px]"></div>`}
                         <button onclick="removeImage(${idx})" class="p-1 hover:bg-rose-100 rounded text-rose-500"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
@@ -624,9 +686,28 @@
             const word = document.getElementById('cardWord'); word.style.color = finalColor; word.style.fontSize = textSize + 'px'; word.innerText = title; 
             const type = document.getElementById('cardType'); if (category !== '-') { type.innerText = category; type.classList.remove('hidden'); type.style.backgroundColor = hexToRgba(finalColor, 0.15); type.style.color = finalColor; } else type.classList.add('hidden');
             const notesSection = document.getElementById('cardNotesSection'); if (definition.trim()) { document.getElementById('cardDef').innerText = definition; document.getElementById('cardDef').style.color = finalColor; document.getElementById('cardDef').style.fontSize = Math.max(14, Math.round(textSize * 0.45)) + 'px'; notesSection.classList.remove('hidden'); } else notesSection.classList.add('hidden');
+            
             const cardImages = document.getElementById('cardImagesContainer');
-            if (imageCols === 0) { cardImages.className = 'flex flex-wrap gap-9 w-full justify-center'; cardImages.style.gridTemplateColumns = ''; } else { cardImages.className = 'grid gap-9 w-full items-start'; cardImages.style.gridTemplateColumns = `repeat(${imageCols}, minmax(0, 1fr))`; }
-            cardImages.innerHTML = uploadedImages.map(src => `<img src="${src}" class="${imageCols === 0 ? 'max-w-full' : 'w-full'} h-auto object-cover rounded-[1.5rem] shadow-sm block" style="border: ${imgBorder}px solid ${finalColor};">`).join('');
+            if (imageCols === 0) { cardImages.className = 'flex flex-wrap gap-9 w-full justify-center'; cardImages.style.gridTemplateColumns = ''; } 
+            else { cardImages.className = 'grid gap-9 w-full items-start'; cardImages.style.gridTemplateColumns = `repeat(${imageCols}, minmax(0, 1fr))`; }
+            
+            cardImages.innerHTML = '';
+            uploadedImages.forEach((imgObj, idx) => {
+                const img = document.createElement('img');
+                img.id = `preview-img-${idx}`;
+                img.src = imgObj.src;
+                img.className = "resizable-img h-auto object-cover rounded-[1.5rem] shadow-sm block mx-auto";
+                img.style.border = `${imgBorder}px solid ${finalColor}`;
+                img.style.width = `${imgObj.scale}%`;
+                img.draggable = false;
+                
+                // Add swipe/resize events
+                img.onmousedown = (e) => handleImageResizeStart(e, idx);
+                img.ontouchstart = (e) => handleImageResizeStart(e, idx);
+
+                cardImages.appendChild(img);
+            });
+
             updateFavicon(); updateBrandLogo();
             const dynamicStyles = document.getElementById('dynamic-card-styles');
             dynamicStyles.innerHTML = `input[type=range]::-webkit-slider-thumb { background: white !important; border: 3px solid ${finalColor} !important; box-shadow: 0 0 10px ${finalColor}66 !important; } #cardWord, #cardDef, #cardType { text-decoration: none !important; }`;
@@ -669,7 +750,7 @@
                     npNotes[idx].content = area.value; 
                     npNotes[idx].title = titleInput.value; 
                     save(); 
-                    render(); // Added render() here to update sidebar automatically
+                    render();
                 }
             }
             document.getElementById('new-note-btn').onclick = () => { const n = { id: Date.now(), title: '', content: '', createdAt: new Date().toISOString() }; npNotes.unshift(n); select(n.id); titleInput.focus(); };
