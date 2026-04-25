@@ -132,6 +132,12 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2 pr-10 md:pr-0">
+                        <button id="np-undo-btn" class="np-control-btn p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#AC8766]" title="Undo">
+                            <i data-lucide="undo" class="w-4 h-4"></i>
+                        </button>
+                        <button id="np-redo-btn" class="np-control-btn p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#AC8766]" title="Redo">
+                            <i data-lucide="redo" class="w-4 h-4"></i>
+                        </button>
                         <button id="np-copy-btn" class="np-control-btn p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#AC8766]" title="Copy to Clipboard">
                             <i data-lucide="copy" class="w-4 h-4"></i>
                         </button>
@@ -727,37 +733,117 @@
         function initNotepad() {
             const overlay = document.getElementById('notepad-overlay'), main = document.getElementById('mainLayout');
             document.getElementById('close-notepad-btn').onclick = () => { overlay.classList.add('hidden'); main.classList.remove('hidden'); };
+            
             let npNotes = JSON.parse(localStorage.getItem('ali_dashboard_multiple_notes')) || [{ id: Date.now(), title: 'My First Note', content: '', createdAt: new Date().toISOString() }];
             let npCurrentId = npNotes[0]?.id || Date.now();
             const list = document.getElementById('notes-list'), area = document.getElementById('note-area'), titleInput = document.getElementById('note-title'), count = document.getElementById('word-count'), status = document.getElementById('save-status');
+            
+            // Undo/Redo State variables
+            let undoStack = [];
+            let redoStack = [];
+            let historyTimeout;
+            let isUndoingRedoing = false;
+
             function save() { localStorage.setItem('ali_dashboard_multiple_notes', JSON.stringify(npNotes)); status.textContent = 'Synced'; setTimeout(() => status.textContent = 'Ready', 1000); }
+            
             function render() {
                 list.innerHTML = '';
                 npNotes.forEach(n => {
                     const el = document.createElement('div');
                     el.className = `note-item px-6 py-4 border-b border-gray-50 dark:border-gray-800 flex flex-col gap-1 ${n.id === npCurrentId ? 'active' : ''}`;
-                    el.innerHTML = `<div class="font-bold text-xs uppercase tracking-wider truncate">${n.title || 'Untitled Note'}</div><div class="text-[10px] text-gray-400 dark:text-gray-500 truncate opacity-60">${n.content.slice(0,35) || 'Empty...'}</div>`;
+                    el.innerHTML = `<div class="font-bold text-xs tracking-wider truncate">${n.title || 'Untitled Note'}</div><div class="text-[10px] text-gray-400 dark:text-gray-500 truncate opacity-60">${n.content.slice(0,35) || 'Empty...'}</div>`;
                     el.onclick = () => select(n.id);
                     list.appendChild(el);
                 });
             }
-            function select(id) { npCurrentId = id; const n = npNotes.find(x => x.id === id); if(n) { titleInput.value = n.title; area.value = n.content; } update(); render(); }
-            function update() {
+            
+            function select(id) { 
+                npCurrentId = id; 
+                const n = npNotes.find(x => x.id === id); 
+                if(n) { 
+                    titleInput.value = n.title; 
+                    area.value = n.content; 
+                    
+                    // Reset history stacks for the newly selected note
+                    undoStack = [{ title: n.title, content: n.content }];
+                    redoStack = [];
+                } 
+                update(false); 
+                render(); 
+            }
+            
+            function update(pushHistory = true) {
                 const words = area.value.trim() ? area.value.trim().split(/\s+/).length : 0;
                 count.textContent = `${words} Words`;
                 const idx = npNotes.findIndex(x => x.id === npCurrentId);
+                
                 if(idx !== -1) { 
                     npNotes[idx].content = area.value; 
                     npNotes[idx].title = titleInput.value; 
                     save(); 
                     render();
                 }
+                
+                // Push history automatically if user pauses typing for half a second
+                if (pushHistory !== false && !isUndoingRedoing) {
+                    clearTimeout(historyTimeout);
+                    historyTimeout = setTimeout(() => {
+                        const topState = undoStack[undoStack.length - 1];
+                        if (!topState || topState.title !== titleInput.value || topState.content !== area.value) {
+                            undoStack.push({ title: titleInput.value, content: area.value });
+                            if (undoStack.length > 50) undoStack.shift(); // Limit stack size
+                            redoStack = []; // Clear redo stack on new input
+                        }
+                    }, 500);
+                }
             }
+
+            document.getElementById('np-undo-btn').onclick = () => {
+                const currentTitle = titleInput.value;
+                const currentContent = area.value;
+                const topState = undoStack[undoStack.length - 1];
+
+                // If currently typed text hasn't been saved to history yet, push it before undoing
+                if (topState && (topState.title !== currentTitle || topState.content !== currentContent)) {
+                    undoStack.push({ title: currentTitle, content: currentContent });
+                    redoStack = [];
+                }
+
+                if (undoStack.length > 1) {
+                    isUndoingRedoing = true;
+                    const poppedState = undoStack.pop();
+                    redoStack.push(poppedState);
+                    
+                    const prevState = undoStack[undoStack.length - 1];
+                    titleInput.value = prevState.title;
+                    area.value = prevState.content;
+                    
+                    update(false);
+                    isUndoingRedoing = false;
+                }
+            };
+
+            document.getElementById('np-redo-btn').onclick = () => {
+                if (redoStack.length > 0) {
+                    isUndoingRedoing = true;
+                    const nextState = redoStack.pop();
+                    undoStack.push(nextState);
+                    
+                    titleInput.value = nextState.title;
+                    area.value = nextState.content;
+                    
+                    update(false);
+                    isUndoingRedoing = false;
+                }
+            };
+
             document.getElementById('new-note-btn').onclick = () => { const n = { id: Date.now(), title: '', content: '', createdAt: new Date().toISOString() }; npNotes.unshift(n); select(n.id); titleInput.focus(); };
-            document.getElementById('np-delete-btn').onclick = () => { if(npNotes.length <= 1) { npNotes[0].title = ''; npNotes[0].content = ''; area.value = ''; titleInput.value = ''; update(); render(); return; } npNotes = npNotes.filter(x => x.id !== npCurrentId); select(npNotes[0].id); };
+            document.getElementById('np-delete-btn').onclick = () => { if(npNotes.length <= 1) { npNotes[0].title = ''; npNotes[0].content = ''; area.value = ''; titleInput.value = ''; update(false); render(); return; } npNotes = npNotes.filter(x => x.id !== npCurrentId); select(npNotes[0].id); };
             document.getElementById('np-copy-btn').onclick = () => { area.select(); document.execCommand('copy'); window.getSelection().removeAllRanges(); const btn = document.getElementById('np-copy-btn'), icon = btn.innerHTML; btn.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-[#AC8766]"></i>'; if (typeof lucide !== 'undefined') lucide.createIcons(); setTimeout(() => { btn.innerHTML = icon; if (typeof lucide !== 'undefined') lucide.createIcons(); }, 2000); };
             document.getElementById('np-download-btn').onclick = () => { const b = new Blob([area.value], {type:'text/plain'}), u = URL.createObjectURL(b), a = document.createElement('a'); a.href = u; a.download = `${titleInput.value || 'Untitled'}.txt`; a.click(); };
-            area.oninput = update; titleInput.oninput = update;
+            
+            area.oninput = update; 
+            titleInput.oninput = update;
             select(npCurrentId);
         }
 
