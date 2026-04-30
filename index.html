@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -176,7 +176,7 @@
                         <div id="brand-logo-container" class="w-10 h-10 transition-transform duration-300 shrink-0 hover:scale-110" title="Open Notepad">
                             <!-- SVG injected via JS -->
                         </div>
-                        <h2 class="text-xl font-bold text-[#222222] tracking-tight">Notion</h2>
+                        <h2 class="text-xl font-bold text-[#222222] dark:text-[#f1f1f1] tracking-tight">Notion</h2>
                     </div>
 
                     <div class="flex items-center gap-3">
@@ -203,9 +203,9 @@
                         <div class="flex items-center justify-between mb-2">
                             <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Reference Images</label>
                             
-                            <!-- Image Layout Dropdown (Moved here) -->
+                            <!-- Image Layout Dropdown -->
                             <div class="relative shrink-0 w-24">
-                                <button id="imageColsBtn" class="w-full px-2 py-1.5 bg-[#F3EBE3] dark:bg-[#222] text-[#AC8766] text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group border border-transparent hover:border-[#E5D7CC]">
+                                <button id="imageColsBtn" class="w-full px-2 py-1.5 bg-[#F3EBE3] dark:bg-[#222] text-[#AC8766] text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group border border-transparent hover:border-[#E5D7CC] dark:hover:border-[#333]">
                                     <span id="currentImageColsText">Auto</span>
                                     <i data-lucide="chevron-down" class="w-3 h-3 transition-transform group-hover:translate-y-0.5 shrink-0"></i>
                                 </button>
@@ -215,7 +215,7 @@
                             </div>
                         </div>
 
-                        <div class="group relative flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-2xl cursor-pointer bg-[#FAFAFA] hover:bg-[#F3EBE3] transition-all overflow-hidden">
+                        <div class="group relative flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 dark:border-gray-700 border-dashed rounded-2xl cursor-pointer bg-[#FAFAFA] hover:bg-[#F3EBE3] dark:bg-[#111] dark:hover:bg-[#222] transition-all overflow-hidden">
                             <input type="file" id="imageInput" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept="image/*" multiple>
                             <div class="flex flex-col items-center justify-center pointer-events-none text-center px-4">
                                 <i data-lucide="image-plus" class="w-6 h-6 text-gray-400 mb-2 transition-colors group-hover:text-[#AC8766]"></i>
@@ -227,19 +227,19 @@
                         <p class="text-[9px] text-gray-400 mt-4 italic font-medium uppercase tracking-widest text-center">* Hint: Swipe horizontally on images in preview to resize</p>
                     </div>
 
-                    <div class="bg-[#FAFAFA] rounded-[2.5rem] p-8 border border-gray-200 mb-10">
+                    <div class="bg-[#FAFAFA] dark:bg-[#111] rounded-[2.5rem] p-8 border border-gray-200 dark:border-[#333] mb-10">
                         <div class="flex items-center justify-between mb-4">
-                            <label class="block text-xs font-bold text-gray-800 uppercase tracking-widest m-0">Card Theme Color</label>
+                            <label class="block text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest m-0">Card Theme Color</label>
                             
                             <div class="flex items-center gap-2">
                                 <!-- Random Palette Button (Moved here as an icon) -->
-                                <button id="btnRandomColor" class="p-1.5 bg-white border border-gray-200 text-gray-400 hover:text-[#AC8766] rounded-lg transition-all shadow-sm hover:border-gray-300 outline-none" title="Generate Random Palette">
+                                <button id="btnRandomColor" class="p-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-gray-400 hover:text-[#AC8766] rounded-lg transition-all shadow-sm hover:border-gray-300 dark:hover:border-gray-600 outline-none" title="Generate Random Palette">
                                     <i data-lucide="shuffle" class="w-4 h-4"></i>
                                 </button>
 
                                 <!-- Background Blend Dropdown -->
                                 <div class="relative shrink-0 w-28">
-                                    <button id="blendBtn" class="w-full px-2 py-1.5 bg-white border border-gray-200 text-[#AC8766] text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group hover:border-gray-300">
+                                    <button id="blendBtn" class="w-full px-2 py-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-[#AC8766] text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group hover:border-gray-300 dark:hover:border-gray-600">
                                         <span class="text-gray-400">Blend</span>
                                         <span id="blendValueLabel">10%</span>
                                         <i data-lucide="chevron-down" class="w-3 h-3 text-gray-400 transition-transform group-hover:translate-y-0.5 shrink-0"></i>
@@ -305,7 +305,7 @@
                                 </button>
                             </div>
                             
-                            <div id="cardImagesContainer" class="flex flex-wrap gap-9 w-full justify-center mt-12"></div>
+                            <div id="cardImagesContainer" class="flex flex-wrap gap-9 w-full justify-center" style="padding-top: 0px;"></div>
                         </div>
                     </div>
                 </div>
@@ -783,7 +783,7 @@
                 title: '', category: '-', definition: '', images: [], 
                 color: { hex: "#AC8766", hue: 28, sat: 40, bri: 67 }, 
                 textSize: 32, defSize: 24, imageBorder: 2, imageCols: 0, blend: 10,
-                showTitlePlaceholder: true, showDefPlaceholder: true
+                showTitlePlaceholder: true, showDefPlaceholder: false
             };
             cards.push(newCard); switchCard(newCard.id);
         }
@@ -893,9 +893,11 @@
             }
             
             const cardImages = document.getElementById('cardImagesContainer');
-            const imageMarginClass = uploadedImages.length > 0 ? 'mt-12' : '';
-            if (imageCols === 0) { cardImages.className = `flex flex-wrap gap-9 w-full justify-center ${imageMarginClass}`; cardImages.style.gridTemplateColumns = ''; } 
-            else { cardImages.className = `grid gap-9 w-full items-start ${imageMarginClass}`; cardImages.style.gridTemplateColumns = `repeat(${imageCols}, minmax(0, 1fr))`; }
+            if (imageCols === 0) { cardImages.className = `flex flex-wrap gap-9 w-full justify-center`; cardImages.style.gridTemplateColumns = ''; } 
+            else { cardImages.className = `grid gap-9 w-full items-start`; cardImages.style.gridTemplateColumns = `repeat(${imageCols}, minmax(0, 1fr))`; }
+            
+            // Explicit padding instead of margin to prevent html2canvas collapse bug
+            cardImages.style.paddingTop = uploadedImages.length > 0 ? '3rem' : '0px';
             
             cardImages.innerHTML = '';
             uploadedImages.forEach((imgObj, idx) => {
@@ -1099,6 +1101,12 @@
                         }
                         if (!clonedTitle.innerText.trim() && !clonedType.innerText.trim()) {
                             doc.getElementById('cardTitleSection').style.display = 'none';
+                        }
+                        
+                        // Guarantee spacing in html2canvas clone
+                        const imgContainer = doc.getElementById('cardImagesContainer');
+                        if (imgContainer && imgContainer.children.length > 0) {
+                            imgContainer.style.paddingTop = '3rem';
                         }
                         
                         doc.querySelectorAll('#cardWord, #cardDef, #cardType').forEach(el => el.style.textDecoration = 'none'); 
