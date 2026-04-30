@@ -235,8 +235,29 @@
                         <p class="text-[9px] text-gray-400 mt-4 italic font-medium uppercase tracking-widest text-center">* Hint: Swipe horizontally on images in preview to resize</p>
                     </div>
 
-                    <div class="bg-[#FAFAFA] rounded-[2.5rem] p-8 border border-gray-200">
-                        <label class="block text-xs font-bold text-gray-800 uppercase tracking-widest mb-4">Card Theme Color</label>
+                    <div class="bg-[#FAFAFA] rounded-[2.5rem] p-8 border border-gray-200 mb-10">
+                        <div class="flex items-center justify-between mb-4">
+                            <label class="block text-xs font-bold text-gray-800 uppercase tracking-widest m-0">Card Theme Color</label>
+                            
+                            <div class="flex items-center gap-2">
+                                <!-- Random Palette Button (Moved here as an icon) -->
+                                <button id="btnRandomColor" class="p-1.5 bg-white border border-gray-200 text-gray-400 hover:text-[#AC8766] rounded-lg transition-all shadow-sm hover:border-gray-300 outline-none" title="Generate Random Palette">
+                                    <i data-lucide="shuffle" class="w-4 h-4"></i>
+                                </button>
+
+                                <!-- Background Blend Dropdown -->
+                                <div class="relative shrink-0 w-28">
+                                    <button id="blendBtn" class="w-full px-2 py-1.5 bg-white border border-gray-200 text-[#AC8766] text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group hover:border-gray-300">
+                                        <span class="text-gray-400">Blend</span>
+                                        <span id="blendValueLabel">10%</span>
+                                        <i data-lucide="chevron-down" class="w-3 h-3 text-gray-400 transition-transform group-hover:translate-y-0.5 shrink-0"></i>
+                                    </button>
+                                    <div id="blendDropdownMenu" class="hidden absolute right-0 mt-2 w-full bg-white dark:bg-[#1a1a1a] border border-[#E5D7CC] dark:border-[#333] rounded-xl shadow-xl z-50 overflow-hidden">
+                                        <div id="blendOptions" class="py-1"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         
                         <div id="colorMap" class="mb-4">
                             <div class="color-map-white"></div>
@@ -276,23 +297,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="mt-4 pt-4 border-t border-gray-200">
-                            <div class="flex justify-between items-center mb-2">
-                                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Background Blend</label>
-                                <span id="blendValueLabel" class="text-xs font-bold text-[#AC8766]">10%</span>
-                            </div>
-                            <input type="range" id="inputBlend" min="0" max="100" value="10" class="cursor-pointer">
-                        </div>
-
-                        <button id="btnRandomColor" class="w-full bg-white border border-gray-200 py-3.5 rounded-2xl text-gray-800 text-sm font-bold hover:bg-gray-50 transition-colors mt-4 shadow-sm">
-                            Generate Random Palette
-                        </button>
-                    </div>
-
-                    <div class="pt-2 pb-10">
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-2">File Info (Saved in Metadata)</label>
-                        <textarea id="inputFileDesc" rows="2" placeholder="Metadata description..." class="w-full px-4 py-3 rounded-xl border focus:outline-none transition-all resize-none text-xs"></textarea>
                     </div>
                 </div>
             </section>
@@ -395,6 +399,7 @@
         let currentSelectedDefSize = 24;
         let currentImageBorder = 2;
         let currentImageCols = 0;
+        let currentBlendPercentage = 10;
         
         // Visibility state for placeholders
         let showTitlePlaceholder = true;
@@ -410,6 +415,7 @@
 
         initColorPicker();
         initImageColsDropdown();
+        initBlendDropdown();
         initFloatingMenu();
         setupEventListeners();
         initCards();
@@ -440,6 +446,21 @@
                 item.className = 'dropdown-item text-gray-700 dark:text-gray-300';
                 item.innerText = c === 0 ? 'Auto' : c;
                 item.onclick = (e) => { e.stopPropagation(); selectImageCols(c); menu.classList.add('hidden'); };
+                container.appendChild(item);
+            });
+            btn.onclick = (e) => { e.stopPropagation(); closeAllDropdowns(); menu.classList.toggle('hidden'); };
+        }
+
+        function initBlendDropdown() {
+            const container = document.getElementById('blendOptions');
+            const menu = document.getElementById('blendDropdownMenu');
+            const btn = document.getElementById('blendBtn');
+            const blends = [0, 5, 10, 15, 20, 25, 30, 40, 50, 75, 100];
+            blends.forEach(b => {
+                const item = document.createElement('div');
+                item.className = 'dropdown-item text-gray-700 dark:text-gray-300';
+                item.innerText = b + '%';
+                item.onclick = (e) => { e.stopPropagation(); selectBlend(b); menu.classList.add('hidden'); };
                 container.appendChild(item);
             });
             btn.onclick = (e) => { e.stopPropagation(); closeAllDropdowns(); menu.classList.toggle('hidden'); };
@@ -595,6 +616,7 @@
         function selectDefSize(size) { currentSelectedDefSize = size; updatePreview(); }
         function selectImageBorder(border) { currentImageBorder = border; updatePreview(); }
         function selectImageCols(cols) { currentImageCols = cols; document.getElementById('currentImageColsText').innerText = cols === 0 ? 'Auto' : cols; updatePreview(); }
+        function selectBlend(blend) { currentBlendPercentage = blend; document.getElementById('blendValueLabel').innerText = blend + '%'; updatePreview(); }
 
         window.clearTitle = function() {
             document.getElementById('inputTitle').value = '';
@@ -662,9 +684,7 @@
                 syncCardState();
             });
             
-            document.getElementById('inputBlend').addEventListener('input', (e) => { document.getElementById('blendValueLabel').innerText = e.target.value + '%'; updatePreview(); });
             document.getElementById('btnRandomColor').addEventListener('click', () => { setManualColor('#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')); });
-            document.getElementById('inputFileDesc').addEventListener('input', updatePreview);
 
             document.addEventListener('paste', (event) => {
                 const items = (event.clipboardData || event.originalEvent.clipboardData).items;
@@ -804,7 +824,7 @@
                 id: 'card_' + Date.now() + Math.random().toString(36).substr(2, 9), 
                 title: '', category: '-', definition: '', images: [], 
                 color: { hex: "#AC8766", hue: 28, sat: 40, bri: 67 }, 
-                textSize: 32, defSize: 24, imageBorder: 2, imageCols: 0, blend: 10, fileDesc: '',
+                textSize: 32, defSize: 24, imageBorder: 2, imageCols: 0, blend: 10,
                 showTitlePlaceholder: true, showDefPlaceholder: true
             };
             cards.push(newCard); switchCard(newCard.id);
@@ -819,9 +839,13 @@
             showDefPlaceholder = card.showDefPlaceholder !== false;
             
             selectCategory(card.category || "-"); selectTextSize(card.textSize || 32); selectDefSize(card.defSize || 24); currentImageBorder = card.imageBorder || 2; selectImageCols(card.imageCols || 0);
+            
+            currentBlendPercentage = card.blend !== undefined ? card.blend : 10;
+            document.getElementById('blendValueLabel').innerText = currentBlendPercentage + '%';
+            
             document.getElementById('inputDef').value = card.definition; uploadedImages = [...card.images]; renderUploadPreviews();
-            document.getElementById('inputBlend').value = card.blend; document.getElementById('inputFileDesc').value = card.fileDesc;
-            document.getElementById('blendValueLabel').innerText = card.blend + '%';
+            
+            document.getElementById('blendValueLabel').style.color = card.color.hex;
             activeColor = card.color.hex; hue = card.color.hue; saturation = card.color.sat; brightness = card.color.bri;
             setManualColor(activeColor, hue, saturation, brightness); isSwitching = false;
         }
@@ -832,7 +856,7 @@
             card.title = document.getElementById('inputTitle').value; card.category = currentSelectedCategory; card.definition = document.getElementById('inputDef').value;
             card.images = [...uploadedImages]; card.color = { hex: activeColor, hue: hue, sat: saturation, bri: brightness };
             card.textSize = currentSelectedSize; card.defSize = currentSelectedDefSize; card.imageBorder = currentImageBorder; card.imageCols = currentImageCols;
-            card.blend = document.getElementById('inputBlend').value; card.fileDesc = document.getElementById('inputFileDesc').value;
+            card.blend = currentBlendPercentage; 
             card.showTitlePlaceholder = showTitlePlaceholder; card.showDefPlaceholder = showDefPlaceholder;
             const tabEl = document.getElementById(`tab-text-${activeCardId}`);
             if (tabEl) tabEl.innerText = card.title.trim() || `Card ${cards.indexOf(card) + 1}`;
@@ -861,7 +885,7 @@
         }
 
         function updatePreview() {
-            const title = document.getElementById('inputTitle').value, category = currentSelectedCategory, definition = document.getElementById('inputDef').value, blend = document.getElementById('inputBlend').value, textSize = currentSelectedSize, defSize = currentSelectedDefSize, imgBorder = currentImageBorder, imageCols = currentImageCols;
+            const title = document.getElementById('inputTitle').value, category = currentSelectedCategory, definition = document.getElementById('inputDef').value, blend = currentBlendPercentage, textSize = currentSelectedSize, defSize = currentSelectedDefSize, imgBorder = currentImageBorder, imageCols = currentImageCols;
             const finalColor = activeColor;
             document.getElementById('blendValueLabel').style.color = finalColor;
             const card = document.getElementById('cardContainer'); card.style.width = '1050px'; card.style.borderColor = finalColor; card.style.backgroundColor = getLightShade(finalColor, blend);
