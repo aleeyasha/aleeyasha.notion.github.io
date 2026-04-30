@@ -188,17 +188,6 @@
                     </div>
 
                     <div class="flex items-center gap-3">
-                        <!-- Category Button Dropdown -->
-                        <div class="relative">
-                            <button id="categoryBtn" class="w-44 px-4 py-3 bg-[#F3EBE3] dark:bg-[#222] text-[#AC8766] text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all shadow-sm flex items-center justify-between gap-2 outline-none group">
-                                <span id="currentCategoryText" class="truncate">Category</span>
-                                <i data-lucide="chevron-down" class="w-3.5 h-3.5 transition-transform group-hover:translate-y-0.5 shrink-0"></i>
-                            </button>
-                            <div id="categoryDropdownMenu" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-[#1a1a1a] border border-[#E5D7CC] dark:border-[#333] rounded-xl shadow-xl z-50 overflow-hidden">
-                                <div id="categoryOptions" class="py-2 max-h-80 overflow-y-auto custom-scrollbar"></div>
-                            </div>
-                        </div>
-
                         <!-- Theme Toggle next to download -->
                         <button id="main-theme-toggle" class="p-3 bg-[#F3EBE3] dark:bg-[#222] text-[#AC8766] rounded-xl transition-all shadow-sm hover:scale-105" title="Toggle Light/Dark Mode">
                             <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
@@ -424,7 +413,6 @@
         let activeContextElement = null; // Tracks title or def context menu
 
         initColorPicker();
-        initCategoryDropdown();
         initImageBorderDropdown();
         initImageColsDropdown();
         initFloatingMenu();
@@ -446,21 +434,6 @@
         document.getElementById('main-theme-toggle').addEventListener('click', () => {
             document.documentElement.classList.toggle('dark');
         });
-
-        function initCategoryDropdown() {
-            const container = document.getElementById('categoryOptions');
-            const menu = document.getElementById('categoryDropdownMenu');
-            const btn = document.getElementById('categoryBtn');
-            const categories = ["-", ...Object.keys(categoryColors)];
-            categories.forEach(cat => {
-                const item = document.createElement('div');
-                item.className = 'dropdown-item text-gray-700 dark:text-gray-300';
-                item.innerText = cat;
-                item.onclick = (e) => { e.stopPropagation(); selectCategory(cat); menu.classList.add('hidden'); };
-                container.appendChild(item);
-            });
-            btn.onclick = (e) => { e.stopPropagation(); closeAllDropdowns(); menu.classList.toggle('hidden'); };
-        }
 
         function initImageBorderDropdown() {
             const container = document.getElementById('imageBorderOptions');
@@ -595,7 +568,6 @@
 
         function selectCategory(cat) {
             currentSelectedCategory = cat;
-            document.getElementById('currentCategoryText').innerText = cat === "-" ? "Category" : cat;
             if (cat !== '-' && categoryColors[cat]) setManualColor(categoryColors[cat]);
             updatePreview();
         }
@@ -608,7 +580,6 @@
         window.clearTitle = function() {
             document.getElementById('inputTitle').value = '';
             currentSelectedCategory = '-';
-            document.getElementById('currentCategoryText').innerText = 'Category';
             showTitlePlaceholder = false;
             updatePreview();
         };
@@ -633,7 +604,6 @@
 
         window.restoreCategory = function() {
             currentSelectedCategory = ''; 
-            document.getElementById('currentCategoryText').innerText = 'Category';
             updatePreview();
             setTimeout(() => document.getElementById('cardType').focus(), 50);
         };
@@ -653,7 +623,6 @@
             cardTypeEl.addEventListener('input', (e) => {
                 const val = e.target.innerText.trim();
                 currentSelectedCategory = val || '-';
-                document.getElementById('currentCategoryText').innerText = val || 'Category';
                 if (categoryColors[val]) {
                     setManualColor(categoryColors[val]);
                 }
