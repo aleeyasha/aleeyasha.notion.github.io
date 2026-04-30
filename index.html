@@ -46,14 +46,6 @@
         #cardContainer { backface-visibility: hidden; -webkit-font-smoothing: antialiased; margin: 0 auto; transition: all 0.3s ease; }
         .editor-scroll-area { max-height: 75vh; overflow-y: auto; scrollbar-gutter: stable; }
 
-        .switch { position: relative; display: inline-block; width: 34px; height: 20px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider-round { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #E5D7CC; transition: .4s; border-radius: 34px; }
-        .dark .slider-round { background-color: #333; }
-        .slider-round:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider-round { background-color: #AC8766; }
-        input:checked + .slider-round:before { transform: translateX(14px); }
-
         .dark #builderArea { background-color: #1a1a1a !important; border-color: #333 !important; }
         .dark #builderArea h2, .dark #builderArea label { color: #f1f1f1 !important; }
         .dark .bg-\[\#FAFAFA\] { background-color: #111 !important; border-color: #333 !important; }
@@ -267,35 +259,6 @@
 
                         <div class="px-1">
                             <input type="range" id="inputHue" min="0" max="360" value="28" class="cursor-pointer">
-                        </div>
-
-                        <div class="flex items-center gap-3 p-3 bg-white rounded-2xl border border-gray-200 mb-4 mt-2">
-                            <div id="activeColorCircle" class="w-10 h-10 rounded-full shrink-0 border border-gray-200 shadow-sm" style="background-color: #AC8766;"></div>
-                            
-                            <div class="flex flex-1 justify-between items-center px-2">
-                                <div class="flex items-center gap-4 text-gray-800 font-bold">
-                                    <div class="flex items-center gap-1">
-                                        <span class="text-[10px] text-gray-400">R</span>
-                                        <span id="labelR">172</span>
-                                    </div>
-                                    <div class="flex items-center gap-1">
-                                        <span class="text-[10px] text-gray-400">G</span>
-                                        <span id="labelG">135</span>
-                                    </div>
-                                    <div class="flex items-center gap-1">
-                                        <span class="text-[10px] text-gray-400">B</span>
-                                        <span id="labelB">102</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="flex items-center gap-2">
-                                    <span class="text-[10px] font-bold text-gray-400">RGB</span>
-                                    <label class="switch">
-                                        <input type="checkbox" checked disabled>
-                                        <span class="slider-round"></span>
-                                    </label>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -761,7 +724,7 @@
             let r, g, b;
             switch(i % 6) { case 0: r = v, g = t, b = p; break; case 1: r = q, g = v, b = p; break; case 2: r = p, g = v, b = t; break; case 3: r = p, g = q, b = v; break; case 4: r = t, g = p, b = v; break; case 5: r = v, g = p, b = q; break; }
             activeColor = rgbToHex(Math.round(r * 255), Math.round(g * 255), Math.round(b * 255));
-            updateColorPickerUI(); updatePreview();
+            updatePreview();
         }
 
         function setManualColor(hex, forceHue=null, forceSat=null, forceBri=null) {
@@ -772,12 +735,7 @@
             document.getElementById('colorMarker').style.left = (saturation / 100) * (rect.width || 510) + 'px';
             document.getElementById('colorMarker').style.top = (1 - brightness / 100) * (rect.height || 200) + 'px';
             document.getElementById('inputHue').value = hue; map.style.backgroundColor = `hsl(${hue}, 100%, 50%)`;
-            updateColorPickerUI(); updatePreview();
-        }
-
-        function updateColorPickerUI() {
-            const rgb = hexToRgb(activeColor); document.getElementById('activeColorCircle').style.backgroundColor = activeColor;
-            document.getElementById('labelR').innerText = rgb.r; document.getElementById('labelG').innerText = rgb.g; document.getElementById('labelB').innerText = rgb.b;
+            updatePreview();
         }
 
         function rgbToHex(r, g, b) { return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase(); }
