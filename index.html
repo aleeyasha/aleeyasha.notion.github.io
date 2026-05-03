@@ -1015,7 +1015,7 @@
             const color = CONSTANT_ICON_COLOR; 
             const yellow = "#eed142";
             const dark = "#222222";
-            return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+            return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
                 <!-- Base shape -->
                 <path d="M 25 15 L 75 15 C 80.5 15 85 19.5 85 25 L 85 65 L 65 65 C 62.2 65 60 67.2 60 70 L 60 85 L 25 85 C 19.5 85 15 80.5 15 75 L 15 25 C 15 19.5 19.5 15 25 15 Z" fill="${color}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/>
                 <!-- Folded Corner -->
@@ -1039,25 +1039,33 @@
         function updateFavicon() { const favicon = document.getElementById('favicon'); favicon.href = `data:image/svg+xml;base64,${btoa(generateNotebookSVG())}`; }
         function updateBrandLogo() { const container = document.getElementById('brand-logo-container'); if (container) container.innerHTML = generateNotebookSVG(); }
 
-        function initPWA() {
-            try {
-                let startUrl = '.';
-                let iconUrl = 'notion.png';
+        function createPNGIconFromSVG(svgString, size) {
+            return new Promise((resolve) => {
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                img.onload = () => {
+                    ctx.drawImage(img, 0, 0, size, size);
+                    resolve(canvas.toDataURL('image/png'));
+                };
+                img.onerror = () => resolve(`data:image/svg+xml;base64,${btoa(svgString)}`);
+                img.src = `data:image/svg+xml;base64,${btoa(svgString)}`;
+            });
+        }
 
-                // Try to generate absolute URLs so they resolve correctly inside the Blob manifest
-                // but skip if running in a blob/data sandbox where URL constructor fails
-                if (!window.location.href.startsWith('blob:') && !window.location.href.startsWith('data:')) {
-                    try {
-                        const baseUrl = new URL('.', window.location.href).href;
-                        startUrl = baseUrl;
-                        iconUrl = new URL('notion.png', baseUrl).href;
-                    } catch (e) {
-                        // Ignore URL resolution errors
-                    }
-                }
-                
+        async function initPWA() {
+            try {
+                // Generate PNG icons from the SVG to guarantee browser compatibility natively
+                const svgString = generateNotebookSVG();
+                const icon192 = await createPNGIconFromSVG(svgString, 192);
+                const icon512 = await createPNGIconFromSVG(svgString, 512);
+
+                let startUrl = window.location.href.split('?')[0];
+
                 // Set Apple Touch Icon
-                document.getElementById('apple-touch-icon').href = iconUrl;
+                document.getElementById('apple-touch-icon').href = icon192;
 
                 const manifest = {
                     name: "Notion",
@@ -1068,13 +1076,13 @@
                     theme_color: "#51b8cb",
                     icons: [
                         {
-                            src: iconUrl,
+                            src: icon192,
                             sizes: "192x192",
                             type: "image/png",
                             purpose: "any maskable"
                         },
                         {
-                            src: iconUrl,
+                            src: icon512,
                             sizes: "512x512",
                             type: "image/png",
                             purpose: "any maskable"
@@ -1082,8 +1090,10 @@
                     ]
                 };
 
-                const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
-                document.getElementById('manifest').href = URL.createObjectURL(manifestBlob);
+                const manifestStr = JSON.stringify(manifest);
+                // Embed the manifest directly as a Data URI to bypass Blob/Cross-Origin restrictions entirely
+                const manifestUrl = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(manifestStr);
+                document.getElementById('manifest').href = manifestUrl;
             } catch (err) {
                 console.error("PWA initialization skipped:", err);
             }
