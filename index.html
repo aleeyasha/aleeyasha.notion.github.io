@@ -180,6 +180,11 @@
                     </div>
 
                     <div class="flex items-center gap-3">
+                        <!-- Open Theme Color Button -->
+                        <button id="btnOpenColorModal" class="p-3 bg-[#F3EBE3] dark:bg-[#222] text-[#AC8766] rounded-xl transition-all shadow-sm hover:scale-105" title="Toggle Theme Color">
+                            <i data-lucide="palette" class="w-5 h-5"></i>
+                        </button>
+
                         <!-- Theme Toggle next to download -->
                         <button id="main-theme-toggle" class="p-3 bg-[#F3EBE3] dark:bg-[#222] text-[#AC8766] rounded-xl transition-all shadow-sm hover:scale-105" title="Toggle Light/Dark Mode">
                             <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
@@ -227,12 +232,12 @@
                         <p class="text-[9px] text-gray-400 mt-4 italic font-medium uppercase tracking-widest text-center">* Hint: Swipe horizontally on images in preview to resize</p>
                     </div>
 
-                    <div class="bg-[#FAFAFA] dark:bg-[#111] rounded-[2.5rem] p-8 border border-gray-200 dark:border-[#333] mb-10">
+                    <div id="themeColorSection" class="hidden bg-[#FAFAFA] dark:bg-[#111] rounded-[2.5rem] p-8 border border-gray-200 dark:border-[#333] mb-10 animate-fade-in">
                         <div class="flex items-center justify-between mb-4">
                             <label class="block text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest m-0">Card Theme Color</label>
                             
                             <div class="flex items-center gap-2">
-                                <!-- Random Palette Button (Moved here as an icon) -->
+                                <!-- Random Palette Button -->
                                 <button id="btnRandomColor" class="p-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-gray-400 hover:text-[#AC8766] rounded-lg transition-all shadow-sm hover:border-gray-300 dark:hover:border-gray-600 outline-none" title="Generate Random Palette">
                                     <i data-lucide="shuffle" class="w-4 h-4"></i>
                                 </button>
@@ -616,6 +621,12 @@
             document.getElementById('imageInput').addEventListener('change', handleImageUpload);
             document.getElementById('btnDownload').addEventListener('click', downloadPNG);
             
+            // Setup Color Toggle Event
+            document.getElementById('btnOpenColorModal').addEventListener('click', () => {
+                const colorSection = document.getElementById('themeColorSection');
+                colorSection.classList.toggle('hidden');
+            });
+
             // Direct editing on preview handlers
             document.getElementById('cardWord').addEventListener('input', (e) => {
                 document.getElementById('inputTitle').value = e.target.innerText;
