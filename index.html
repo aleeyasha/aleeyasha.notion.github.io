@@ -2,7 +2,7 @@
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Notion</title>
     <!-- Dynamic Favicon Link -->
     <link id="favicon" rel="icon" type="image/svg+xml">
@@ -44,7 +44,7 @@
         #colorMarker { position: absolute; width: 16px; height: 16px; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 0 1px rgba(0,0,0,0.2); pointer-events: none; transform: translate(-50%, -50%); }
 
         #cardContainer { backface-visibility: hidden; -webkit-font-smoothing: antialiased; margin: 0 auto; transition: all 0.3s ease; }
-        .editor-scroll-area { max-height: 75vh; overflow-y: auto; scrollbar-gutter: stable; }
+        .editor-scroll-area { max-height: calc(100vh - 8rem); lg:max-h-[75vh]; overflow-y: auto; scrollbar-gutter: stable; }
 
         #builderArea h2 { color: #222222 !important; }
         .dark #builderArea { background-color: #1a1a1a !important; border-color: #333 !important; }
@@ -55,13 +55,15 @@
         /* --- Notepad Styles --- */
         .notepad-container { background: rgba(255,255,255,0.9); backdrop-filter: blur(20px); border: 1px solid rgba(0,0,0,0.05); }
         .dark .notepad-container { background: rgba(26,26,26,0.9); border: 1px solid rgba(255,255,255,0.05); }
-        #note-area { font-family: 'Caveat', cursive; font-size: 24px; line-height: 1.5; resize: none; background: transparent !important; border: none !important; box-shadow: none !important; }
+        #note-area { font-family: 'Caveat', cursive; font-size: 20px; line-height: 1.5; resize: none; background: transparent !important; border: none !important; box-shadow: none !important; }
+        @media (min-width: 768px) { #note-area { font-size: 24px; } }
         #note-area:focus { outline: none; box-shadow: none !important; }
         .dark #note-area { color: #cccccc; }
         .np-control-btn { transition: all 0.2s ease; cursor: pointer; }
         .dark .np-control-btn { background-color: #1a1a1a; border-color: #333; color: #777; }
         .np-control-btn:hover { transform: translateY(-1px); }
-        .np-title-input { font-family: 'Caveat', cursive !important; background: transparent !important; border: none !important; font-weight: 700; font-size: 28px; letter-spacing: 0.02em; width: 100%; box-shadow: none !important; padding: 0 !important; }
+        .np-title-input { font-family: 'Caveat', cursive !important; background: transparent !important; border: none !important; font-weight: 700; font-size: 24px; letter-spacing: 0.02em; width: 100%; box-shadow: none !important; padding: 0 !important; }
+        @media (min-width: 768px) { .np-title-input { font-size: 28px; } }
         .dark .np-title-input { color: #eee; }
         .np-title-input:focus { outline: none; box-shadow: none !important; }
         
@@ -89,7 +91,7 @@
         .resizable-img:active { cursor: ew-resize; box-shadow: 0 0 0 4px rgba(172, 135, 102, 0.3); }
 
         /* Hand-drawn typography */
-        #cardWord, #cardDef, #cardNotesHeader, #cardType { font-family: 'Caveat', cursive !important; }
+        #cardWord, #cardDef, #cardType { font-family: 'Caveat', cursive !important; }
 
         /* ContentEditable Placeholder Styling */
         [contenteditable]:empty:before {
@@ -105,108 +107,108 @@
 <body class="relative min-h-screen">
 
     <!-- Notepad Overlay -->
-    <div id="notepad-overlay" class="fixed inset-0 z-50 hidden bg-[#e8f6f8] dark:bg-[#0f0f0f] p-4 md:p-10 h-screen overflow-hidden flex flex-col transition-colors duration-500">
-        <div class="absolute top-4 right-4 md:top-8 md:right-8 z-50">
-           <button id="close-notepad-btn" class="bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full p-3 border border-[#d0ebf0] dark:border-[#333] text-[#51b8cb] hover:scale-105 transition-all outline-none" title="Back to Cards">
+    <div id="notepad-overlay" class="fixed inset-0 z-50 hidden bg-[#e8f6f8] dark:bg-[#0f0f0f] p-0 md:p-10 h-screen overflow-hidden flex flex-col transition-colors duration-500">
+        <div class="absolute top-4 right-4 md:top-8 md:right-8 z-[60]">
+           <button id="close-notepad-btn" class="bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full p-2.5 md:p-3 border border-[#d0ebf0] dark:border-[#333] text-[#51b8cb] hover:scale-105 transition-all outline-none" title="Back to Cards">
                <i data-lucide="x" class="w-5 h-5"></i>
            </button>
         </div>
-        <div class="notepad-container flex-1 rounded-[3rem] shadow-2xl flex overflow-hidden max-w-7xl mx-auto w-full relative pt-12 md:pt-0">
+        <div class="notepad-container flex-1 rounded-none md:rounded-[3rem] shadow-2xl flex flex-col md:flex-row overflow-hidden max-w-7xl mx-auto w-full relative pt-14 md:pt-0">
             <!-- Sidebar -->
-            <aside class="w-64 md:w-72 border-r border-gray-100 flex flex-col bg-white/50 dark:bg-black/20 dark:border-gray-800">
-                <div class="p-6 border-b border-gray-100 dark:border-gray-800">
-                    <button id="new-note-btn" class="w-full bg-[#51b8cb] hover:bg-[#3a98aa] text-white py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-all">
+            <aside class="w-full md:w-72 border-b md:border-b-0 md:border-r border-gray-100 flex flex-col bg-white/50 dark:bg-black/20 dark:border-gray-800 shrink-0">
+                <div class="p-4 md:p-6 border-b border-gray-100 dark:border-gray-800">
+                    <button id="new-note-btn" class="w-full bg-[#51b8cb] hover:bg-[#3a98aa] text-white py-2.5 md:py-3 px-4 rounded-xl md:rounded-2xl flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-all">
                         <i data-lucide="plus" class="w-4 h-4"></i> New Note
                     </button>
                 </div>
-                <div id="notes-list" class="flex-1 overflow-y-auto py-4">
+                <div id="notes-list" class="flex-1 overflow-y-auto py-2 md:py-4 max-h-32 md:max-h-none">
                     <!-- Notes will appear here -->
                 </div>
             </aside>
 
             <!-- Main Editor -->
-            <main class="flex-1 flex flex-col p-8 md:p-12 relative">
-                <header class="flex flex-wrap justify-between items-center mb-8 gap-4">
-                    <div class="flex items-center gap-4 flex-1 text-inherit">
-                        <div class="w-10 h-10 bg-[#51b8cb]/10 rounded-xl flex items-center justify-center shrink-0">
-                            <i data-lucide="edit-3" class="text-[#51b8cb] w-5 h-5"></i>
+            <main class="flex-1 flex flex-col p-4 md:p-12 relative h-full">
+                <header class="flex flex-col md:flex-row md:justify-between items-start md:items-center mb-4 md:mb-8 gap-4">
+                    <div class="flex items-center gap-3 md:gap-4 w-full md:w-auto text-inherit pr-10 md:pr-0">
+                        <div class="w-8 h-8 md:w-10 md:h-10 bg-[#51b8cb]/10 rounded-lg md:rounded-xl flex items-center justify-center shrink-0">
+                            <i data-lucide="edit-3" class="text-[#51b8cb] w-4 h-4 md:w-5 md:h-5"></i>
                         </div>
                         <div class="flex-1">
                             <input type="text" id="note-title" class="np-title-input placeholder:text-gray-300 dark:placeholder:text-gray-600" placeholder="Untitled Note">
-                            <p class="text-[10px] text-gray-400 font-medium">Auto-save to Workspace</p>
+                            <p class="text-[9px] md:text-[10px] text-gray-400 font-medium">Auto-save to Workspace</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2 pr-10 md:pr-0">
-                        <button id="np-undo-btn" class="np-control-btn p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#51b8cb]" title="Undo">
-                            <i data-lucide="undo" class="w-4 h-4"></i>
+                    <div class="flex items-center gap-1.5 md:gap-2 flex-wrap w-full justify-end md:w-auto">
+                        <button id="np-undo-btn" class="np-control-btn p-2.5 md:p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#51b8cb]" title="Undo">
+                            <i data-lucide="undo" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
                         </button>
-                        <button id="np-redo-btn" class="np-control-btn p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#51b8cb]" title="Redo">
-                            <i data-lucide="redo" class="w-4 h-4"></i>
+                        <button id="np-redo-btn" class="np-control-btn p-2.5 md:p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#51b8cb]" title="Redo">
+                            <i data-lucide="redo" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
                         </button>
-                        <button id="np-copy-btn" class="np-control-btn p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#51b8cb]" title="Copy to Clipboard">
-                            <i data-lucide="copy" class="w-4 h-4"></i>
+                        <button id="np-copy-btn" class="np-control-btn p-2.5 md:p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#51b8cb]" title="Copy to Clipboard">
+                            <i data-lucide="copy" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
                         </button>
-                        <button id="np-download-btn" class="np-control-btn p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#51b8cb]" title="Download as .txt">
-                            <i data-lucide="download" class="w-4 h-4"></i>
+                        <button id="np-download-btn" class="np-control-btn p-2.5 md:p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#51b8cb]" title="Download as .txt">
+                            <i data-lucide="download" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
                         </button>
-                        <button id="np-delete-btn" class="np-control-btn p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-red-500" title="Delete Note">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        <button id="np-delete-btn" class="np-control-btn p-2.5 md:p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-red-500" title="Delete Note">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
                         </button>
                     </div>
                 </header>
 
-                <textarea id="note-area" class="flex-1 w-full text-lg text-gray-700 dark:text-gray-300 placeholder:text-gray-300 dark:placeholder:text-gray-600" placeholder="Start typing your thoughts..."></textarea>
+                <textarea id="note-area" class="flex-1 w-full text-gray-700 dark:text-gray-300 placeholder:text-gray-300 dark:placeholder:text-gray-600 custom-scrollbar" placeholder="Start typing your thoughts..."></textarea>
                 
-                <footer class="mt-8 pt-6 border-t border-gray-50 dark:border-gray-800 flex justify-between items-center">
-                    <div id="word-count" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">0 Words</div>
-                    <div id="save-status" class="text-[10px] font-bold text-[#51b8cb] uppercase tracking-widest opacity-60">Synced</div>
+                <footer class="mt-4 md:mt-8 pt-4 md:pt-6 border-t border-gray-50 dark:border-gray-800 flex justify-between items-center">
+                    <div id="word-count" class="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest">0 Words</div>
+                    <div id="save-status" class="text-[9px] md:text-[10px] font-bold text-[#51b8cb] uppercase tracking-widest opacity-60">Synced</div>
                 </footer>
             </main>
         </div>
     </div>
 
-    <div id="mainLayout" class="relative z-10 w-full flex flex-col items-center pt-10">
+    <div id="mainLayout" class="relative z-10 w-full flex flex-col items-center pt-4 md:pt-10">
         
         <!-- Main Layout -->
-        <div class="w-full max-w-[1800px] px-4 grid grid-cols-1 lg:grid-cols-[550px_1fr] gap-12 items-start">
+        <div class="w-full max-w-[1800px] px-3 md:px-4 grid grid-cols-1 lg:grid-cols-[450px_1fr] xl:grid-cols-[550px_1fr] gap-6 md:gap-12 items-start">
             
-            <section id="builderArea" class="bg-white border border-[#d0ebf0] rounded-[2rem] card-shadow animate-fade-in relative flex flex-col max-h-[85vh] overflow-hidden">
-                <div class="flex items-center justify-between border-b border-gray-100 shrink-0 p-8 pb-4">
-                    <div class="flex items-center gap-4">
+            <section id="builderArea" class="bg-white border border-[#d0ebf0] rounded-[1.5rem] md:rounded-[2rem] card-shadow animate-fade-in relative flex flex-col lg:max-h-[85vh] overflow-hidden">
+                <div class="flex items-center justify-between border-b border-gray-100 shrink-0 p-5 md:p-8 pb-4">
+                    <div class="flex items-center gap-3 md:gap-4">
                         <!-- Main Icon (Now opens Notepad) -->
-                        <div id="brand-logo-container" class="w-10 h-10 transition-transform duration-300 shrink-0 hover:scale-110" title="Open Notepad">
+                        <div id="brand-logo-container" class="w-8 h-8 md:w-10 md:h-10 transition-transform duration-300 shrink-0 hover:scale-110" title="Open Notepad">
                             <!-- SVG injected via JS -->
                         </div>
-                        <h2 class="text-xl font-bold text-[#222222] dark:text-[#f1f1f1] tracking-tight">Notion</h2>
+                        <h2 class="text-lg md:text-xl font-bold text-[#222222] dark:text-[#f1f1f1] tracking-tight">Notion</h2>
                     </div>
 
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 md:gap-3">
                         <!-- Open Theme Color Button -->
-                        <button id="btnOpenColorModal" class="p-3 bg-[#e8f6f8] dark:bg-[#222] text-[#51b8cb] rounded-xl transition-all shadow-sm hover:scale-105" title="Toggle Theme Color">
-                            <i data-lucide="palette" class="w-5 h-5"></i>
+                        <button id="btnOpenColorModal" class="p-2 md:p-3 bg-[#e8f6f8] dark:bg-[#222] text-[#51b8cb] rounded-lg md:rounded-xl transition-all shadow-sm hover:scale-105" title="Toggle Theme Color">
+                            <i data-lucide="palette" class="w-4 h-4 md:w-5 md:h-5"></i>
                         </button>
 
                         <!-- Theme Toggle next to download -->
-                        <button id="main-theme-toggle" class="p-3 bg-[#e8f6f8] dark:bg-[#222] text-[#51b8cb] rounded-xl transition-all shadow-sm hover:scale-105" title="Toggle Light/Dark Mode">
-                            <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
-                            <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                        <button id="main-theme-toggle" class="p-2 md:p-3 bg-[#e8f6f8] dark:bg-[#222] text-[#51b8cb] rounded-lg md:rounded-xl transition-all shadow-sm hover:scale-105" title="Toggle Light/Dark Mode">
+                            <i data-lucide="moon" class="w-4 h-4 md:w-5 md:h-5 dark:hidden"></i>
+                            <i data-lucide="sun" class="w-4 h-4 md:w-5 md:h-5 hidden dark:block"></i>
                         </button>
 
-                        <button id="btnDownload" class="p-3 bg-[#51b8cb] hover:bg-[#3a98aa] text-white rounded-xl transition-all shadow-md flex items-center justify-center group" title="Download PNG">
-                            <i data-lucide="download" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                        <button id="btnDownload" class="p-2 md:p-3 bg-[#51b8cb] hover:bg-[#3a98aa] text-white rounded-lg md:rounded-xl transition-all shadow-md flex items-center justify-center group" title="Download PNG">
+                            <i data-lucide="download" class="w-4 h-4 md:w-5 md:h-5 group-hover:scale-110 transition-transform"></i>
                         </button>
                     </div>
                 </div>
 
-                <div class="editor-scroll-area p-8 pt-6 space-y-6">
-                    <div id="cardTabsContainer" class="flex gap-2 overflow-x-auto pb-4 border-b border-gray-100 mb-6 custom-scrollbar shrink-0 w-full items-center"></div>
+                <div class="editor-scroll-area p-5 md:p-8 pt-4 md:pt-6 space-y-6">
+                    <div id="cardTabsContainer" class="flex gap-2 overflow-x-auto pb-4 border-b border-gray-100 mb-4 md:mb-6 custom-scrollbar shrink-0 w-full items-center"></div>
                     
                     <!-- Hidden inputs to maintain application state without the sidebar UI -->
                     <input type="hidden" id="inputTitle" value="">
                     <textarea id="inputDef" class="hidden"></textarea>
 
                     <div class="pt-2">
-                        <div class="flex items-center justify-between mb-2">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
                             <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Reference Images</label>
                             
                             <!-- Image Layout Dropdown -->
@@ -221,11 +223,11 @@
                             </div>
                         </div>
 
-                        <div class="group relative flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 dark:border-gray-700 border-dashed rounded-2xl cursor-pointer bg-[#FAFAFA] hover:bg-[#e8f6f8] dark:bg-[#111] dark:hover:bg-[#222] transition-all overflow-hidden">
+                        <div class="group relative flex flex-col items-center justify-center w-full h-24 md:h-32 border-2 border-gray-300 dark:border-gray-700 border-dashed rounded-xl md:rounded-2xl cursor-pointer bg-[#FAFAFA] hover:bg-[#e8f6f8] dark:bg-[#111] dark:hover:bg-[#222] transition-all overflow-hidden">
                             <input type="file" id="imageInput" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept="image/*" multiple>
                             <div class="flex flex-col items-center justify-center pointer-events-none text-center px-4">
-                                <i data-lucide="image-plus" class="w-6 h-6 text-gray-400 mb-2 transition-colors group-hover:text-[#51b8cb]"></i>
-                                <p class="text-[10px] text-gray-500">Click to upload or paste images</p>
+                                <i data-lucide="image-plus" class="w-5 h-5 md:w-6 md:h-6 text-gray-400 mb-2 transition-colors group-hover:text-[#51b8cb]"></i>
+                                <p class="text-[9px] md:text-[10px] text-gray-500">Click to upload or paste images</p>
                             </div>
                         </div>
                         <div id="uploadPreviewContainer" class="flex flex-wrap gap-2 mt-3"></div>
@@ -233,8 +235,8 @@
                         <p class="text-[9px] text-gray-400 mt-4 italic font-medium uppercase tracking-widest text-center">* Hint: Swipe horizontally on images in preview to resize</p>
                     </div>
 
-                    <div id="themeColorSection" class="hidden bg-[#FAFAFA] dark:bg-[#111] rounded-[2.5rem] p-8 border border-gray-200 dark:border-[#333] mb-10 animate-fade-in">
-                        <div class="flex items-center justify-between mb-4">
+                    <div id="themeColorSection" class="hidden bg-[#FAFAFA] dark:bg-[#111] rounded-[1.5rem] md:rounded-[2.5rem] p-5 md:p-8 border border-gray-200 dark:border-[#333] mb-6 md:mb-10 animate-fade-in">
+                        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
                             <label class="block text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest m-0">Card Theme Color</label>
                             
                             <div class="flex items-center gap-2">
@@ -244,8 +246,8 @@
                                 </button>
 
                                 <!-- Background Blend Dropdown -->
-                                <div class="relative shrink-0 w-28">
-                                    <button id="blendBtn" class="w-full px-2 py-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-[#51b8cb] text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group hover:border-gray-300 dark:hover:border-gray-600">
+                                <div class="relative shrink-0 w-24 md:w-28">
+                                    <button id="blendBtn" class="w-full px-2 py-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-[#51b8cb] text-[9px] md:text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group hover:border-gray-300 dark:hover:border-gray-600">
                                         <span class="text-gray-400">Blend</span>
                                         <span id="blendValueLabel">10%</span>
                                         <i data-lucide="chevron-down" class="w-3 h-3 text-gray-400 transition-transform group-hover:translate-y-0.5 shrink-0"></i>
@@ -257,7 +259,7 @@
                             </div>
                         </div>
                         
-                        <div id="colorMap" class="mb-4">
+                        <div id="colorMap" class="mb-4 h-32 md:h-48">
                             <div class="color-map-white"></div>
                             <div class="color-map-black"></div>
                             <div id="colorMarker" style="top: 20%; left: 80%;"></div>
@@ -270,47 +272,47 @@
                 </div>
             </section>
 
-            <section class="lg:sticky lg:top-8 animate-fade-in flex justify-center overflow-x-auto p-4">
-                <!-- Enlarged card container: 1050px width, 600px min-height -->
-                <div id="cardContainer" class="rounded-[3rem] card-shadow overflow-hidden border-[6px] border-[#51b8cb] relative transition-all duration-500 min-h-[600px]" style="width: 1050px; background-color: #ffffff;">
-                    <div class="pt-8 md:pt-10 px-16 md:px-20 pb-16 md:pb-20 group/card flex flex-col h-full">
+            <section class="lg:sticky lg:top-8 animate-fade-in flex justify-center w-full mb-10 overflow-hidden">
+                <!-- Mobile optimized card container: Responsive Width -->
+                <div id="cardContainer" class="rounded-[2rem] md:rounded-[3rem] card-shadow overflow-hidden border-[4px] md:border-[6px] border-[#51b8cb] relative transition-all duration-500 min-h-[400px] md:min-h-[600px] w-full max-w-[1050px]" style="background-color: #ffffff;">
+                    <div class="pt-6 md:pt-10 px-6 md:px-20 pb-8 md:pb-20 group/card flex flex-col h-full">
                         
                         <!-- Title Restore Button -->
-                        <div id="cardTitleRestore" onclick="restoreTitle()" class="hidden cursor-pointer py-2 px-4 -mx-4 rounded-2xl border-2 border-dashed border-transparent hover:border-[#d0ebf0] dark:hover:border-[#333] text-center text-gray-400 hover:text-[#51b8cb] opacity-0 group-hover/card:opacity-100 transition-all flex items-center justify-center gap-2">
+                        <div id="cardTitleRestore" onclick="restoreTitle()" class="hidden cursor-pointer py-2 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl border-2 border-dashed border-transparent hover:border-[#d0ebf0] dark:hover:border-[#333] text-center text-gray-400 hover:text-[#51b8cb] opacity-100 lg:opacity-0 group-hover/card:opacity-100 transition-all flex items-center justify-center gap-2">
                             <i data-lucide="plus" class="w-4 h-4"></i> <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Add Title / Category</span>
                         </div>
 
                         <!-- Editable Title Section -->
-                        <div id="cardTitleSection" class="group/title relative flex items-center flex-wrap gap-4 py-1 px-4 -mx-4 rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                        <div id="cardTitleSection" class="group/title relative flex items-center flex-wrap gap-2 md:gap-4 py-1 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                             <h2 id="cardWord" contenteditable="true" data-placeholder="Enter Term / Title..." class="font-bold tracking-tight leading-tight outline-none flex-1 min-w-[50%]" style="text-decoration: none;"></h2>
-                            <span id="cardType" contenteditable="true" data-placeholder="Category..." class="text-xl font-bold px-4 py-1 rounded-none outline-none min-w-[80px] empty:min-w-[100px]"></span>
+                            <span id="cardType" contenteditable="true" data-placeholder="Category..." class="text-sm md:text-xl font-bold px-3 py-1 md:px-4 md:py-1 rounded-none outline-none min-w-[80px] empty:min-w-[100px]"></span>
                             
-                            <button id="addCategoryBtn" onclick="restoreCategory()" class="hidden text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-lg border-2 border-dashed border-gray-300 dark:border-[#333] text-gray-400 hover:border-[#51b8cb] hover:text-[#51b8cb] transition-all flex items-center gap-1 opacity-0 group-hover/title:opacity-100 outline-none" title="Add Category">
+                            <button id="addCategoryBtn" onclick="restoreCategory()" class="hidden text-[9px] md:text-[10px] font-bold uppercase tracking-widest px-2 py-1 md:px-3 md:py-1 rounded-lg border-2 border-dashed border-gray-300 dark:border-[#333] text-gray-400 hover:border-[#51b8cb] hover:text-[#51b8cb] transition-all flex items-center gap-1 opacity-100 lg:opacity-0 group-hover/title:opacity-100 outline-none" title="Add Category">
                                 <i data-lucide="plus" class="w-3 h-3"></i> Add Category
                             </button>
 
-                            <button onclick="clearTitle()" class="clear-btn absolute top-1/2 -translate-y-1/2 right-4 p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-0 group-hover/title:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" title="Remove Title Section">
-                                <i data-lucide="x" class="w-4 h-4"></i>
+                            <button onclick="clearTitle()" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 group-hover/title:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" title="Remove Title Section">
+                                <i data-lucide="x" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
                             </button>
                         </div>
                         
-                        <div id="cardContent" class="space-y-0 mt-1">
+                        <div id="cardContent" class="space-y-0 mt-1 flex-1">
                             
                             <!-- Def Restore Button -->
-                            <div id="cardDefRestore" onclick="restoreDef()" class="hidden cursor-pointer py-2 px-4 -mx-4 rounded-2xl border-2 border-dashed border-transparent hover:border-[#d0ebf0] dark:hover:border-[#333] text-center text-gray-400 hover:text-[#51b8cb] opacity-0 group-hover/card:opacity-100 transition-all flex items-center justify-center gap-2">
+                            <div id="cardDefRestore" onclick="restoreDef()" class="hidden cursor-pointer py-2 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl border-2 border-dashed border-transparent hover:border-[#d0ebf0] dark:hover:border-[#333] text-center text-gray-400 hover:text-[#51b8cb] opacity-100 lg:opacity-0 group-hover/card:opacity-100 transition-all flex items-center justify-center gap-2">
                                 <i data-lucide="plus" class="w-4 h-4"></i> <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Add Notes</span>
                             </div>
 
                             <!-- Editable Definition Section -->
-                            <div id="cardNotesSection" class="group/def relative py-1 px-4 -mx-4 rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                            <div id="cardNotesSection" class="group/def relative py-1 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                                 <div id="cardDef" contenteditable="true" data-placeholder="Enter definition or notes..." class="font-medium leading-relaxed whitespace-pre-wrap outline-none" style="text-decoration: none; min-height: 1.5em;"></div>
                                 
-                                <button onclick="clearDef()" class="clear-btn absolute top-1/2 -translate-y-1/2 right-4 p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-0 group-hover/def:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" title="Remove Notes Section">
-                                    <i data-lucide="x" class="w-4 h-4"></i>
+                                <button onclick="clearDef()" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 group-hover/def:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" title="Remove Notes Section">
+                                    <i data-lucide="x" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
                                 </button>
                             </div>
                             
-                            <div id="cardImagesContainer" class="flex flex-wrap gap-9 w-full justify-center" style="padding-top: 0px;"></div>
+                            <div id="cardImagesContainer" class="flex flex-wrap gap-4 md:gap-9 w-full justify-center" style="padding-top: 0px;"></div>
                         </div>
                     </div>
                 </div>
@@ -858,7 +860,12 @@
             const finalColor = activeColor;
             const textColor = getDarkerShade(finalColor, 0.4); // Darkened for better contrast readability
             document.getElementById('blendValueLabel').style.color = finalColor;
-            const card = document.getElementById('cardContainer'); card.style.width = '1050px'; card.style.borderColor = finalColor; card.style.backgroundColor = getLightShade(finalColor, blend);
+            
+            const card = document.getElementById('cardContainer'); 
+            card.style.width = '100%'; // Ensures mobile responsive width
+            card.style.maxWidth = '1050px'; // Maintains expected export boundaries
+            card.style.borderColor = finalColor; 
+            card.style.backgroundColor = getLightShade(finalColor, blend);
             
             const titleSection = document.getElementById('cardTitleSection');
             const titleRestore = document.getElementById('cardTitleRestore');
@@ -905,8 +912,8 @@
             }
             
             const cardImages = document.getElementById('cardImagesContainer');
-            if (imageCols === 0) { cardImages.className = `flex flex-wrap gap-9 w-full justify-center`; cardImages.style.gridTemplateColumns = ''; } 
-            else { cardImages.className = `grid gap-9 w-full items-start`; cardImages.style.gridTemplateColumns = `repeat(${imageCols}, minmax(0, 1fr))`; }
+            if (imageCols === 0) { cardImages.className = `flex flex-wrap gap-4 md:gap-9 w-full justify-center`; cardImages.style.gridTemplateColumns = ''; } 
+            else { cardImages.className = `grid gap-4 md:gap-9 w-full items-start`; cardImages.style.gridTemplateColumns = `repeat(${imageCols}, minmax(0, 1fr))`; }
             
             // Explicit padding instead of margin to prevent html2canvas collapse bug
             cardImages.style.paddingTop = uploadedImages.length > 0 ? '3rem' : '0px';
@@ -1098,6 +1105,7 @@
             
             const card = document.getElementById('cardContainer'), f = document.getElementById('inputTitle').value.trim() || "Card";
             try {
+                // Keep the exact same inline responsive widths during capture
                 card.classList.remove('card-shadow');
                 const imgs = card.querySelectorAll('img');
                 await Promise.all(Array.from(imgs).map(img => img.complete ? Promise.resolve() : new Promise(r => { img.onload = r; img.onerror = r; })));
