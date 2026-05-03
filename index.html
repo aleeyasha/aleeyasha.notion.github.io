@@ -11,33 +11,33 @@
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body { font-family: 'Poppins', sans-serif; background-color: #F3EBE3; color: #222222; overflow-x: hidden; transition: background-color 0.3s ease, color 0.3s ease; }
+        body { font-family: 'Poppins', sans-serif; background-color: #e8f6f8; color: #222222; overflow-x: hidden; transition: background-color 0.3s ease, color 0.3s ease; }
         .dark body { background-color: #0f0f0f; color: #f1f1f1; }
-        .card-shadow { box-shadow: 0 20px 40px -10px rgba(172, 135, 102, 0.15), 0 0 15px rgba(0, 0, 0, 0.02); }
+        .card-shadow { box-shadow: 0 20px 40px -10px rgba(81, 184, 203, 0.15), 0 0 15px rgba(0, 0, 0, 0.02); }
         .dark .card-shadow { box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 0, 0, 0.2); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
         
-        input, textarea, select { background-color: #FFFFFF !important; border-color: #E5D7CC !important; color: #222222 !important; transition: all 0.3s ease !important; }
+        input, textarea, select { background-color: #FFFFFF !important; border-color: #d0ebf0 !important; color: #222222 !important; transition: all 0.3s ease !important; }
         .dark input, .dark textarea, .dark select { background-color: #111 !important; border-color: #333 !important; color: #eee !important; }
-        input:focus, textarea:focus, select:focus { border-color: #AC8766 !important; box-shadow: 0 0 0 2px rgba(172, 135, 102, 0.15) !important; }
+        input:focus, textarea:focus, select:focus { border-color: #51b8cb !important; box-shadow: 0 0 0 2px rgba(81, 184, 203, 0.15) !important; }
         
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #AC8766; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #906A49; }
+        ::-webkit-scrollbar-thumb { background: #51b8cb; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3a98aa; }
 
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]:focus { outline: none; }
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: #E5D7CC; border-radius: 3px; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: #d0ebf0; border-radius: 3px; }
         .dark input[type=range]::-webkit-slider-runnable-track { background: #333; }
         input[type=range]::-webkit-slider-thumb { height: 18px; width: 18px; border-radius: 50%; cursor: pointer; -webkit-appearance: none; margin-top: -6px; }
 
         #inputHue { height: 12px; border-radius: 6px; background: linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%); margin: 15px 0; }
         #inputHue::-webkit-slider-runnable-track { background: transparent; height: 12px; }
-        #inputHue::-webkit-slider-thumb { height: 20px; width: 20px; border-radius: 50%; background: white; border: 3px solid #AC8766; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; -webkit-appearance: none; margin-top: -4px; }
+        #inputHue::-webkit-slider-thumb { height: 20px; width: 20px; border-radius: 50%; background: white; border: 3px solid #51b8cb; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; -webkit-appearance: none; margin-top: -4px; }
 
-        #colorMap { width: 100%; height: 200px; position: relative; cursor: crosshair; border-radius: 12px; overflow: hidden; background-color: red; border: 1px solid #E5D7CC; }
+        #colorMap { width: 100%; height: 200px; position: relative; cursor: crosshair; border-radius: 12px; overflow: hidden; background-color: red; border: 1px solid #d0ebf0; }
         .dark #colorMap { border-color: #333; }
         .color-map-white { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to right, #fff, rgba(255,255,255,0)); }
         .color-map-black { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, #000, rgba(0,0,0,0)); }
@@ -46,6 +46,7 @@
         #cardContainer { backface-visibility: hidden; -webkit-font-smoothing: antialiased; margin: 0 auto; transition: all 0.3s ease; }
         .editor-scroll-area { max-height: 75vh; overflow-y: auto; scrollbar-gutter: stable; }
 
+        #builderArea h2 { color: #222222 !important; }
         .dark #builderArea { background-color: #1a1a1a !important; border-color: #333 !important; }
         .dark #builderArea h2, .dark #builderArea label { color: #f1f1f1 !important; }
         .dark .bg-\[\#FAFAFA\] { background-color: #111 !important; border-color: #333 !important; }
@@ -65,20 +66,20 @@
         .np-title-input:focus { outline: none; box-shadow: none !important; }
         
         .note-item { transition: all 0.2s ease; cursor: pointer; }
-        .note-item.active { background-color: #F3EBE3; color: #AC8766; }
-        .dark .note-item.active { background-color: #222; color: #AC8766; }
-        .note-item:hover:not(.active) { background-color: rgba(243, 235, 227, 0.5); }
+        .note-item.active { background-color: #e8f6f8; color: #51b8cb; }
+        .dark .note-item.active { background-color: #222; color: #51b8cb; }
+        .note-item:hover:not(.active) { background-color: rgba(232, 246, 248, 0.5); }
         .dark .note-item:hover:not(.active) { background-color: rgba(255, 255, 255, 0.05); }
         
         .custom-scrollbar::-webkit-scrollbar { height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #AC8766; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #906A49; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #51b8cb; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #3a98aa; }
         .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; }
         .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #555; }
 
         .dropdown-item { padding: 10px 16px; cursor: pointer; font-size: 11px; font-weight: 600; transition: all 0.2s; border-radius: 8px; margin: 0 4px; }
-        .dropdown-item:hover { background-color: #F3EBE3; color: #AC8766; }
+        .dropdown-item:hover { background-color: #e8f6f8; color: #51b8cb; }
         .dark .dropdown-item:hover { background-color: #333; }
 
         #brand-logo-container { cursor: pointer; }
@@ -104,9 +105,9 @@
 <body class="relative min-h-screen">
 
     <!-- Notepad Overlay -->
-    <div id="notepad-overlay" class="fixed inset-0 z-50 hidden bg-[#F3EBE3] dark:bg-[#0f0f0f] p-4 md:p-10 h-screen overflow-hidden flex flex-col transition-colors duration-500">
+    <div id="notepad-overlay" class="fixed inset-0 z-50 hidden bg-[#e8f6f8] dark:bg-[#0f0f0f] p-4 md:p-10 h-screen overflow-hidden flex flex-col transition-colors duration-500">
         <div class="absolute top-4 right-4 md:top-8 md:right-8 z-50">
-           <button id="close-notepad-btn" class="bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full p-3 border border-[#E5D7CC] dark:border-[#333] text-[#AC8766] hover:scale-105 transition-all outline-none" title="Back to Cards">
+           <button id="close-notepad-btn" class="bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full p-3 border border-[#d0ebf0] dark:border-[#333] text-[#51b8cb] hover:scale-105 transition-all outline-none" title="Back to Cards">
                <i data-lucide="x" class="w-5 h-5"></i>
            </button>
         </div>
@@ -114,7 +115,7 @@
             <!-- Sidebar -->
             <aside class="w-64 md:w-72 border-r border-gray-100 flex flex-col bg-white/50 dark:bg-black/20 dark:border-gray-800">
                 <div class="p-6 border-b border-gray-100 dark:border-gray-800">
-                    <button id="new-note-btn" class="w-full bg-[#AC8766] hover:bg-[#906A49] text-white py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-all">
+                    <button id="new-note-btn" class="w-full bg-[#51b8cb] hover:bg-[#3a98aa] text-white py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-all">
                         <i data-lucide="plus" class="w-4 h-4"></i> New Note
                     </button>
                 </div>
@@ -127,8 +128,8 @@
             <main class="flex-1 flex flex-col p-8 md:p-12 relative">
                 <header class="flex flex-wrap justify-between items-center mb-8 gap-4">
                     <div class="flex items-center gap-4 flex-1 text-inherit">
-                        <div class="w-10 h-10 bg-[#AC8766]/10 rounded-xl flex items-center justify-center shrink-0">
-                            <i data-lucide="edit-3" class="text-[#AC8766] w-5 h-5"></i>
+                        <div class="w-10 h-10 bg-[#51b8cb]/10 rounded-xl flex items-center justify-center shrink-0">
+                            <i data-lucide="edit-3" class="text-[#51b8cb] w-5 h-5"></i>
                         </div>
                         <div class="flex-1">
                             <input type="text" id="note-title" class="np-title-input placeholder:text-gray-300 dark:placeholder:text-gray-600" placeholder="Untitled Note">
@@ -136,16 +137,16 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2 pr-10 md:pr-0">
-                        <button id="np-undo-btn" class="np-control-btn p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#AC8766]" title="Undo">
+                        <button id="np-undo-btn" class="np-control-btn p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#51b8cb]" title="Undo">
                             <i data-lucide="undo" class="w-4 h-4"></i>
                         </button>
-                        <button id="np-redo-btn" class="np-control-btn p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#AC8766]" title="Redo">
+                        <button id="np-redo-btn" class="np-control-btn p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#51b8cb]" title="Redo">
                             <i data-lucide="redo" class="w-4 h-4"></i>
                         </button>
-                        <button id="np-copy-btn" class="np-control-btn p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#AC8766]" title="Copy to Clipboard">
+                        <button id="np-copy-btn" class="np-control-btn p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#51b8cb]" title="Copy to Clipboard">
                             <i data-lucide="copy" class="w-4 h-4"></i>
                         </button>
-                        <button id="np-download-btn" class="np-control-btn p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#AC8766]" title="Download as .txt">
+                        <button id="np-download-btn" class="np-control-btn p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#51b8cb]" title="Download as .txt">
                             <i data-lucide="download" class="w-4 h-4"></i>
                         </button>
                         <button id="np-delete-btn" class="np-control-btn p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-red-500" title="Delete Note">
@@ -158,7 +159,7 @@
                 
                 <footer class="mt-8 pt-6 border-t border-gray-50 dark:border-gray-800 flex justify-between items-center">
                     <div id="word-count" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">0 Words</div>
-                    <div id="save-status" class="text-[10px] font-bold text-[#AC8766] uppercase tracking-widest opacity-60">Synced</div>
+                    <div id="save-status" class="text-[10px] font-bold text-[#51b8cb] uppercase tracking-widest opacity-60">Synced</div>
                 </footer>
             </main>
         </div>
@@ -169,7 +170,7 @@
         <!-- Main Layout -->
         <div class="w-full max-w-[1800px] px-4 grid grid-cols-1 lg:grid-cols-[550px_1fr] gap-12 items-start">
             
-            <section id="builderArea" class="bg-white border border-[#E5D7CC] rounded-[2rem] card-shadow animate-fade-in relative flex flex-col max-h-[85vh] overflow-hidden">
+            <section id="builderArea" class="bg-white border border-[#d0ebf0] rounded-[2rem] card-shadow animate-fade-in relative flex flex-col max-h-[85vh] overflow-hidden">
                 <div class="flex items-center justify-between border-b border-gray-100 shrink-0 p-8 pb-4">
                     <div class="flex items-center gap-4">
                         <!-- Main Icon (Now opens Notepad) -->
@@ -181,17 +182,17 @@
 
                     <div class="flex items-center gap-3">
                         <!-- Open Theme Color Button -->
-                        <button id="btnOpenColorModal" class="p-3 bg-[#F3EBE3] dark:bg-[#222] text-[#AC8766] rounded-xl transition-all shadow-sm hover:scale-105" title="Toggle Theme Color">
+                        <button id="btnOpenColorModal" class="p-3 bg-[#e8f6f8] dark:bg-[#222] text-[#51b8cb] rounded-xl transition-all shadow-sm hover:scale-105" title="Toggle Theme Color">
                             <i data-lucide="palette" class="w-5 h-5"></i>
                         </button>
 
                         <!-- Theme Toggle next to download -->
-                        <button id="main-theme-toggle" class="p-3 bg-[#F3EBE3] dark:bg-[#222] text-[#AC8766] rounded-xl transition-all shadow-sm hover:scale-105" title="Toggle Light/Dark Mode">
+                        <button id="main-theme-toggle" class="p-3 bg-[#e8f6f8] dark:bg-[#222] text-[#51b8cb] rounded-xl transition-all shadow-sm hover:scale-105" title="Toggle Light/Dark Mode">
                             <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
                             <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
                         </button>
 
-                        <button id="btnDownload" class="p-3 bg-[#AC8766] hover:bg-[#906A49] text-white rounded-xl transition-all shadow-md flex items-center justify-center group" title="Download PNG">
+                        <button id="btnDownload" class="p-3 bg-[#51b8cb] hover:bg-[#3a98aa] text-white rounded-xl transition-all shadow-md flex items-center justify-center group" title="Download PNG">
                             <i data-lucide="download" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
                         </button>
                     </div>
@@ -210,20 +211,20 @@
                             
                             <!-- Image Layout Dropdown -->
                             <div class="relative shrink-0 w-24">
-                                <button id="imageColsBtn" class="w-full px-2 py-1.5 bg-[#F3EBE3] dark:bg-[#222] text-[#AC8766] text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group border border-transparent hover:border-[#E5D7CC] dark:hover:border-[#333]">
+                                <button id="imageColsBtn" class="w-full px-2 py-1.5 bg-[#e8f6f8] dark:bg-[#222] text-[#51b8cb] text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group border border-transparent hover:border-[#d0ebf0] dark:hover:border-[#333]">
                                     <span id="currentImageColsText">Auto</span>
                                     <i data-lucide="chevron-down" class="w-3 h-3 transition-transform group-hover:translate-y-0.5 shrink-0"></i>
                                 </button>
-                                <div id="imageColsDropdownMenu" class="hidden absolute right-0 mt-2 w-full bg-white dark:bg-[#1a1a1a] border border-[#E5D7CC] dark:border-[#333] rounded-xl shadow-xl z-50 overflow-hidden">
+                                <div id="imageColsDropdownMenu" class="hidden absolute right-0 mt-2 w-full bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-50 overflow-hidden">
                                     <div id="imageColsOptions" class="py-1"></div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="group relative flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 dark:border-gray-700 border-dashed rounded-2xl cursor-pointer bg-[#FAFAFA] hover:bg-[#F3EBE3] dark:bg-[#111] dark:hover:bg-[#222] transition-all overflow-hidden">
+                        <div class="group relative flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 dark:border-gray-700 border-dashed rounded-2xl cursor-pointer bg-[#FAFAFA] hover:bg-[#e8f6f8] dark:bg-[#111] dark:hover:bg-[#222] transition-all overflow-hidden">
                             <input type="file" id="imageInput" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept="image/*" multiple>
                             <div class="flex flex-col items-center justify-center pointer-events-none text-center px-4">
-                                <i data-lucide="image-plus" class="w-6 h-6 text-gray-400 mb-2 transition-colors group-hover:text-[#AC8766]"></i>
+                                <i data-lucide="image-plus" class="w-6 h-6 text-gray-400 mb-2 transition-colors group-hover:text-[#51b8cb]"></i>
                                 <p class="text-[10px] text-gray-500">Click to upload or paste images</p>
                             </div>
                         </div>
@@ -238,18 +239,18 @@
                             
                             <div class="flex items-center gap-2">
                                 <!-- Random Palette Button -->
-                                <button id="btnRandomColor" class="p-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-gray-400 hover:text-[#AC8766] rounded-lg transition-all shadow-sm hover:border-gray-300 dark:hover:border-gray-600 outline-none" title="Generate Random Palette">
+                                <button id="btnRandomColor" class="p-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-gray-400 hover:text-[#51b8cb] rounded-lg transition-all shadow-sm hover:border-gray-300 dark:hover:border-gray-600 outline-none" title="Generate Random Palette">
                                     <i data-lucide="shuffle" class="w-4 h-4"></i>
                                 </button>
 
                                 <!-- Background Blend Dropdown -->
                                 <div class="relative shrink-0 w-28">
-                                    <button id="blendBtn" class="w-full px-2 py-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-[#AC8766] text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group hover:border-gray-300 dark:hover:border-gray-600">
+                                    <button id="blendBtn" class="w-full px-2 py-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-[#51b8cb] text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group hover:border-gray-300 dark:hover:border-gray-600">
                                         <span class="text-gray-400">Blend</span>
                                         <span id="blendValueLabel">10%</span>
                                         <i data-lucide="chevron-down" class="w-3 h-3 text-gray-400 transition-transform group-hover:translate-y-0.5 shrink-0"></i>
                                     </button>
-                                    <div id="blendDropdownMenu" class="hidden absolute right-0 mt-2 w-full bg-white dark:bg-[#1a1a1a] border border-[#E5D7CC] dark:border-[#333] rounded-xl shadow-xl z-50 overflow-hidden">
+                                    <div id="blendDropdownMenu" class="hidden absolute right-0 mt-2 w-full bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-50 overflow-hidden">
                                         <div id="blendOptions" class="py-1"></div>
                                     </div>
                                 </div>
@@ -263,7 +264,7 @@
                         </div>
 
                         <div class="px-1">
-                            <input type="range" id="inputHue" min="0" max="360" value="28" class="cursor-pointer">
+                            <input type="range" id="inputHue" min="0" max="360" value="189" class="cursor-pointer">
                         </div>
                     </div>
                 </div>
@@ -271,11 +272,11 @@
 
             <section class="lg:sticky lg:top-8 animate-fade-in flex justify-center overflow-x-auto p-4">
                 <!-- Enlarged card container: 1050px width, 600px min-height -->
-                <div id="cardContainer" class="rounded-[3rem] card-shadow overflow-hidden border-[6px] border-[#AC8766] relative transition-all duration-500 min-h-[600px]" style="width: 1050px; background-color: #ffffff;">
+                <div id="cardContainer" class="rounded-[3rem] card-shadow overflow-hidden border-[6px] border-[#51b8cb] relative transition-all duration-500 min-h-[600px]" style="width: 1050px; background-color: #ffffff;">
                     <div class="pt-8 md:pt-10 px-16 md:px-20 pb-16 md:pb-20 group/card flex flex-col h-full">
                         
                         <!-- Title Restore Button -->
-                        <div id="cardTitleRestore" onclick="restoreTitle()" class="hidden cursor-pointer py-2 px-4 -mx-4 rounded-2xl border-2 border-dashed border-transparent hover:border-[#E5D7CC] dark:hover:border-[#333] text-center text-gray-400 hover:text-[#AC8766] opacity-0 group-hover/card:opacity-100 transition-all flex items-center justify-center gap-2">
+                        <div id="cardTitleRestore" onclick="restoreTitle()" class="hidden cursor-pointer py-2 px-4 -mx-4 rounded-2xl border-2 border-dashed border-transparent hover:border-[#d0ebf0] dark:hover:border-[#333] text-center text-gray-400 hover:text-[#51b8cb] opacity-0 group-hover/card:opacity-100 transition-all flex items-center justify-center gap-2">
                             <i data-lucide="plus" class="w-4 h-4"></i> <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Add Title / Category</span>
                         </div>
 
@@ -284,7 +285,7 @@
                             <h2 id="cardWord" contenteditable="true" data-placeholder="Enter Term / Title..." class="font-bold tracking-tight leading-tight outline-none flex-1 min-w-[50%]" style="text-decoration: none;"></h2>
                             <span id="cardType" contenteditable="true" data-placeholder="Category..." class="text-xl font-bold px-4 py-1 rounded-none outline-none min-w-[80px] empty:min-w-[100px]"></span>
                             
-                            <button id="addCategoryBtn" onclick="restoreCategory()" class="hidden text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-lg border-2 border-dashed border-gray-300 dark:border-[#333] text-gray-400 hover:border-[#AC8766] hover:text-[#AC8766] transition-all flex items-center gap-1 opacity-0 group-hover/title:opacity-100 outline-none" title="Add Category">
+                            <button id="addCategoryBtn" onclick="restoreCategory()" class="hidden text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-lg border-2 border-dashed border-gray-300 dark:border-[#333] text-gray-400 hover:border-[#51b8cb] hover:text-[#51b8cb] transition-all flex items-center gap-1 opacity-0 group-hover/title:opacity-100 outline-none" title="Add Category">
                                 <i data-lucide="plus" class="w-3 h-3"></i> Add Category
                             </button>
 
@@ -296,13 +297,12 @@
                         <div id="cardContent" class="space-y-0 mt-1">
                             
                             <!-- Def Restore Button -->
-                            <div id="cardDefRestore" onclick="restoreDef()" class="hidden cursor-pointer py-2 px-4 -mx-4 rounded-2xl border-2 border-dashed border-transparent hover:border-[#E5D7CC] dark:hover:border-[#333] text-center text-gray-400 hover:text-[#AC8766] opacity-0 group-hover/card:opacity-100 transition-all flex items-center justify-center gap-2">
+                            <div id="cardDefRestore" onclick="restoreDef()" class="hidden cursor-pointer py-2 px-4 -mx-4 rounded-2xl border-2 border-dashed border-transparent hover:border-[#d0ebf0] dark:hover:border-[#333] text-center text-gray-400 hover:text-[#51b8cb] opacity-0 group-hover/card:opacity-100 transition-all flex items-center justify-center gap-2">
                                 <i data-lucide="plus" class="w-4 h-4"></i> <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Add Notes</span>
                             </div>
 
                             <!-- Editable Definition Section -->
                             <div id="cardNotesSection" class="group/def relative py-1 px-4 -mx-4 rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                                <h3 id="cardNotesHeader" class="text-[11px] font-bold uppercase tracking-widest opacity-60 mb-0">Notes</h3>
                                 <div id="cardDef" contenteditable="true" data-placeholder="Enter definition or notes..." class="font-medium leading-relaxed whitespace-pre-wrap outline-none" style="text-decoration: none; min-height: 1.5em;"></div>
                                 
                                 <button onclick="clearDef()" class="clear-btn absolute top-1/2 -translate-y-1/2 right-4 p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-0 group-hover/def:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" title="Remove Notes Section">
@@ -319,19 +319,19 @@
     </div>
 
     <!-- Floating Context Size Menu -->
-    <div id="floatingSizeMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#E5D7CC] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-32 py-1">
+    <div id="floatingSizeMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-32 py-1">
         <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Set Size</div>
         <div id="floatingSizeOptions" class="max-h-60 overflow-y-auto custom-scrollbar"></div>
     </div>
 
     <!-- Floating Context Category Menu -->
-    <div id="floatingCategoryMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#E5D7CC] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-48 py-1">
+    <div id="floatingCategoryMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-48 py-1">
         <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Set Category</div>
         <div id="floatingCategoryOptions" class="max-h-60 overflow-y-auto custom-scrollbar"></div>
     </div>
 
     <!-- Floating Context Image Border Menu -->
-    <div id="floatingImageBorderMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#E5D7CC] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-32 py-1">
+    <div id="floatingImageBorderMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-32 py-1">
         <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Image Border</div>
         <div id="floatingImageBorderOptions" class="max-h-60 overflow-y-auto custom-scrollbar"></div>
     </div>
@@ -351,12 +351,12 @@
             "Communications": "#14b8a6"
         };
 
-        const CONSTANT_ICON_COLOR = "#AC8766"; 
+        const CONSTANT_ICON_COLOR = "#51b8cb"; 
 
-        let activeColor = "#AC8766"; 
-        let hue = 28;
-        let saturation = 40;
-        let brightness = 67;
+        let activeColor = "#51b8cb"; 
+        let hue = 189;
+        let saturation = 60;
+        let brightness = 80;
         let uploadedImages = []; // Now stores { src, scale }
 
         let cards = [];
@@ -792,7 +792,7 @@
             const newCard = { 
                 id: 'card_' + Date.now() + Math.random().toString(36).substr(2, 9), 
                 title: '', category: '-', definition: '', images: [], 
-                color: { hex: "#AC8766", hue: 28, sat: 40, bri: 67 }, 
+                color: { hex: "#51b8cb", hue: 189, sat: 60, bri: 80 }, 
                 textSize: 32, defSize: 24, imageBorder: 2, imageCols: 0, blend: 10,
                 showTitlePlaceholder: true, showDefPlaceholder: false
             };
@@ -838,7 +838,7 @@
             cards.forEach((card, index) => {
                 const isActive = card.id === activeCardId;
                 const btn = document.createElement('button');
-                btn.className = `px-4 py-2 text-xs font-bold rounded-xl whitespace-nowrap transition-all flex items-center gap-2 group ${isActive ? 'bg-[#AC8766] text-white shadow-md' : 'bg-[#F3EBE3] text-gray-500 hover:bg-[#E5D7CC] dark:bg-[#222] dark:hover:bg-[#333]'}`;
+                btn.className = `px-4 py-2 text-xs font-bold rounded-xl whitespace-nowrap transition-all flex items-center gap-2 group ${isActive ? 'bg-[#51b8cb] text-white shadow-md' : 'bg-[#e8f6f8] text-gray-500 hover:bg-[#d0ebf0] dark:bg-[#222] dark:hover:bg-[#333]'}`;
                 btn.onclick = () => switchCard(card.id);
                 btn.innerHTML = `<span id="tab-text-${card.id}">${card.title.trim() || `Card ${index + 1}`}</span>`;
                 if (cards.length > 1) {
@@ -848,7 +848,7 @@
                 }
                 container.appendChild(btn);
             });
-            const add = document.createElement('button'); add.className = "px-3 py-2 bg-white dark:bg-[#1a1a1a] border border-[#E5D7CC] dark:border-[#333] text-[#AC8766] rounded-xl hover:bg-[#F3EBE3] transition-all shrink-0";
+            const add = document.createElement('button'); add.className = "px-3 py-2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] text-[#51b8cb] rounded-xl hover:bg-[#e8f6f8] transition-all shrink-0";
             add.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i>'; add.onclick = createCard; container.appendChild(add);
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
@@ -856,13 +856,14 @@
         function updatePreview() {
             const title = document.getElementById('inputTitle').value, category = currentSelectedCategory, definition = document.getElementById('inputDef').value, blend = currentBlendPercentage, textSize = currentSelectedSize, defSize = currentSelectedDefSize, imgBorder = currentImageBorder, imageCols = currentImageCols;
             const finalColor = activeColor;
+            const textColor = getDarkerShade(finalColor, 0.4); // Darkened for better contrast readability
             document.getElementById('blendValueLabel').style.color = finalColor;
             const card = document.getElementById('cardContainer'); card.style.width = '1050px'; card.style.borderColor = finalColor; card.style.backgroundColor = getLightShade(finalColor, blend);
             
             const titleSection = document.getElementById('cardTitleSection');
             const titleRestore = document.getElementById('cardTitleRestore');
             const word = document.getElementById('cardWord'); 
-            word.style.color = finalColor; 
+            word.style.color = textColor; 
             word.style.fontSize = textSize + 'px'; 
             if (word.innerText !== title) word.innerText = title; 
             
@@ -871,7 +872,7 @@
 
             if (category !== '-') { 
                 type.style.backgroundColor = hexToRgba(finalColor, 0.15); 
-                type.style.color = finalColor; 
+                type.style.color = textColor; 
                 if (type.innerText !== category) type.innerText = category; 
                 type.classList.remove('hidden');
                 addCatBtn.classList.add('hidden');
@@ -895,7 +896,7 @@
                 notesSection.classList.remove('hidden');
                 defRestore.classList.add('hidden');
                 const cardDef = document.getElementById('cardDef');
-                cardDef.style.color = finalColor; 
+                cardDef.style.color = textColor; 
                 cardDef.style.fontSize = defSize + 'px'; 
                 if (cardDef.innerText !== definition) cardDef.innerText = definition;
             } else {
@@ -946,8 +947,28 @@
         function getDarkerShade(hex, factor = 0.7) { const rgb = hexToRgb(hex); return rgbToHex(Math.round(rgb.r * factor), Math.round(rgb.g * factor), Math.round(rgb.b * factor)); }
 
         function generateNotebookSVG() {
-            const color = CONSTANT_ICON_COLOR, darkerColor = getDarkerShade(color, 0.7);
-            return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="0" y="0" width="100" height="100" rx="25" fill="${color}"/><path d="M25 35 Q25 32 27 32 L73 32 Q75 32 75 35 L75 60 L60 75 L27 75 Q25 75 25 73 Z" fill="white"/><circle cx="28" cy="42" r="4" fill="${color}"/><circle cx="28" cy="53" r="4" fill="${color}"/><circle cx="28" cy="64" r="4" fill="${color}"/><path d="M75 60 L60 75 L60 62 Q60 60 62 60 Z" fill="${darkerColor}"/></svg>`.trim();
+            const color = CONSTANT_ICON_COLOR; 
+            const yellow = "#eed142";
+            const dark = "#222222";
+            return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                <!-- Base shape -->
+                <path d="M 25 15 L 75 15 C 80.5 15 85 19.5 85 25 L 85 65 L 65 65 C 62.2 65 60 67.2 60 70 L 60 85 L 25 85 C 19.5 85 15 80.5 15 75 L 15 25 C 15 19.5 19.5 15 25 15 Z" fill="${color}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/>
+                <!-- Folded Corner -->
+                <path d="M 85 65 L 65 85 L 65 70 C 65 67.2 67.2 65 70 65 Z" fill="${yellow}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/>
+                <!-- Rings -->
+                <g stroke="${dark}" stroke-width="4" fill="${color}">
+                    <rect x="12" y="27" width="16" height="6" rx="3" />
+                    <rect x="12" y="42" width="16" height="6" rx="3" />
+                    <rect x="12" y="57" width="16" height="6" rx="3" />
+                    <rect x="12" y="72" width="16" height="6" rx="3" />
+                </g>
+                <g fill="${dark}">
+                    <circle cx="25" cy="30" r="3" />
+                    <circle cx="25" cy="45" r="3" />
+                    <circle cx="25" cy="60" r="3" />
+                    <circle cx="25" cy="75" r="3" />
+                </g>
+            </svg>`.trim();
         }
 
         function updateFavicon() { const favicon = document.getElementById('favicon'); favicon.href = `data:image/svg+xml;base64,${btoa(generateNotebookSVG())}`; }
@@ -1062,7 +1083,7 @@
 
             document.getElementById('new-note-btn').onclick = () => { const n = { id: Date.now(), title: '', content: '', createdAt: new Date().toISOString() }; npNotes.unshift(n); select(n.id); titleInput.focus(); };
             document.getElementById('np-delete-btn').onclick = () => { if(npNotes.length <= 1) { npNotes[0].title = ''; npNotes[0].content = ''; area.value = ''; titleInput.value = ''; update(false); render(); return; } npNotes = npNotes.filter(x => x.id !== npCurrentId); select(npNotes[0].id); };
-            document.getElementById('np-copy-btn').onclick = () => { area.select(); document.execCommand('copy'); window.getSelection().removeAllRanges(); const btn = document.getElementById('np-copy-btn'), icon = btn.innerHTML; btn.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-[#AC8766]"></i>'; if (typeof lucide !== 'undefined') lucide.createIcons(); setTimeout(() => { btn.innerHTML = icon; if (typeof lucide !== 'undefined') lucide.createIcons(); }, 2000); };
+            document.getElementById('np-copy-btn').onclick = () => { area.select(); document.execCommand('copy'); window.getSelection().removeAllRanges(); const btn = document.getElementById('np-copy-btn'), icon = btn.innerHTML; btn.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-[#51b8cb]"></i>'; if (typeof lucide !== 'undefined') lucide.createIcons(); setTimeout(() => { btn.innerHTML = icon; if (typeof lucide !== 'undefined') lucide.createIcons(); }, 2000); };
             document.getElementById('np-download-btn').onclick = () => { const b = new Blob([area.value], {type:'text/plain'}), u = URL.createObjectURL(b), a = document.createElement('a'); a.href = u; a.download = `${titleInput.value || 'Untitled'}.txt`; a.click(); };
             
             area.oninput = update; 
