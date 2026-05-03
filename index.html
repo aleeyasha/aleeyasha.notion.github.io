@@ -3,9 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#51b8cb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="NotionCards">
+    
     <title>Notion</title>
-    <!-- Dynamic Favicon Link -->
+    <!-- Dynamic Favicon & PWA Links -->
     <link id="favicon" rel="icon" type="image/svg+xml">
+    <link id="apple-touch-icon" rel="apple-touch-icon">
+    <link id="manifest" rel="manifest">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
@@ -391,6 +401,7 @@
         initCards();
         initNotepad();
         if (typeof lucide !== 'undefined') lucide.createIcons();
+        initPWA(); // Initialize Progressive Web App features
 
         // Logo handles Notepad opening now
         document.getElementById('brand-logo-container').addEventListener('click', () => {
@@ -980,6 +991,57 @@
 
         function updateFavicon() { const favicon = document.getElementById('favicon'); favicon.href = `data:image/svg+xml;base64,${btoa(generateNotebookSVG())}`; }
         function updateBrandLogo() { const container = document.getElementById('brand-logo-container'); if (container) container.innerHTML = generateNotebookSVG(); }
+
+        function initPWA() {
+            // Generate Manifest dynamically based on the current icon
+            const iconDataUrl = `data:image/svg+xml;base64,${btoa(generateNotebookSVG())}`;
+            
+            // Set Apple Touch Icon
+            document.getElementById('apple-touch-icon').href = iconDataUrl;
+
+            const manifest = {
+                name: "Notion Card Builder",
+                short_name: "NotionCards",
+                start_url: ".",
+                display: "standalone",
+                background_color: "#e8f6f8",
+                theme_color: "#51b8cb",
+                icons: [{
+                    src: iconDataUrl,
+                    sizes: "512x512",
+                    type: "image/svg+xml",
+                    purpose: "any maskable"
+                }]
+            };
+
+            const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+            document.getElementById('manifest').href = URL.createObjectURL(manifestBlob);
+
+            // Register Service Worker
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    self.addEventListener('install', (e) => self.skipWaiting());
+                    self.addEventListener('activate', (e) => e.waitUntil(clients.claim()));
+                    self.addEventListener('fetch', (e) => {
+                        e.respondWith(
+                            fetch(e.request).catch(() => {
+                                return new Response("You are offline. Notion Card Builder PWA is active.");
+                            })
+                        );
+                    });
+                `;
+                const swBlob = new Blob([swCode], {type: 'application/javascript'});
+                const swUrl = URL.createObjectURL(swBlob);
+                
+                // Attempt to register the SW via Blob URL
+                // (Note: works best when exported/hosted, but provides the structure required)
+                navigator.serviceWorker.register(swUrl).then(registration => {
+                    console.log('PWA ServiceWorker registered with scope:', registration.scope);
+                }).catch(err => {
+                    console.log('PWA ServiceWorker registration failed:', err);
+                });
+            }
+        }
 
         function initNotepad() {
             const overlay = document.getElementById('notepad-overlay'), main = document.getElementById('mainLayout');
