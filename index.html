@@ -8,7 +8,7 @@
     <meta name="theme-color" content="#51b8cb">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="NotionCards">
+    <meta name="apple-mobile-web-app-title" content="Notion">
     
     <title>Notion</title>
     <!-- Dynamic Favicon & PWA Links -->
@@ -93,56 +93,18 @@
 </head>
 <body class="relative min-h-screen">
 
-    <div id="mainLayout" class="relative z-10 w-full flex flex-col items-center pt-4 md:pt-10">
-        
-        <!-- Main Layout -->
-        <div class="w-full max-w-[1800px] px-3 md:px-4 grid grid-cols-1 lg:grid-cols-[450px_1fr] xl:grid-cols-[550px_1fr] gap-6 md:gap-12 items-start">
+    <!-- Hidden inputs to maintain application state (Moved from deleted header) -->
+    <input type="hidden" id="inputTitle" value="">
+    <textarea id="inputDef" class="hidden"></textarea>
+    <input type="file" id="imageInput" class="hidden" accept="image/*" multiple>
+    <button id="btnInstallApp" class="hidden"></button>
+
+    <div id="mainLayout" class="relative z-10 w-full flex flex-col items-center pt-8 md:pt-12 pb-10">
+        <main class="w-full px-3 md:px-4 flex justify-center">
             
-            <!-- Sidebar Editor -->
-            <section id="builderArea" class="bg-white border border-[#d0ebf0] rounded-[1.5rem] md:rounded-[2rem] card-shadow animate-fade-in relative flex flex-col lg:max-h-[85vh] overflow-hidden">
-                <div id="builder-content" class="flex flex-col h-full w-full">
-                    <div class="flex items-center justify-between border-b border-gray-100 shrink-0 p-5 md:p-8 pb-4">
-                        <div class="flex items-center gap-3 md:gap-4">
-                            <!-- Main Icon (Now opens Notepad) -->
-                            <div id="brand-logo-container" class="w-8 h-8 md:w-10 md:h-10 transition-transform duration-300 shrink-0 hover:scale-110" title="Open Notepad">
-                                <!-- SVG injected via JS -->
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <h2 class="text-lg md:text-xl font-bold text-[#222222] dark:text-[#f1f1f1] tracking-tight">Notion</h2>
-                                <button id="main-theme-toggle" class="text-gray-400 hover:text-[#51b8cb] transition-colors outline-none cursor-pointer p-1" title="Toggle Light/Dark Mode">
-                                    <i data-lucide="moon" class="w-4 h-4 md:w-5 md:h-5 dark:hidden"></i>
-                                    <i data-lucide="sun" class="w-4 h-4 md:w-5 md:h-5 hidden dark:block"></i>
-                                </button>
-                            </div>
-                        </div>
+            <!-- Main Preview Card -->
+            <div id="cardContainer" class="rounded-[2rem] md:rounded-[3rem] card-shadow overflow-hidden border-[4px] md:border-[6px] border-[#51b8cb] relative transition-all duration-500 min-h-[400px] md:min-h-[600px] w-full max-w-[1050px] group/maincard" style="background-color: #ffffff;">
 
-                        <div class="flex items-center gap-2 md:gap-3">
-                            <!-- Install App Button (Hidden by default) -->
-                            <button id="btnInstallApp" class="hidden p-2 md:p-3 bg-[#e8f6f8] dark:bg-[#222] text-[#51b8cb] rounded-lg md:rounded-xl transition-all shadow-sm hover:scale-105 items-center gap-1" title="Install App">
-                                <i data-lucide="monitor-smartphone" class="w-4 h-4 md:w-5 md:h-5"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="editor-scroll-area p-5 md:p-8 pt-4 md:pt-6 space-y-6 flex-1">
-                        <div id="cardTabsContainer" class="flex flex-wrap gap-2 pb-4 border-b border-gray-100 mb-4 md:mb-6 w-full items-center"></div>
-                        
-                        <!-- Hidden inputs to maintain application state -->
-                        <input type="hidden" id="inputTitle" value="">
-                        <textarea id="inputDef" class="hidden"></textarea>
-                        
-                        <!-- Hidden File Input for Image Upload via Context Menu -->
-                        <input type="file" id="imageInput" class="hidden" accept="image/*" multiple>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Preview Section -->
-            <section class="lg:sticky lg:top-8 animate-fade-in flex justify-center w-full mb-10 overflow-hidden relative">
-                
-                <!-- Main Preview Card -->
-                <div id="cardContainer" class="rounded-[2rem] md:rounded-[3rem] card-shadow overflow-hidden border-[4px] md:border-[6px] border-[#51b8cb] relative transition-all duration-500 min-h-[400px] md:min-h-[600px] w-full max-w-[1050px] group/maincard" style="background-color: #ffffff;">
-                    
                     <!-- Quick Download Button -->
                     <button id="cardDownloadBtn" onclick="downloadPNG()" class="absolute top-4 right-4 md:top-6 md:right-6 bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md opacity-100 lg:opacity-0 group-hover/maincard:opacity-100 transition-all z-[30] hidden-in-export flex items-center justify-center hover:scale-110 w-[36px] h-[36px] md:w-[44px] md:h-[44px] outline-none" title="Download Card">
                         <i data-lucide="download" class="w-4 h-4 md:w-5 md:h-5"></i>
@@ -254,47 +216,51 @@
                 </div>
 
                 <!-- Notepad Section (Swaps with Main Preview Card) -->
-                <div id="notepadContainer" class="hidden rounded-[2rem] md:rounded-[3rem] card-shadow overflow-hidden border-[4px] md:border-[6px] border-[#51b8cb] relative transition-all duration-500 min-h-[400px] md:min-h-[600px] w-full max-w-[1050px] flex-col bg-white dark:bg-[#1a1a1a]">
-                    <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 shrink-0 p-5 md:p-8 pb-4">
-                        <div class="flex items-center gap-3 md:gap-4">
-                            <button id="close-notepad-btn" class="p-2 md:p-3 bg-[#e8f6f8] dark:bg-[#222] text-[#51b8cb] rounded-lg md:rounded-xl transition-all shadow-sm hover:scale-105 outline-none" title="Back to Cards">
+                <div id="notepadContainer" class="hidden rounded-[2rem] md:rounded-[3rem] card-shadow overflow-hidden border-[4px] md:border-[6px] border-[#51b8cb] relative transition-all duration-500 min-h-[400px] md:min-h-[600px] w-full max-w-[1050px] flex-col bg-white dark:bg-[#1a1a1a] p-6 md:p-12">
+                    
+                    <div class="flex-1 flex flex-col h-full relative z-20">
+                        
+                        <!-- Notes List Tabs & New Note Button -->
+                        <div class="flex items-center gap-2 mb-4 w-full overflow-x-auto custom-scrollbar shrink-0 pb-2 border-b border-gray-100 dark:border-gray-800">
+                            <div id="notes-list" class="flex gap-2 items-center flex-1"></div>
+                            <button id="new-note-btn" class="p-2 bg-[#e8f6f8] dark:bg-[#222] text-[#51b8cb] rounded-lg transition-all shadow-sm hover:scale-105 shrink-0" title="New Note">
+                                <i data-lucide="plus" class="w-4 h-4 md:w-5 md:h-5"></i>
+                            </button>
+                            <!-- Moved Switch Back Button -->
+                            <button id="switchToPreviewBtn" class="p-2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] text-gray-500 hover:text-[#51b8cb] rounded-lg transition-all shadow-sm hover:scale-105 shrink-0 outline-none" title="Back to Card">
                                 <i data-lucide="arrow-left" class="w-4 h-4 md:w-5 md:h-5"></i>
                             </button>
-                            <h2 class="text-lg md:text-xl font-bold text-[#222222] dark:text-[#f1f1f1] tracking-tight">Notepad</h2>
                         </div>
-                        <button id="new-note-btn" class="p-2 md:p-3 bg-[#51b8cb] hover:bg-[#3a98aa] text-white rounded-lg md:rounded-xl transition-all shadow-sm hover:scale-105 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest">
-                            <i data-lucide="plus" class="w-4 h-4 md:w-5 md:h-5"></i> <span class="hidden md:inline">New Note</span>
-                        </button>
-                    </div>
 
-                    <div class="px-5 md:px-8 py-3 border-b border-gray-100 dark:border-gray-800 shrink-0 bg-[#FAFAFA] dark:bg-[#111]">
-                        <div id="notes-list" class="flex gap-2 overflow-x-auto pb-2 custom-scrollbar items-center"></div>
-                    </div>
-
-                    <div class="flex-1 flex flex-col p-5 md:p-8 overflow-y-auto custom-scrollbar relative">
-                        <input type="text" id="note-title" class="np-title-input placeholder:text-gray-300 dark:placeholder:text-gray-600 mb-4 shrink-0" placeholder="Untitled Note">
-                        <div class="flex items-center gap-1.5 md:gap-2 flex-wrap w-full mb-4 pb-4 border-b border-gray-50 dark:border-gray-800 shrink-0">
-                            <button id="np-undo-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
-                            <button id="np-redo-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
-                            <div class="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                            <button id="np-bold-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
-                            <button id="np-highlight-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
-                            <div class="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                            <button id="np-copy-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Copy"><i data-lucide="copy" class="w-4 h-4"></i></button>
-                            <button id="np-download-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Download"><i data-lucide="download" class="w-4 h-4"></i></button>
-                            <div class="ml-auto"><button id="np-delete-btn" class="np-control-btn p-2 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-rose-100 dark:border-rose-900 rounded-lg shadow-sm text-gray-400 hover:text-rose-500" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>
+                        <!-- Header with Title and Toolbar -->
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 w-full mb-4 pb-4 border-b border-gray-100 dark:border-gray-800 shrink-0">
+                            <!-- Note Title -->
+                            <input type="text" id="note-title" class="np-title-input flex-1 placeholder:text-gray-300 dark:placeholder:text-gray-600 m-0 min-w-[50%]" placeholder="Note Title...">
+                            
+                            <!-- Format Toolbar -->
+                            <div class="flex items-center gap-1.5 md:gap-2 shrink-0">
+                                <button id="np-undo-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
+                                <button id="np-redo-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
+                                <div class="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                <button id="np-bold-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
+                                <button id="np-highlight-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
+                                <div class="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                <button id="np-copy-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Copy"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                                <button id="np-download-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Download TXT"><i data-lucide="download" class="w-4 h-4"></i></button>
+                            </div>
                         </div>
-                        <div id="note-area" contenteditable="true" data-placeholder="Start typing your thoughts..." class="flex-1 w-full text-gray-700 dark:text-gray-300 placeholder:text-gray-300 dark:placeholder:text-gray-600 outline-none whitespace-pre-wrap font-medium leading-relaxed"></div>
+
+                        <!-- Editor Area -->
+                        <div id="note-area" contenteditable="true" data-placeholder="Start typing your notes here..." class="flex-1 w-full text-gray-700 dark:text-gray-300 placeholder:text-gray-300 dark:placeholder:text-gray-600 outline-none whitespace-pre-wrap font-medium leading-relaxed custom-scrollbar overflow-y-auto"></div>
+                        
                         <footer class="mt-4 pt-4 border-t border-gray-50 dark:border-gray-800 flex justify-between items-center shrink-0">
                             <div id="word-count" class="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest">0 Words</div>
                             <div id="save-status" class="text-[9px] md:text-[10px] font-bold text-[#51b8cb] uppercase tracking-widest opacity-60">Synced</div>
                         </footer>
                     </div>
                 </div>
-
-            </section>
+            </main>
         </div>
-    </div>
 
     <!-- Floating Categories Menu -->
     <div id="floatingCategoryMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-48 py-1">
@@ -309,8 +275,14 @@
     </div>
 
     <!-- Preview Context Menu -->
-    <div id="floatingPreviewMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-44 py-1">
-        <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Card Actions</div>
+    <div id="floatingPreviewMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-48 py-1">
+        <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 mb-1 flex items-center justify-between">
+            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Card Actions</span>
+            <button id="context-theme-toggle" class="text-gray-400 hover:text-[#51b8cb] transition-colors outline-none cursor-pointer p-1" title="Toggle Light/Dark Mode">
+                <i data-lucide="moon" class="w-3.5 h-3.5 dark:hidden"></i>
+                <i data-lucide="sun" class="w-3.5 h-3.5 hidden dark:block"></i>
+            </button>
+        </div>
         <div class="py-1">
             <div onclick="document.getElementById('imageInput').click()" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300">
                 <i data-lucide="image-plus" class="w-4 h-4"></i> Upload Image
@@ -318,9 +290,31 @@
             <div class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300 opacity-60 cursor-default">
                 <i data-lucide="clipboard" class="w-4 h-4"></i> Paste Enabled
             </div>
+            
+            <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
+            
+            <div id="contextAddCardBtn" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                <i data-lucide="plus-square" class="w-4 h-4"></i> New Card
+            </div>
+            <div id="contextAddNoteBtn" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                <i data-lucide="file-text" class="w-4 h-4"></i> Switch Notepad
+            </div>
+            <div id="contextDeleteCardBtn" class="dropdown-item flex items-center gap-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10">
+                <i data-lucide="trash-2" class="w-4 h-4"></i> Delete Card
+            </div>
+            
+            <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
+            
+            <div id="imageLayoutToggleBtn" class="dropdown-item flex items-center justify-between gap-2 text-gray-700 dark:text-gray-300">
+                <div class="flex items-center gap-2"><i data-lucide="layout-grid" class="w-4 h-4"></i> Image Layout</div>
+                <i data-lucide="chevron-down" class="w-3 h-3 transition-transform" id="imageLayoutChevron"></i>
+            </div>
+            <div id="floatingLayoutOptions" class="hidden py-1 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mt-1"></div>
+
+            <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
+            <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Other Cards</div>
+            <div id="contextOtherCardsList" class="py-1 max-h-40 overflow-y-auto custom-scrollbar"></div>
         </div>
-        <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-y border-gray-100 dark:border-gray-800 my-1">Image Layout</div>
-        <div id="floatingLayoutOptions" class="py-1"></div>
     </div>
 
     <script>
@@ -341,21 +335,10 @@
         if (typeof lucide !== 'undefined') lucide.createIcons();
         initPWA();
 
-        // Logo handles Notepad opening
-        document.getElementById('brand-logo-container').addEventListener('click', () => {
-            document.getElementById('cardContainer').classList.add('hidden');
-            document.getElementById('notepadContainer').classList.remove('hidden');
-            document.getElementById('notepadContainer').classList.add('flex');
-            if (typeof lucide !== 'undefined') lucide.createIcons();
+        document.getElementById('context-theme-toggle').addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.documentElement.classList.toggle('dark');
         });
-
-        document.getElementById('close-notepad-btn').onclick = () => {
-            document.getElementById('notepadContainer').classList.add('hidden');
-            document.getElementById('notepadContainer').classList.remove('flex');
-            document.getElementById('cardContainer').classList.remove('hidden');
-        };
-
-        document.getElementById('main-theme-toggle').addEventListener('click', () => document.documentElement.classList.toggle('dark'));
 
         function initBlendDropdown() {
             const container = document.getElementById('blendOptions'), menu = document.getElementById('blendDropdownMenu'), btn = document.getElementById('blendBtn');
@@ -410,14 +393,16 @@
         };
 
         function initFloatingMenu() {
-            const sizes = [12, 14, 16, 18, 20, 24, 28, 32, 40, 48, 64, 80];
+            const defSizes = [12, 14, 16, 18, 20, 24, 28, 32, 40, 48, 64, 80];
+            const titleSizes = [32, 36, 40, 48, 56, 64, 72, 80, 96, 120];
+            
             const colorBtn = document.getElementById('toolbarColorBtn'), colorMenu = document.getElementById('toolbarColorDropdownMenu');
             if (colorBtn) colorBtn.onclick = (e) => { e.stopPropagation(); const isHidden = colorMenu.classList.contains('hidden'); closeAllDropdowns(); if (isHidden) colorMenu.classList.remove('hidden'); };
             if (colorMenu) { colorMenu.onmousedown = (e) => e.stopPropagation(); colorMenu.onclick = (e) => e.stopPropagation(); }
 
             const defMenu = document.getElementById('toolbarDefSizeDropdownMenu'), defBtn = document.getElementById('toolbarDefSizeBtn');
             if (defBtn) defBtn.onclick = (e) => { e.stopPropagation(); closeAllDropdowns(); defMenu.classList.toggle('hidden'); };
-            sizes.forEach(size => {
+            defSizes.forEach(size => {
                 const item = document.createElement('div');
                 item.className = 'dropdown-item text-gray-700 dark:text-gray-300 text-center py-1.5';
                 item.innerText = size;
@@ -427,7 +412,7 @@
 
             const titleMenu = document.getElementById('toolbarTitleSizeDropdownMenu'), titleBtn = document.getElementById('toolbarTitleSizeBtn');
             if (titleBtn) titleBtn.onclick = (e) => { e.stopPropagation(); closeAllDropdowns(); titleMenu.classList.toggle('hidden'); };
-            sizes.forEach(size => {
+            titleSizes.forEach(size => {
                 const item = document.createElement('div');
                 item.className = 'dropdown-item text-gray-700 dark:text-gray-300 text-center py-1.5';
                 item.innerText = size;
@@ -436,47 +421,152 @@
             });
 
             const catMenu = document.getElementById('floatingCategoryMenu'), catContainer = document.getElementById('floatingCategoryOptions');
-            const manualItem = document.createElement('div');
-            manualItem.className = 'dropdown-item text-[#51b8cb] flex items-center gap-2 italic';
-            manualItem.innerHTML = `<i data-lucide="edit-3" class="w-3 h-3"></i> Custom Entry...`;
-            manualItem.onclick = (e) => { e.stopPropagation(); restoreCategory(); catMenu.classList.add('hidden'); };
-            if (catContainer) catContainer.appendChild(manualItem);
+            if (catContainer) {
+                catContainer.innerHTML = '';
+                const manualItem = document.createElement('div');
+                manualItem.className = 'dropdown-item text-[#51b8cb] flex items-center gap-2 italic';
+                manualItem.innerHTML = `<i data-lucide="edit-3" class="w-3 h-3"></i> Custom Entry...`;
+                manualItem.onclick = (e) => { e.stopPropagation(); restoreCategory(); catMenu.classList.add('hidden'); };
+                catContainer.appendChild(manualItem);
 
-            ["-", ...Object.keys(categoryColors)].forEach(cat => {
-                const item = document.createElement('div');
-                item.className = 'dropdown-item text-gray-700 dark:text-gray-300';
-                item.innerText = cat;
-                item.onclick = (e) => { e.stopPropagation(); selectCategory(cat); catMenu.classList.add('hidden'); };
-                if (catContainer) catContainer.appendChild(item);
-            });
+                ["-", ...Object.keys(categoryColors)].forEach(cat => {
+                    const item = document.createElement('div');
+                    item.className = 'dropdown-item text-gray-700 dark:text-gray-300';
+                    item.innerText = cat;
+                    item.onclick = (e) => { e.stopPropagation(); selectCategory(cat); catMenu.classList.add('hidden'); };
+                    catContainer.appendChild(item);
+                });
+            }
 
             const imgMenu = document.getElementById('floatingImageBorderMenu'), imgContainer = document.getElementById('floatingImageBorderOptions');
-            [0, 1, 2, 3, 4, 6, 8, 10, 15, 20].forEach(b => {
-                const item = document.createElement('div');
-                item.className = 'dropdown-item text-gray-700 dark:text-gray-300';
-                item.innerText = b + 'px';
-                item.onclick = (e) => { e.stopPropagation(); if (activeImageIdx !== -1 && uploadedImages[activeImageIdx]) { uploadedImages[activeImageIdx].border = b; updatePreview(); } imgMenu.classList.add('hidden'); };
-                if (imgContainer) imgContainer.appendChild(item);
-            });
+            if (imgContainer) {
+                imgContainer.innerHTML = '';
+                [0, 1, 2, 3, 4, 6, 8, 10, 15, 20].forEach(b => {
+                    const item = document.createElement('div');
+                    item.className = 'dropdown-item text-gray-700 dark:text-gray-300';
+                    item.innerText = b + 'px';
+                    item.onclick = (e) => { e.stopPropagation(); if (activeImageIdx !== -1 && uploadedImages[activeImageIdx]) { uploadedImages[activeImageIdx].border = b; updatePreview(); } imgMenu.classList.add('hidden'); };
+                    imgContainer.appendChild(item);
+                });
+            }
 
             const layoutOptions = document.getElementById('floatingLayoutOptions');
-            [0, 1, 2, 3, 4].forEach(c => {
-                const item = document.createElement('div');
-                item.className = 'dropdown-item text-gray-700 dark:text-gray-300 flex items-center justify-between';
-                item.innerHTML = `<span>${c === 0 ? 'Auto Layout' : c + ' Columns'}</span>`;
-                item.onclick = (e) => { e.stopPropagation(); selectImageCols(c); document.getElementById('floatingPreviewMenu').classList.add('hidden'); };
-                if (layoutOptions) layoutOptions.appendChild(item);
-            });
+            if (layoutOptions) {
+                layoutOptions.innerHTML = '';
+                [0, 1, 2, 3, 4].forEach(c => {
+                    const item = document.createElement('div');
+                    item.className = 'dropdown-item text-gray-700 dark:text-gray-300 flex items-center justify-between';
+                    item.innerHTML = `<span>${c === 0 ? 'Auto Layout' : c + ' Columns'}</span>`;
+                    item.onclick = (e) => { 
+                        e.stopPropagation(); 
+                        selectImageCols(c); 
+                        document.getElementById('floatingPreviewMenu').classList.add('hidden'); 
+                        layoutOptions.classList.add('hidden');
+                        const chevron = document.getElementById('imageLayoutChevron');
+                        if (chevron) chevron.classList.remove('rotate-180');
+                    };
+                    layoutOptions.appendChild(item);
+                });
+            }
+
+            const imageLayoutToggleBtn = document.getElementById('imageLayoutToggleBtn');
+            if (imageLayoutToggleBtn) {
+                imageLayoutToggleBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    if (layoutOptions) layoutOptions.classList.toggle('hidden');
+                    const chevron = document.getElementById('imageLayoutChevron');
+                    if (chevron) chevron.classList.toggle('rotate-180');
+                };
+            }
+
+            const addCardBtn = document.getElementById('contextAddCardBtn');
+            if (addCardBtn) {
+                addCardBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    document.getElementById('floatingPreviewMenu').classList.add('hidden');
+                    createCard();
+                };
+            }
+
+            const deleteCardBtn = document.getElementById('contextDeleteCardBtn');
+            if (deleteCardBtn) {
+                deleteCardBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    document.getElementById('floatingPreviewMenu').classList.add('hidden');
+                    if (cards.length > 1) {
+                        const index = cards.findIndex(c => c.id === activeCardId);
+                        cards.splice(index, 1);
+                        switchCard(cards[Math.max(0, index - 1)].id);
+                    }
+                };
+            }
+
+            const addNoteBtn = document.getElementById('contextAddNoteBtn');
+            if (addNoteBtn) {
+                addNoteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    document.getElementById('floatingPreviewMenu').classList.add('hidden');
+                    const c = document.getElementById('cardContainer');
+                    const n = document.getElementById('notepadContainer');
+                    if (c && n) {
+                        c.classList.add('hidden');
+                        n.classList.remove('hidden');
+                        n.classList.add('flex');
+                    }
+                };
+            }
 
             window.addEventListener('click', () => { 
                 if(catMenu) catMenu.classList.add('hidden'); 
                 const imgM = document.getElementById('floatingImageBorderMenu'); if(imgM) imgM.classList.add('hidden');
-                const prevM = document.getElementById('floatingPreviewMenu'); if(prevM) prevM.classList.add('hidden');
+                const prevM = document.getElementById('floatingPreviewMenu'); 
+                if(prevM && !prevM.classList.contains('hidden')) {
+                    prevM.classList.add('hidden');
+                    if (layoutOptions) layoutOptions.classList.add('hidden');
+                    const chevron = document.getElementById('imageLayoutChevron');
+                    if (chevron) chevron.classList.remove('rotate-180');
+                }
             });
 
             document.getElementById('cardContainer').addEventListener('contextmenu', (e) => {
                 if (e.target.closest('#cardWord') || e.target.closest('#cardType') || e.target.closest('#cardDef') || e.target.closest('[id^="preview-wrapper-"]')) return;
                 e.preventDefault();
+                
+                const deleteCardBtn = document.getElementById('contextDeleteCardBtn');
+                if (deleteCardBtn) {
+                    if (cards.length <= 1) {
+                        deleteCardBtn.classList.add('opacity-50', 'pointer-events-none');
+                    } else {
+                        deleteCardBtn.classList.remove('opacity-50', 'pointer-events-none');
+                    }
+                }
+
+                // Populate Other Cards
+                const cardsListContainer = document.getElementById('contextOtherCardsList');
+                if (cardsListContainer) {
+                    cardsListContainer.innerHTML = '';
+                    const otherCards = cards.filter(c => c.id !== activeCardId);
+                    if (otherCards.length === 0) {
+                        const emptyItem = document.createElement('div');
+                        emptyItem.className = 'dropdown-item text-gray-400 dark:text-gray-500 italic cursor-default opacity-60';
+                        emptyItem.innerText = 'No other cards';
+                        cardsListContainer.appendChild(emptyItem);
+                    } else {
+                        otherCards.forEach((c) => {
+                            const item = document.createElement('div');
+                            item.className = 'dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300';
+                            item.innerHTML = `<i data-lucide="layout-template" class="w-4 h-4"></i> <span class="truncate">${c.title.trim() || 'Card ' + (cards.indexOf(c) + 1)}</span>`;
+                            item.onclick = (evt) => {
+                                evt.stopPropagation();
+                                switchCard(c.id);
+                                document.getElementById('floatingPreviewMenu').classList.add('hidden');
+                            };
+                            cardsListContainer.appendChild(item);
+                        });
+                    }
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                }
+
                 const menu = document.getElementById('floatingPreviewMenu');
                 menu.classList.remove('hidden');
                 requestAnimationFrame(() => {
@@ -516,7 +606,7 @@
         function removeStyleFromSelection(styleName) {
             const sel = window.getSelection(); if (!sel.rangeCount) return;
             let node = sel.anchorNode, parent = node.nodeType === 3 ? node.parentNode : node;
-            while (parent && parent.id !== 'cardDef' && parent.id !== 'note-area' && parent.tagName !== 'BODY') {
+            while (parent && parent.id !== 'cardDef' && parent.tagName !== 'BODY') {
                 if (parent.style && parent.style[styleName] !== undefined) parent.style[styleName] = '';
                 if (parent.getAttribute('style') === '') parent.removeAttribute('style');
                 parent = parent.parentNode;
@@ -531,17 +621,6 @@
                 });
             }
         }
-
-        window.toggleNpHighlight = function() {
-            document.execCommand('styleWithCSS', false, true);
-            let bgStyle = getSelectionStyle('backgroundColor');
-            if (bgStyle && bgStyle !== 'transparent' && bgStyle !== 'rgba(0, 0, 0, 0)') {
-                document.execCommand('hiliteColor', false, 'transparent'); removeStyleFromSelection('backgroundColor');
-            } else {
-                document.execCommand('hiliteColor', false, 'rgba(81, 184, 203, 0.4)');
-            }
-            document.getElementById('note-area').focus();
-        };
 
         window.execFormat = function(cmd, val = null) {
             document.execCommand('styleWithCSS', false, true);
@@ -579,7 +658,6 @@
             document.getElementById('imageInput').addEventListener('change', handleImageUpload);
             document.addEventListener('selectionchange', () => { 
                 if (document.activeElement === document.getElementById('cardDef')) checkFormatState(); 
-                else if (document.activeElement === document.getElementById('note-area')) updateNpFormatState(); 
             });
             document.getElementById('cardWord').addEventListener('input', (e) => { document.getElementById('inputTitle').value = e.target.innerText; showTitlePlaceholder = true; syncCardState(); });
             const cardTypeEl = document.getElementById('cardType');
@@ -636,30 +714,19 @@
         function hexToRgba(hex, alpha) { const rgb = hexToRgb(hex); return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`; }
         function initCards() { createCard(); }
         function createCard() { const newCard = { id: 'card_' + Date.now() + Math.random().toString(36).substr(2, 9), title: '', category: '-', definition: '', images: [], color: { hex: "#51b8cb", hue: 189, sat: 60, bri: 80 }, textSize: 32, defSize: 24, imageBorder: 2, imageCols: 0, blend: 10, showTitlePlaceholder: true, showDefPlaceholder: false }; cards.push(newCard); switchCard(newCard.id); }
-        function switchCard(id) { activeCardId = id; loadCurrentCard(); renderTabs(); }
+        function switchCard(id) { activeCardId = id; loadCurrentCard(); }
         function loadCurrentCard() { isSwitching = true; const card = cards.find(c => c.id === activeCardId); if (!card) return; document.getElementById('inputTitle').value = card.title; showTitlePlaceholder = card.showTitlePlaceholder !== false; showDefPlaceholder = card.showDefPlaceholder !== false; selectCategory(card.category || "-"); selectTextSize(card.textSize || 32); selectDefSize(card.defSize || 24); currentImageBorder = card.imageBorder || 2; selectImageCols(card.imageCols || 0); const sL = document.getElementById('toolbarDefSizeLabel'); if (sL) sL.innerText = card.defSize || 24; const tL = document.getElementById('toolbarTitleSizeLabel'); if (tL) tL.innerText = card.textSize || 32; currentBlendPercentage = card.blend !== undefined ? card.blend : 10; document.getElementById('blendValueLabel').innerText = currentBlendPercentage + '%'; document.getElementById('inputDef').value = card.definition; uploadedImages = [...card.images]; activeColor = card.color.hex; hue = card.color.hue; saturation = card.color.sat; brightness = card.color.bri; setManualColor(activeColor, hue, saturation, brightness); isSwitching = false; }
-        function syncCardState() { if (!activeCardId || isSwitching) return; const card = cards.find(c => c.id === activeCardId); if (!card) return; card.title = document.getElementById('inputTitle').value; card.category = currentSelectedCategory; card.definition = document.getElementById('inputDef').value; card.images = [...uploadedImages]; card.color = { hex: activeColor, hue: hue, sat: saturation, bri: brightness }; card.textSize = currentSelectedSize; card.defSize = currentSelectedDefSize; card.imageBorder = currentImageBorder; card.imageCols = currentImageCols; card.blend = currentBlendPercentage; card.showTitlePlaceholder = showTitlePlaceholder; card.showDefPlaceholder = showDefPlaceholder; const tE = document.getElementById(`tab-text-${activeCardId}`); if (tE) tE.innerText = card.title.trim() || `Card ${cards.indexOf(card) + 1}`; }
-        function deleteCard(e, id) { e.stopPropagation(); if (cards.length <= 1) return; const index = cards.findIndex(c => c.id === id); cards.splice(index, 1); if (activeCardId === id) switchCard(cards[Math.max(0, index - 1)].id); else renderTabs(); }
-
-        function renderTabs() {
-            const container = document.getElementById('cardTabsContainer'); container.innerHTML = '';
-            cards.forEach((card, index) => {
-                const isActive = card.id === activeCardId, btn = document.createElement('button');
-                btn.className = `px-4 py-2 text-xs font-bold rounded-xl whitespace-nowrap transition-all flex items-center gap-2 group ${isActive ? 'bg-[#51b8cb] text-white shadow-md' : 'bg-[#e8f6f8] text-gray-500 hover:bg-[#d0ebf0] dark:bg-[#222] dark:hover:bg-[#333]'}`;
-                btn.onclick = () => switchCard(card.id); btn.innerHTML = `<span id="tab-text-${card.id}">${card.title.trim() || `Card ${index + 1}`}</span>`;
-                if (cards.length > 1) { const del = document.createElement('span'); del.innerHTML = '<i data-lucide="x" class="w-3.5 h-3.5"></i>'; del.className = `p-0.5 rounded-full transition-colors ${isActive ? 'hover:bg-black/20 text-white/80' : 'hover:bg-black/10'}`; del.onclick = (e) => deleteCard(e, card.id); btn.appendChild(del); }
-                container.appendChild(btn);
-            });
-            const add = document.createElement('button'); add.className = "px-3 py-2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] text-[#51b8cb] rounded-xl hover:bg-[#e8f6f8] transition-all shrink-0"; add.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i>'; add.onclick = createCard; container.appendChild(add);
-            if (typeof lucide !== 'undefined') lucide.createIcons();
-        }
+        function syncCardState() { if (!activeCardId || isSwitching) return; const card = cards.find(c => c.id === activeCardId); if (!card) return; card.title = document.getElementById('inputTitle').value; card.category = currentSelectedCategory; card.definition = document.getElementById('inputDef').value; card.images = [...uploadedImages]; card.color = { hex: activeColor, hue: hue, sat: saturation, bri: brightness }; card.textSize = currentSelectedSize; card.defSize = currentSelectedDefSize; card.imageBorder = currentImageBorder; card.imageCols = currentImageCols; card.blend = currentBlendPercentage; card.showTitlePlaceholder = showTitlePlaceholder; card.showDefPlaceholder = showDefPlaceholder; }
 
         function updatePreview() {
             const finalColor = activeColor, textColor = getDarkerShade(finalColor, 0.4), blend = currentBlendPercentage, textSize = currentSelectedSize, defSize = currentSelectedDefSize, imgBorder = currentImageBorder, imageCols = currentImageCols;
             const bVL = document.getElementById('blendValueLabel'); if (bVL) bVL.style.color = finalColor;
             const card = document.getElementById('cardContainer'); card.style.borderColor = finalColor; card.style.backgroundColor = getLightShade(finalColor, blend);
             const notepad = document.getElementById('notepadContainer'); if (notepad) notepad.style.borderColor = finalColor;
+            
             const dlBtn = document.getElementById('cardDownloadBtn'); if (dlBtn) { dlBtn.style.color = finalColor; dlBtn.style.border = `2px solid ${finalColor}`; }
+            const switchPrvBtn = document.getElementById('switchToPreviewBtn'); if (switchPrvBtn) { switchPrvBtn.style.color = finalColor; switchPrvBtn.style.borderColor = finalColor; }
+
             const word = document.getElementById('cardWord'); word.style.color = textColor; word.style.fontSize = textSize + 'px'; if (word.innerText !== document.getElementById('inputTitle').value) word.innerText = document.getElementById('inputTitle').value;
             const type = document.getElementById('cardType'), addCatBtn = document.getElementById('addCategoryBtn');
             if (currentSelectedCategory !== '-') { type.style.backgroundColor = hexToRgba(finalColor, 0.15); type.style.color = textColor; if (type.innerText !== currentSelectedCategory) type.innerText = currentSelectedCategory; type.classList.remove('hidden'); addCatBtn.classList.add('hidden'); }
@@ -696,39 +763,79 @@
         function createPNGIconFromSVG(svg, size) { return new Promise((resolve) => { const canvas = document.createElement('canvas'); canvas.width = size; canvas.height = size; const ctx = canvas.getContext('2d'), img = new Image(); img.onload = () => { ctx.drawImage(img, 0, 0, size, size); resolve(canvas.toDataURL('image/png')); }; img.onerror = () => resolve(`data:image/svg+xml;base64,${btoa(svg)}`); img.src = `data:image/svg+xml;base64,${btoa(svg)}`; }); }
         async function initPWA() { try { const svg = generateNotebookSVG(), i192 = await createPNGIconFromSVG(svg, 192), i512 = await createPNGIconFromSVG(svg, 512); document.getElementById('apple-touch-icon').href = i192; const manifest = { name: "Notion", short_name: "Notion", start_url: window.location.href.split('?')[0], display: "standalone", background_color: "#e8f6f8", theme_color: "#51b8cb", icons: [{ src: i192, sizes: "192x192", type: "image/png", purpose: "any maskable" }, { src: i512, sizes: "512x512", type: "image/png", purpose: "any maskable" }] }; document.getElementById('manifest').href = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest)); } catch (e) { console.error("PWA initialization skipped:", e); } }
 
-        function updateNpFormatState() {
-            if (document.activeElement !== document.getElementById('note-area')) return;
-            const isBold = document.queryCommandState('bold');
-            let bgStyle = getSelectionStyle('backgroundColor'), isHighlighted = bgStyle && bgStyle !== 'transparent' && bgStyle !== 'rgba(0, 0, 0, 0)';
-            const b = document.getElementById('np-bold-btn'), h = document.getElementById('np-highlight-btn');
-            if (b) { b.classList.toggle('text-[#51b8cb]', isBold); b.classList.toggle('text-gray-500', !isBold); b.classList.toggle('bg-[#e8f6f8]', isBold); b.classList.toggle('dark:bg-[#333]', isBold); }
-            if (h) { h.classList.toggle('text-[#51b8cb]', isHighlighted); h.classList.toggle('text-gray-500', !isHighlighted); h.classList.toggle('bg-[#e8f6f8]', isHighlighted); h.classList.toggle('dark:bg-[#333]', isHighlighted); }
-        }
-
         function initNotepad() {
-            let npNotes = JSON.parse(localStorage.getItem('ali_dashboard_multiple_notes')) || [{ id: Date.now(), title: 'My First Note', content: '', createdAt: new Date().toISOString() }], npCurrentId = npNotes[0]?.id || Date.now();
-            const list = document.getElementById('notes-list'), area = document.getElementById('note-area'), titleInput = document.getElementById('note-title'), count = document.getElementById('word-count'), status = document.getElementById('save-status');
+            let npNotes = JSON.parse(localStorage.getItem('ali_dashboard_multiple_notes')) || [{ id: Date.now(), title: 'Note 1', content: '', createdAt: new Date().toISOString() }];
+            let npCurrentId = npNotes[0]?.id || Date.now();
+            
+            const list = document.getElementById('notes-list');
+            const area = document.getElementById('note-area');
+            const titleInput = document.getElementById('note-title');
             
             let undoStack = [], redoStack = [], historyTimeout, isUndoingRedoing = false;
             
-            function save() { localStorage.setItem('ali_dashboard_multiple_notes', JSON.stringify(npNotes)); status.textContent = 'Synced'; setTimeout(() => status.textContent = 'Ready', 1000); }
+            function save() { 
+                localStorage.setItem('ali_dashboard_multiple_notes', JSON.stringify(npNotes)); 
+            }
             
-            function render() { list.innerHTML = ''; npNotes.forEach((n, idx) => { const isActive = n.id === npCurrentId, btn = document.createElement('button'); btn.className = `px-4 py-2 text-xs font-bold rounded-xl whitespace-nowrap transition-all flex items-center gap-2 group ${isActive ? 'bg-[#51b8cb] text-white shadow-md' : 'bg-[#e8f6f8] text-gray-500 hover:bg-[#d0ebf0] dark:bg-[#222] dark:hover:bg-[#333]'}`; btn.onclick = () => select(n.id); btn.innerHTML = `<span>${n.title.trim() || `Note ${idx + 1}`}</span>`; list.appendChild(btn); }); }
+            function render() { 
+                list.innerHTML = ''; 
+                npNotes.forEach((n, idx) => { 
+                    const isActive = n.id === npCurrentId;
+                    const btn = document.createElement('button'); 
+                    btn.className = `px-4 py-2 text-xs font-bold rounded-xl whitespace-nowrap transition-all flex items-center gap-2 group ${isActive ? 'bg-[#51b8cb] text-white shadow-md' : 'bg-[#e8f6f8] text-gray-500 hover:bg-[#d0ebf0] dark:bg-[#222] dark:hover:bg-[#333]'}`; 
+                    btn.onclick = () => select(n.id); 
+                    btn.innerHTML = `<span>${n.title.trim() || `Note ${idx + 1}`}</span>`; 
+                    if (npNotes.length > 1) {
+                        const del = document.createElement('span'); 
+                        del.innerHTML = '<i data-lucide="trash-2" class="w-3 h-3"></i>'; 
+                        del.className = `p-1 rounded-full transition-colors ${isActive ? 'hover:bg-black/20 text-white/80' : 'hover:bg-rose-100 text-rose-500 hover:text-rose-600'}`; 
+                        del.onclick = (e) => { 
+                            e.stopPropagation(); 
+                            npNotes = npNotes.filter(x => x.id !== n.id); 
+                            if (isActive) select(npNotes[0].id); else render(); 
+                            save(); 
+                        }; 
+                        btn.appendChild(del);
+                    }
+                    list.appendChild(btn); 
+                }); 
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            }
             
-            function select(id) { npCurrentId = id; const n = npNotes.find(x => x.id === id); if(n) { titleInput.value = n.title; area.innerHTML = n.content; undoStack = [{ title: n.title, content: n.content }]; redoStack = []; } update(false); render(); }
+            function select(id) { 
+                npCurrentId = id; 
+                const n = npNotes.find(x => x.id === id); 
+                if(n) { 
+                    titleInput.value = n.title; 
+                    area.innerHTML = n.content; 
+                    undoStack = [{ title: n.title, content: n.content }]; 
+                    redoStack = []; 
+                } 
+                update(false); 
+                render(); 
+            }
             
             function update(push = true) { 
-                const words = area.innerText.trim() ? area.innerText.trim().split(/\s+/).length : 0; 
-                count.textContent = `${words} Words`; 
+                const text = area.innerText.trim();
+                const words = text ? text.split(/\s+/).length : 0;
+                const wc = document.getElementById('word-count');
+                if (wc) wc.innerText = `${words} Words`;
+
                 const idx = npNotes.findIndex(x => x.id === npCurrentId); 
-                if(idx !== -1) { npNotes[idx].content = area.innerHTML; npNotes[idx].title = titleInput.value; save(); render(); } 
+                if(idx !== -1) { 
+                    npNotes[idx].content = area.innerHTML; 
+                    npNotes[idx].title = titleInput.value; 
+                    save(); 
+                    render(); 
+                } 
                 if (push !== false && !isUndoingRedoing) { 
                     clearTimeout(historyTimeout); 
                     historyTimeout = setTimeout(() => { 
                         const top = undoStack[undoStack.length - 1]; 
                         if (!top || top.title !== titleInput.value || top.content !== area.innerHTML) { 
                             undoStack.push({ title: titleInput.value, content: area.innerHTML }); 
-                            if (undoStack.length > 50) undoStack.shift(); redoStack = []; 
+                            if (undoStack.length > 50) undoStack.shift(); 
+                            redoStack = []; 
                         } 
                     }, 500); 
                 } 
@@ -738,12 +845,55 @@
             document.getElementById('np-redo-btn').onclick = () => { if(redoStack.length > 0) { isUndoingRedoing = true; const next = redoStack.pop(); undoStack.push(next); titleInput.value = next.title; area.innerHTML = next.content; update(false); isUndoingRedoing = false; } };
             document.getElementById('np-bold-btn').onclick = () => { document.execCommand('bold'); updateNpFormatState(); update(); };
             document.getElementById('np-highlight-btn').onclick = () => { toggleNpHighlight(); updateNpFormatState(); update(); };
-            document.getElementById('new-note-btn').onclick = () => { const n = { id: Date.now(), title: '', content: '', createdAt: new Date().toISOString() }; npNotes.unshift(n); select(n.id); titleInput.focus(); };
-            document.getElementById('np-delete-btn').onclick = () => { if(npNotes.length <= 1) { npNotes[0].title = ''; npNotes[0].content = ''; area.innerHTML = ''; titleInput.value = ''; update(false); render(); return; } npNotes = npNotes.filter(x => x.id !== npCurrentId); select(npNotes[0].id); };
-            document.getElementById('np-copy-btn').onclick = () => { const r = document.createRange(); r.selectNodeContents(area); const s = window.getSelection(); s.removeAllRanges(); s.addRange(r); document.execCommand('copy'); s.removeAllRanges(); const b = document.getElementById('np-copy-btn'), i = b.innerHTML; b.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-[#51b8cb]"></i>'; if (typeof lucide !== 'undefined') lucide.createIcons(); setTimeout(() => { b.innerHTML = i; if (typeof lucide !== 'undefined') lucide.createIcons(); }, 2000); };
-            document.getElementById('np-download-btn').onclick = () => { const b = new Blob([area.innerText], {type:'text/plain'}), u = URL.createObjectURL(b), a = document.createElement('a'); a.href = u; a.download = `${titleInput.value || 'Untitled'}.txt`; a.click(); };
             
-            area.oninput = update; titleInput.oninput = update; select(npCurrentId);
+            document.getElementById('new-note-btn').onclick = () => { 
+                const newNum = npNotes.length + 1;
+                const n = { id: Date.now(), title: `Note ${newNum}`, content: '', createdAt: new Date().toISOString() }; 
+                npNotes.push(n); 
+                select(n.id); 
+                titleInput.focus(); 
+            };
+            
+            document.getElementById('np-copy-btn').onclick = () => { 
+                const r = document.createRange(); 
+                r.selectNodeContents(area); 
+                const s = window.getSelection(); 
+                s.removeAllRanges(); 
+                s.addRange(r); 
+                document.execCommand('copy'); 
+                s.removeAllRanges(); 
+                const b = document.getElementById('np-copy-btn'), i = b.innerHTML; 
+                b.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-[#51b8cb]"></i>'; 
+                if (typeof lucide !== 'undefined') lucide.createIcons(); 
+                setTimeout(() => { b.innerHTML = i; if (typeof lucide !== 'undefined') lucide.createIcons(); }, 2000); 
+            };
+
+            const downloadBtn = document.getElementById('np-download-btn');
+            downloadBtn.addEventListener('click', () => { 
+                const textToSave = area.innerText;
+                const blob = new Blob([textToSave], { type:'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); 
+                a.href = url; 
+                a.download = `${titleInput.value.trim() || 'Untitled'}.txt`; 
+                a.click(); 
+                URL.revokeObjectURL(url);
+            });
+            
+            area.addEventListener('input', update); 
+            titleInput.addEventListener('input', update); 
+
+            const switchToPreviewBtn = document.getElementById('switchToPreviewBtn');
+            const notepadContainer = document.getElementById('notepadContainer');
+            const cardContainer = document.getElementById('cardContainer');
+
+            switchToPreviewBtn.addEventListener('click', () => {
+                notepadContainer.classList.add('hidden');
+                notepadContainer.classList.remove('flex');
+                cardContainer.classList.remove('hidden');
+            });
+
+            select(npCurrentId);
         }
 
         let isDownloading = false;
