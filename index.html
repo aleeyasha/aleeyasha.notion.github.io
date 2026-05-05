@@ -155,6 +155,16 @@
                         <button id="np-redo-btn" class="np-control-btn p-2.5 md:p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#51b8cb]" title="Redo">
                             <i data-lucide="redo" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
                         </button>
+                        
+                        <button id="np-bold-btn" onmousedown="event.preventDefault(); document.execCommand('bold', false, null); updateNpFormatState(); document.getElementById('note-area').dispatchEvent(new Event('input'));" class="np-control-btn p-2.5 md:p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#51b8cb]" title="Bold">
+                            <i data-lucide="bold" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
+                        </button>
+                        <button id="np-highlight-btn" onmousedown="event.preventDefault(); toggleNpHighlight(); updateNpFormatState(); document.getElementById('note-area').dispatchEvent(new Event('input'));" class="np-control-btn p-2.5 md:p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#51b8cb]" title="Highlight">
+                            <i data-lucide="highlighter" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
+                        </button>
+
+                        <div class="w-px h-6 bg-gray-200 dark:bg-gray-800 mx-1"></div>
+
                         <button id="np-copy-btn" class="np-control-btn p-2.5 md:p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#51b8cb]" title="Copy to Clipboard">
                             <i data-lucide="copy" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
                         </button>
@@ -167,7 +177,7 @@
                     </div>
                 </header>
 
-                <textarea id="note-area" class="flex-1 w-full text-gray-700 dark:text-gray-300 placeholder:text-gray-300 dark:placeholder:text-gray-600 custom-scrollbar" placeholder="Start typing your thoughts..."></textarea>
+                <div id="note-area" contenteditable="true" data-placeholder="Start typing your thoughts..." class="flex-1 w-full text-gray-700 dark:text-gray-300 placeholder:text-gray-300 dark:placeholder:text-gray-600 custom-scrollbar overflow-y-auto outline-none whitespace-pre-wrap"></div>
                 
                 <footer class="mt-4 md:mt-8 pt-4 md:pt-6 border-t border-gray-50 dark:border-gray-800 flex justify-between items-center">
                     <div id="word-count" class="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest">0 Words</div>
@@ -189,7 +199,13 @@
                         <div id="brand-logo-container" class="w-8 h-8 md:w-10 md:h-10 transition-transform duration-300 shrink-0 hover:scale-110" title="Open Notepad">
                             <!-- SVG injected via JS -->
                         </div>
-                        <h2 class="text-lg md:text-xl font-bold text-[#222222] dark:text-[#f1f1f1] tracking-tight">Notion</h2>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-lg md:text-xl font-bold text-[#222222] dark:text-[#f1f1f1] tracking-tight">Notion</h2>
+                            <button id="main-theme-toggle" class="text-gray-400 hover:text-[#51b8cb] transition-colors outline-none cursor-pointer p-1" title="Toggle Light/Dark Mode">
+                                <i data-lucide="moon" class="w-4 h-4 md:w-5 md:h-5 dark:hidden"></i>
+                                <i data-lucide="sun" class="w-4 h-4 md:w-5 md:h-5 hidden dark:block"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="flex items-center gap-2 md:gap-3">
@@ -198,25 +214,15 @@
                             <i data-lucide="palette" class="w-4 h-4 md:w-5 md:h-5"></i>
                         </button>
 
-                        <!-- Theme Toggle next to download -->
-                        <button id="main-theme-toggle" class="p-2 md:p-3 bg-[#e8f6f8] dark:bg-[#222] text-[#51b8cb] rounded-lg md:rounded-xl transition-all shadow-sm hover:scale-105" title="Toggle Light/Dark Mode">
-                            <i data-lucide="moon" class="w-4 h-4 md:w-5 md:h-5 dark:hidden"></i>
-                            <i data-lucide="sun" class="w-4 h-4 md:w-5 md:h-5 hidden dark:block"></i>
-                        </button>
-                        
                         <!-- Install App Button (Hidden by default) -->
                         <button id="btnInstallApp" class="hidden p-2 md:p-3 bg-[#e8f6f8] dark:bg-[#222] text-[#51b8cb] rounded-lg md:rounded-xl transition-all shadow-sm hover:scale-105 items-center gap-1" title="Install App">
                             <i data-lucide="monitor-smartphone" class="w-4 h-4 md:w-5 md:h-5"></i>
-                        </button>
-
-                        <button id="btnDownload" class="p-2 md:p-3 bg-[#51b8cb] hover:bg-[#3a98aa] text-white rounded-lg md:rounded-xl transition-all shadow-md flex items-center justify-center group" title="Download PNG">
-                            <i data-lucide="download" class="w-4 h-4 md:w-5 md:h-5 group-hover:scale-110 transition-transform"></i>
                         </button>
                     </div>
                 </div>
 
                 <div class="editor-scroll-area p-5 md:p-8 pt-4 md:pt-6 space-y-6">
-                    <div id="cardTabsContainer" class="flex gap-2 overflow-x-auto pb-4 border-b border-gray-100 mb-4 md:mb-6 custom-scrollbar shrink-0 w-full items-center"></div>
+                    <div id="cardTabsContainer" class="flex flex-wrap gap-2 pb-4 border-b border-gray-100 mb-4 md:mb-6 w-full items-center"></div>
                     
                     <!-- Hidden inputs to maintain application state without the sidebar UI -->
                     <input type="hidden" id="inputTitle" value="">
@@ -224,7 +230,16 @@
 
                     <div class="pt-2">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-                            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Reference Images</label>
+                            <div class="flex items-center gap-3">
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] m-0">Reference Images</label>
+                                
+                                <div class="relative cursor-pointer group" title="Upload or paste images">
+                                    <input type="file" id="imageInput" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept="image/*" multiple>
+                                    <button class="p-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-gray-400 group-hover:text-[#51b8cb] rounded-lg transition-all shadow-sm group-hover:border-gray-300 dark:group-hover:border-gray-600 outline-none flex items-center justify-center pointer-events-none">
+                                        <i data-lucide="image-plus" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
                             
                             <!-- Image Layout Dropdown -->
                             <div class="relative shrink-0 w-24">
@@ -238,16 +253,9 @@
                             </div>
                         </div>
 
-                        <div class="group relative flex flex-col items-center justify-center w-full h-24 md:h-32 border-2 border-gray-300 dark:border-gray-700 border-dashed rounded-xl md:rounded-2xl cursor-pointer bg-[#FAFAFA] hover:bg-[#e8f6f8] dark:bg-[#111] dark:hover:bg-[#222] transition-all overflow-hidden">
-                            <input type="file" id="imageInput" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept="image/*" multiple>
-                            <div class="flex flex-col items-center justify-center pointer-events-none text-center px-4">
-                                <i data-lucide="image-plus" class="w-5 h-5 md:w-6 md:h-6 text-gray-400 mb-2 transition-colors group-hover:text-[#51b8cb]"></i>
-                                <p class="text-[9px] md:text-[10px] text-gray-500">Click to upload or paste images</p>
-                            </div>
-                        </div>
-                        <div id="uploadPreviewContainer" class="flex flex-wrap gap-2 mt-3"></div>
+                        <div id="uploadPreviewContainer" class="flex flex-wrap gap-2 mt-2"></div>
                         
-                        <p class="text-[9px] text-gray-400 mt-4 italic font-medium uppercase tracking-widest text-center">* Hint: Swipe horizontally on images in preview to resize</p>
+                        <p class="text-[9px] text-gray-400 mt-2 italic font-medium uppercase tracking-widest text-center">* Hint: Drag images to reorder, swipe to resize</p>
                     </div>
 
                     <div id="themeColorSection" class="hidden bg-[#FAFAFA] dark:bg-[#111] rounded-[1.5rem] md:rounded-[2.5rem] p-5 md:p-8 border border-gray-200 dark:border-[#333] mb-6 md:mb-10 animate-fade-in">
@@ -289,7 +297,13 @@
 
             <section class="lg:sticky lg:top-8 animate-fade-in flex justify-center w-full mb-10 overflow-hidden">
                 <!-- Mobile optimized card container: Responsive Width -->
-                <div id="cardContainer" class="rounded-[2rem] md:rounded-[3rem] card-shadow overflow-hidden border-[4px] md:border-[6px] border-[#51b8cb] relative transition-all duration-500 min-h-[400px] md:min-h-[600px] w-full max-w-[1050px]" style="background-color: #ffffff;">
+                <div id="cardContainer" class="rounded-[2rem] md:rounded-[3rem] card-shadow overflow-hidden border-[4px] md:border-[6px] border-[#51b8cb] relative transition-all duration-500 min-h-[400px] md:min-h-[600px] w-full max-w-[1050px] group/maincard" style="background-color: #ffffff;">
+                    
+                    <!-- Quick Download Button -->
+                    <button id="cardDownloadBtn" onclick="downloadPNG()" class="absolute top-4 right-4 md:top-6 md:right-6 bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md opacity-100 lg:opacity-0 group-hover/maincard:opacity-100 transition-all z-[30] hidden-in-export flex items-center justify-center hover:scale-110 w-[36px] h-[36px] md:w-[44px] md:h-[44px] outline-none" title="Download Card">
+                        <i data-lucide="download" class="w-4 h-4 md:w-5 md:h-5"></i>
+                    </button>
+
                     <div class="pt-6 md:pt-10 px-6 md:px-20 pb-8 md:pb-20 group/card flex flex-col h-full">
                         
                         <!-- Title Restore Button -->
@@ -299,6 +313,20 @@
 
                         <!-- Editable Title Section -->
                         <div id="cardTitleSection" class="group/title relative flex items-center flex-wrap gap-2 md:gap-4 py-1 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                            
+                            <!-- Format Toolbar for Title -->
+                            <div class="format-toolbar absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-lg border border-[#d0ebf0] dark:border-[#333] rounded-xl flex items-center p-1 gap-1 opacity-0 pointer-events-none group-focus-within/title:opacity-100 group-hover/title:opacity-100 group-focus-within/title:pointer-events-auto group-hover/title:pointer-events-auto transition-all z-20 translate-y-2 group-hover/title:translate-y-0 group-focus-within/title:translate-y-0">
+                                <div class="relative">
+                                    <button id="toolbarTitleSizeBtn" onmousedown="event.preventDefault();" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors flex items-center gap-1 text-[11px] font-bold min-w-[40px] justify-center" title="Font Size">
+                                        <span id="toolbarTitleSizeLabel">32</span>
+                                        <i data-lucide="chevron-down" class="w-3 h-3"></i>
+                                    </button>
+                                    <div id="toolbarTitleSizeDropdownMenu" onmousedown="event.preventDefault();" class="hidden absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[60] overflow-hidden w-16 max-h-48 overflow-y-auto custom-scrollbar">
+                                        <!-- Populated via JS -->
+                                    </div>
+                                </div>
+                            </div>
+
                             <h2 id="cardWord" contenteditable="true" data-placeholder="Enter Term / Title..." class="font-bold tracking-tight leading-tight outline-none flex-1 min-w-[50%]" style="text-decoration: none;"></h2>
                             <span id="cardType" contenteditable="true" data-placeholder="Category..." class="text-sm md:text-xl font-bold px-3 py-1 md:px-4 md:py-1 rounded-none outline-none min-w-[80px] empty:min-w-[100px]"></span>
                             
@@ -326,7 +354,19 @@
                                     <button onmousedown="event.preventDefault(); execFormat('undo')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors" title="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
                                     <button onmousedown="event.preventDefault(); execFormat('redo')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors" title="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
                                     <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                    <button onmousedown="event.preventDefault(); execFormat('bold')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors" title="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
+                                    <button id="btnFormatBold" onmousedown="event.preventDefault(); execFormat('bold')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors" title="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
+                                    <button id="btnFormatHighlight" onmousedown="event.preventDefault(); execFormat('highlight')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors" title="Highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
+                                    <button id="btnFormatColor" onmousedown="event.preventDefault(); execFormat('textColor')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors" title="Text Color"><i data-lucide="palette" class="w-4 h-4"></i></button>
+                                    <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                    <div class="relative">
+                                        <button id="toolbarDefSizeBtn" onmousedown="event.preventDefault();" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors flex items-center gap-1 text-[11px] font-bold min-w-[40px] justify-center" title="Font Size">
+                                            <span id="toolbarDefSizeLabel">24</span>
+                                            <i data-lucide="chevron-down" class="w-3 h-3"></i>
+                                        </button>
+                                        <div id="toolbarDefSizeDropdownMenu" onmousedown="event.preventDefault();" class="hidden absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[60] overflow-hidden w-16 max-h-48 overflow-y-auto custom-scrollbar">
+                                            <!-- Populated via JS -->
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div id="cardDef" contenteditable="true" data-placeholder="Enter definition or notes..." class="font-medium leading-relaxed whitespace-pre-wrap outline-none" style="text-decoration: none; min-height: 1.5em;"></div>
@@ -342,12 +382,6 @@
                 </div>
             </section>
         </div>
-    </div>
-
-    <!-- Floating Context Size Menu -->
-    <div id="floatingSizeMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-32 py-1">
-        <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Set Size</div>
-        <div id="floatingSizeOptions" class="max-h-60 overflow-y-auto custom-scrollbar"></div>
     </div>
 
     <!-- Floating Context Category Menu -->
@@ -405,7 +439,6 @@
         let dragStartX = 0;
         let dragImageIdx = -1;
         let dragStartScale = 100;
-        let activeContextElement = null; // Tracks title or def context menu
         let activeImageIdx = -1; // Tracks which image is selected for context menu
 
         initColorPicker();
@@ -469,24 +502,50 @@
         window.addEventListener('click', closeAllDropdowns);
 
         function initFloatingMenu() {
-            const menu = document.getElementById('floatingSizeMenu');
-            const container = document.getElementById('floatingSizeOptions');
             const sizes = [12, 14, 16, 18, 20, 24, 28, 32, 40, 48, 64, 80];
-            
+
+            // Populate the new Notes Size dropdown in the toolbar
+            const toolbarDefSizeMenu = document.getElementById('toolbarDefSizeDropdownMenu');
+            const toolbarDefSizeBtn = document.getElementById('toolbarDefSizeBtn');
+
+            toolbarDefSizeBtn.onclick = (e) => {
+                e.stopPropagation();
+                closeAllDropdowns();
+                toolbarDefSizeMenu.classList.toggle('hidden');
+            };
+
             sizes.forEach(size => {
                 const item = document.createElement('div');
-                item.className = 'dropdown-item text-gray-700 dark:text-gray-300';
-                item.innerText = size + 'px';
-                item.onclick = (e) => {
-                    e.stopPropagation();
-                    if (activeContextElement === 'title') {
-                        selectTextSize(size);
-                    } else if (activeContextElement === 'def') {
-                        selectDefSize(size);
-                    }
-                    menu.classList.add('hidden');
+                item.className = 'dropdown-item text-gray-700 dark:text-gray-300 text-center py-1.5';
+                item.innerText = size;
+                item.onmousedown = (e) => {
+                    e.preventDefault(); // keep focus on the notes section
+                    selectDefSize(size);
+                    toolbarDefSizeMenu.classList.add('hidden');
                 };
-                container.appendChild(item);
+                toolbarDefSizeMenu.appendChild(item);
+            });
+
+            // Populate the new Title Size dropdown in the toolbar
+            const toolbarTitleSizeMenu = document.getElementById('toolbarTitleSizeDropdownMenu');
+            const toolbarTitleSizeBtn = document.getElementById('toolbarTitleSizeBtn');
+
+            toolbarTitleSizeBtn.onclick = (e) => {
+                e.stopPropagation();
+                closeAllDropdowns();
+                toolbarTitleSizeMenu.classList.toggle('hidden');
+            };
+
+            sizes.forEach(size => {
+                const item = document.createElement('div');
+                item.className = 'dropdown-item text-gray-700 dark:text-gray-300 text-center py-1.5';
+                item.innerText = size;
+                item.onmousedown = (e) => {
+                    e.preventDefault(); // keep focus on the title section
+                    selectTextSize(size);
+                    toolbarTitleSizeMenu.classList.add('hidden');
+                };
+                toolbarTitleSizeMenu.appendChild(item);
             });
 
             // Initialize Category Context Menu
@@ -527,52 +586,19 @@
             });
 
             window.addEventListener('click', () => {
-                menu.classList.add('hidden');
                 catMenu.classList.add('hidden');
                 imgMenu.classList.add('hidden');
             });
 
-            const titleEl = document.getElementById('cardWord');
-            const defEl = document.getElementById('cardDef');
             const typeEl = document.getElementById('cardType');
-
-            titleEl.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-                activeContextElement = 'title';
-                showFloatingMenu(e.clientX, e.clientY);
-            });
-
-            defEl.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-                activeContextElement = 'def';
-                showFloatingMenu(e.clientX, e.clientY);
-            });
-
             typeEl.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
                 showFloatingCategoryMenu(e.clientX, e.clientY);
             });
         }
 
-        function showFloatingMenu(x, y) {
-            const menu = document.getElementById('floatingSizeMenu');
-            document.getElementById('floatingCategoryMenu').classList.add('hidden'); // Hide other menu
-            document.getElementById('floatingImageBorderMenu').classList.add('hidden'); // Hide other menu
-            menu.classList.remove('hidden');
-            
-            requestAnimationFrame(() => {
-                const rect = menu.getBoundingClientRect();
-                if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
-                if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
-                
-                menu.style.left = x + 'px';
-                menu.style.top = y + 'px';
-            });
-        }
-
         function showFloatingCategoryMenu(x, y) {
             const menu = document.getElementById('floatingCategoryMenu');
-            document.getElementById('floatingSizeMenu').classList.add('hidden'); // Hide other menu
             document.getElementById('floatingImageBorderMenu').classList.add('hidden'); // Hide other menu
             menu.classList.remove('hidden');
             
@@ -588,7 +614,6 @@
 
         function showFloatingImageBorderMenu(x, y) {
             const menu = document.getElementById('floatingImageBorderMenu');
-            document.getElementById('floatingSizeMenu').classList.add('hidden'); // Hide other menu
             document.getElementById('floatingCategoryMenu').classList.add('hidden'); // Hide other menu
             menu.classList.remove('hidden');
             
@@ -608,8 +633,20 @@
             updatePreview();
         }
 
-        function selectTextSize(size) { currentSelectedSize = size; updatePreview(); }
-        function selectDefSize(size) { currentSelectedDefSize = size; updatePreview(); }
+        function selectTextSize(size) { 
+            currentSelectedSize = size; 
+            const label = document.getElementById('toolbarTitleSizeLabel');
+            if(label) label.innerText = size;
+            updatePreview(); 
+        }
+        
+        function selectDefSize(size) { 
+            currentSelectedDefSize = size; 
+            const label = document.getElementById('toolbarDefSizeLabel');
+            if(label) label.innerText = size;
+            updatePreview(); 
+        }
+        
         function selectImageBorder(border) { currentImageBorder = border; updatePreview(); }
         function selectImageCols(cols) { currentImageCols = cols; document.getElementById('currentImageColsText').innerText = cols === 0 ? 'Auto' : cols; updatePreview(); }
         function selectBlend(blend) { currentBlendPercentage = blend; document.getElementById('blendValueLabel').innerText = blend + '%'; updatePreview(); }
@@ -645,18 +682,220 @@
             setTimeout(() => document.getElementById('cardType').focus(), 50);
         };
 
+        function getSelectionStyle(styleName) {
+            const sel = window.getSelection();
+            if (!sel.rangeCount) return null;
+            let node = sel.anchorNode;
+            if (!node) return null;
+            let parent = node.nodeType === 3 ? node.parentNode : node;
+            
+            // Only check up to the boundary of the editable area
+            while (parent && parent.id !== 'cardDef' && parent.id !== 'note-area' && parent.tagName !== 'BODY') {
+                if (parent.style && parent.style[styleName]) {
+                    return parent.style[styleName];
+                }
+                parent = parent.parentNode;
+            }
+            return null;
+        }
+
+        function removeStyleFromSelection(styleName) {
+            const sel = window.getSelection();
+            if (!sel.rangeCount) return;
+            
+            // Clean up the parent tree to fix nested span bugs
+            let node = sel.anchorNode;
+            let parent = node.nodeType === 3 ? node.parentNode : node;
+            
+            while (parent && parent.id !== 'cardDef' && parent.id !== 'note-area' && parent.tagName !== 'BODY') {
+                if (parent.style && parent.style[styleName] !== undefined && parent.style[styleName] !== '') {
+                    parent.style[styleName] = '';
+                }
+                if (parent.getAttribute('style') === '') parent.removeAttribute('style');
+                if (styleName === 'color' && parent.hasAttribute('color')) parent.removeAttribute('color');
+                parent = parent.parentNode;
+            }
+            
+            // Clean up children in the selection
+            const range = sel.getRangeAt(0);
+            const container = range.commonAncestorContainer;
+            if (container.nodeType === 1) { 
+                const children = container.querySelectorAll('*');
+                children.forEach(child => {
+                    if (sel.containsNode(child, true)) {
+                        if (child.style && child.style[styleName] !== undefined && child.style[styleName] !== '') {
+                            child.style[styleName] = '';
+                        }
+                        if (child.getAttribute('style') === '') child.removeAttribute('style');
+                        if (styleName === 'color' && child.hasAttribute('color')) child.removeAttribute('color');
+                    }
+                });
+            }
+        }
+
+        window.toggleNpHighlight = function() {
+            document.execCommand('styleWithCSS', false, true);
+            let bgStyle = getSelectionStyle('backgroundColor');
+            let isHighlighted = bgStyle && bgStyle !== 'transparent' && bgStyle !== 'rgba(0, 0, 0, 0)';
+            
+            if (isHighlighted) {
+                document.execCommand('hiliteColor', false, 'transparent');
+                document.execCommand('backColor', false, 'transparent');
+                removeStyleFromSelection('backgroundColor');
+            } else {
+                const highlightColor = 'rgba(81, 184, 203, 0.4)'; // A nice semi-transparent cyan default
+                document.execCommand('hiliteColor', false, highlightColor);
+                document.execCommand('backColor', false, highlightColor);
+            }
+            document.getElementById('note-area').focus();
+        };
+
+        window.updateNpFormatState = function() {
+            if (document.activeElement !== document.getElementById('note-area')) return;
+
+            const isBold = document.queryCommandState('bold');
+            
+            let bgStyle = getSelectionStyle('backgroundColor');
+            let isHighlighted = bgStyle && bgStyle !== 'transparent' && bgStyle !== 'rgba(0, 0, 0, 0)';
+
+            const btnBold = document.getElementById('np-bold-btn');
+            const btnHighlight = document.getElementById('np-highlight-btn');
+
+            if (btnBold) {
+                if (isBold) {
+                    btnBold.classList.add('bg-[#e8f6f8]', 'dark:bg-[#333]', 'text-[#51b8cb]');
+                    btnBold.classList.remove('text-gray-400');
+                } else {
+                    btnBold.classList.remove('bg-[#e8f6f8]', 'dark:bg-[#333]', 'text-[#51b8cb]');
+                    btnBold.classList.add('text-gray-400');
+                }
+            }
+
+            if (btnHighlight) {
+                if (isHighlighted) {
+                    btnHighlight.classList.add('bg-[#e8f6f8]', 'dark:bg-[#333]', 'text-[#51b8cb]');
+                    btnHighlight.classList.remove('text-gray-400');
+                } else {
+                    btnHighlight.classList.remove('bg-[#e8f6f8]', 'dark:bg-[#333]', 'text-[#51b8cb]');
+                    btnHighlight.classList.add('text-gray-400');
+                }
+            }
+        };
+
         window.execFormat = function(cmd, val = null) {
-            document.execCommand(cmd, false, val);
+            document.execCommand('styleWithCSS', false, true);
+            
+            if (cmd === 'highlight') {
+                let bgStyle = getSelectionStyle('backgroundColor');
+                let isHighlighted = bgStyle && bgStyle !== 'transparent' && bgStyle !== 'rgba(0, 0, 0, 0)';
+                
+                if (isHighlighted) {
+                    // Tell browser to clear it, then manually strip residual inline styles
+                    document.execCommand('hiliteColor', false, 'transparent');
+                    document.execCommand('backColor', false, 'transparent');
+                    removeStyleFromSelection('backgroundColor');
+                } else {
+                    const highlightColor = hexToRgba(activeColor, 0.4);
+                    document.execCommand('hiliteColor', false, highlightColor);
+                    document.execCommand('backColor', false, highlightColor);
+                }
+            } else if (cmd === 'textColor') {
+                let fStyle = getSelectionStyle('color');
+                let activeRgb = hexToRgb(activeColor);
+                let activeRgbString = `rgb(${activeRgb.r}, ${activeRgb.g}, ${activeRgb.b})`.replace(/\s/g, '');
+                
+                let isColored = false;
+                if (fStyle) {
+                    let fColorNorm = fStyle.replace(/\s/g, '').toLowerCase();
+                    if (fColorNorm === activeRgbString.toLowerCase() || fColorNorm === activeColor.toLowerCase()) {
+                        isColored = true;
+                    }
+                }
+                
+                if (isColored) {
+                    // Dummy apply to create boundary, then strip all inline colors to fall back to the dynamic card text color
+                    document.execCommand('foreColor', false, '#000000'); 
+                    removeStyleFromSelection('color');
+                } else {
+                    document.execCommand('foreColor', false, activeColor);
+                }
+            } else {
+                document.execCommand(cmd, false, val);
+            }
+            
             document.getElementById('cardDef').focus();
             document.getElementById('inputDef').value = document.getElementById('cardDef').innerHTML;
             showDefPlaceholder = true;
             syncCardState();
+            checkFormatState();
         };
+
+        function checkFormatState() {
+            if (document.activeElement !== document.getElementById('cardDef')) return;
+
+            const isBold = document.queryCommandState('bold');
+            
+            // Use specific inline-style checks instead of inherited browser query logic
+            let bgStyle = getSelectionStyle('backgroundColor');
+            let isHighlighted = bgStyle && bgStyle !== 'transparent' && bgStyle !== 'rgba(0, 0, 0, 0)';
+
+            let fStyle = getSelectionStyle('color');
+            let activeRgb = hexToRgb(activeColor);
+            let activeRgbString = `rgb(${activeRgb.r}, ${activeRgb.g}, ${activeRgb.b})`.replace(/\s/g, '');
+            let isColored = false;
+            if (fStyle) {
+                let fColorNorm = fStyle.replace(/\s/g, '').toLowerCase();
+                if (fColorNorm === activeRgbString.toLowerCase() || fColorNorm === activeColor.toLowerCase()) {
+                    isColored = true;
+                }
+            }
+
+            const btnBold = document.getElementById('btnFormatBold');
+            const btnHighlight = document.getElementById('btnFormatHighlight');
+            const btnColor = document.getElementById('btnFormatColor');
+
+            if (btnBold) {
+                if (isBold) {
+                    btnBold.classList.add('bg-[#e8f6f8]', 'dark:bg-[#333]', 'text-[#51b8cb]');
+                    btnBold.classList.remove('text-gray-500');
+                } else {
+                    btnBold.classList.remove('bg-[#e8f6f8]', 'dark:bg-[#333]', 'text-[#51b8cb]');
+                    btnBold.classList.add('text-gray-500');
+                }
+            }
+
+            if (btnHighlight) {
+                if (isHighlighted) {
+                    btnHighlight.classList.add('bg-[#e8f6f8]', 'dark:bg-[#333]', 'text-[#51b8cb]');
+                    btnHighlight.classList.remove('text-gray-500');
+                } else {
+                    btnHighlight.classList.remove('bg-[#e8f6f8]', 'dark:bg-[#333]', 'text-[#51b8cb]');
+                    btnHighlight.classList.add('text-gray-500');
+                }
+            }
+
+            if (btnColor) {
+                if (isColored) {
+                    btnColor.classList.add('bg-[#e8f6f8]', 'dark:bg-[#333]', 'text-[#51b8cb]');
+                    btnColor.classList.remove('text-gray-500');
+                } else {
+                    btnColor.classList.remove('bg-[#e8f6f8]', 'dark:bg-[#333]', 'text-[#51b8cb]');
+                    btnColor.classList.add('text-gray-500');
+                }
+            }
+        }
 
         function setupEventListeners() {
             document.getElementById('imageInput').addEventListener('change', handleImageUpload);
-            document.getElementById('btnDownload').addEventListener('click', downloadPNG);
             
+            document.addEventListener('selectionchange', () => {
+                if (document.activeElement === document.getElementById('cardDef')) {
+                    checkFormatState();
+                } else if (document.activeElement === document.getElementById('note-area')) {
+                    updateNpFormatState();
+                }
+            });
+
             // Setup Color Toggle Event
             document.getElementById('btnOpenColorModal').addEventListener('click', () => {
                 const colorSection = document.getElementById('themeColorSection');
@@ -771,9 +1010,9 @@
 
             uploadedImages[dragImageIdx].scale = newScale;
             
-            const imgEl = document.getElementById(`preview-img-${dragImageIdx}`);
-            if (imgEl) {
-                imgEl.style.width = newScale + '%';
+            const wrapperEl = document.getElementById(`preview-wrapper-${dragImageIdx}`);
+            if (wrapperEl) {
+                wrapperEl.style.width = newScale + '%';
             }
 
             if (e.type === 'touchmove') e.preventDefault();
@@ -886,6 +1125,13 @@
             
             selectCategory(card.category || "-"); selectTextSize(card.textSize || 32); selectDefSize(card.defSize || 24); currentImageBorder = card.imageBorder || 2; selectImageCols(card.imageCols || 0);
             
+            // Ensure label matches loaded card size
+            const sizeLabel = document.getElementById('toolbarDefSizeLabel');
+            if (sizeLabel) sizeLabel.innerText = card.defSize || 24;
+
+            const titleSizeLabel = document.getElementById('toolbarTitleSizeLabel');
+            if (titleSizeLabel) titleSizeLabel.innerText = card.textSize || 32;
+
             currentBlendPercentage = card.blend !== undefined ? card.blend : 10;
             document.getElementById('blendValueLabel').innerText = currentBlendPercentage + '%';
             
@@ -941,6 +1187,12 @@
             card.style.maxWidth = '1050px'; // Maintains expected export boundaries
             card.style.borderColor = finalColor; 
             card.style.backgroundColor = getLightShade(finalColor, blend);
+
+            const dlBtn = document.getElementById('cardDownloadBtn');
+            if (dlBtn) {
+                dlBtn.style.color = finalColor;
+                dlBtn.style.border = `2px solid ${finalColor}`;
+            }
             
             const titleSection = document.getElementById('cardTitleSection');
             const titleRestore = document.getElementById('cardTitleRestore');
@@ -995,15 +1247,18 @@
             
             cardImages.innerHTML = '';
             uploadedImages.forEach((imgObj, idx) => {
+                const wrapper = document.createElement('div');
+                wrapper.id = `preview-wrapper-${idx}`;
+                wrapper.className = "relative group/imgwrapper mx-auto block";
+                wrapper.style.width = `${imgObj.scale}%`;
+
                 const img = document.createElement('img');
                 img.id = `preview-img-${idx}`;
                 img.src = imgObj.src;
-                img.className = "resizable-img h-auto object-cover rounded-[1.5rem] shadow-sm block mx-auto";
+                img.className = "resizable-img h-auto object-cover rounded-[1.5rem] shadow-sm block w-full";
                 
                 const appliedBorder = imgObj.border !== undefined && imgObj.border !== null ? imgObj.border : imgBorder;
                 img.style.border = `${appliedBorder}px solid ${finalColor}`;
-                
-                img.style.width = `${imgObj.scale}%`;
                 img.draggable = false;
                 
                 // Add swipe/resize events
@@ -1017,7 +1272,83 @@
                     showFloatingImageBorderMenu(e.clientX, e.clientY);
                 };
 
-                cardImages.appendChild(img);
+                // Drag Handle
+                const dragBtn = document.createElement('div');
+                dragBtn.className = "absolute -top-3 -left-3 bg-white dark:bg-[#1a1a1a] rounded-full cursor-grab shadow-md opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all z-10 hidden-in-export flex items-center justify-center hover:scale-110 w-[28px] h-[28px] md:w-[32px] md:h-[32px]";
+                dragBtn.style.color = finalColor;
+                dragBtn.style.border = `2px solid ${finalColor}`;
+                dragBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 md:w-5 md:h-5">
+                    <path d="M12 3 l4 4 H8 Z" />
+                    <path d="M12 21 l4 -4 H8 Z" />
+                    <rect x="5" y="8.5" width="14" height="2" rx="1" />
+                    <rect x="5" y="11.5" width="14" height="2" rx="1" />
+                    <rect x="5" y="14.5" width="14" height="2" rx="1" />
+                </svg>`;
+                dragBtn.title = "Drag to reorder";
+                
+                // Only allow drag-and-drop wrapper when handle is held, prevents conflict with resizing
+                dragBtn.onmousedown = () => { wrapper.draggable = true; };
+                dragBtn.onmouseup = () => { wrapper.draggable = false; };
+                dragBtn.onmouseleave = () => { wrapper.draggable = false; };
+                dragBtn.ontouchstart = () => { wrapper.draggable = true; };
+                dragBtn.ontouchend = () => { wrapper.draggable = false; };
+
+                // Delete Button
+                const delBtn = document.createElement('button');
+                delBtn.className = "absolute -top-3 -right-3 opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all z-10 hidden-in-export flex items-center justify-center hover:scale-110 outline-none p-0 bg-transparent border-none w-[28px] h-[28px] md:w-[32px] md:h-[32px]";
+                delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-full h-full drop-shadow-md">
+                    <defs>
+                        <linearGradient id="delGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#ff3333" />
+                            <stop offset="100%" stop-color="#cc0000" />
+                        </linearGradient>
+                    </defs>
+                    <circle cx="12" cy="12" r="11" fill="url(#delGrad)" stroke="#990000" stroke-width="0.5" />
+                    <path d="M8 8 L16 16 M16 8 L8 16" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>`;
+                delBtn.title = "Delete Image";
+                delBtn.onclick = (e) => { e.stopPropagation(); removeImage(idx); };
+
+                wrapper.appendChild(img);
+                wrapper.appendChild(dragBtn);
+                wrapper.appendChild(delBtn);
+
+                // HTML5 Drag and Drop Handlers
+                wrapper.ondragstart = (e) => {
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', idx);
+                    if(e.dataTransfer.setDragImage) { e.dataTransfer.setDragImage(wrapper, 0, 0); }
+                    setTimeout(() => wrapper.classList.add('opacity-50'), 0);
+                };
+                wrapper.ondragend = (e) => {
+                    wrapper.classList.remove('opacity-50');
+                    wrapper.draggable = false;
+                };
+                wrapper.ondragover = (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                };
+                wrapper.ondragenter = (e) => {
+                    e.preventDefault();
+                    wrapper.classList.add('ring-4', 'ring-[#51b8cb]', 'ring-offset-2', 'rounded-[1.5rem]');
+                };
+                wrapper.ondragleave = (e) => {
+                    wrapper.classList.remove('ring-4', 'ring-[#51b8cb]', 'ring-offset-2', 'rounded-[1.5rem]');
+                };
+                wrapper.ondrop = (e) => {
+                    e.preventDefault();
+                    wrapper.classList.remove('ring-4', 'ring-[#51b8cb]', 'ring-offset-2', 'rounded-[1.5rem]');
+                    const fromIdx = parseInt(e.dataTransfer.getData('text/plain'), 10);
+                    const toIdx = idx;
+                    if (fromIdx !== toIdx && !isNaN(fromIdx)) {
+                        const movedItem = uploadedImages.splice(fromIdx, 1)[0];
+                        uploadedImages.splice(toIdx, 0, movedItem);
+                        renderUploadPreviews();
+                        updatePreview();
+                    }
+                };
+
+                cardImages.appendChild(wrapper);
             });
 
             updateFavicon(); updateBrandLogo();
@@ -1148,7 +1479,7 @@
                 const n = npNotes.find(x => x.id === id); 
                 if(n) { 
                     titleInput.value = n.title; 
-                    area.value = n.content; 
+                    area.innerHTML = n.content; 
                     
                     // Reset history stacks for the newly selected note
                     undoStack = [{ title: n.title, content: n.content }];
@@ -1159,12 +1490,12 @@
             }
             
             function update(pushHistory = true) {
-                const words = area.value.trim() ? area.value.trim().split(/\s+/).length : 0;
+                const words = area.innerText.trim() ? area.innerText.trim().split(/\s+/).length : 0;
                 count.textContent = `${words} Words`;
                 const idx = npNotes.findIndex(x => x.id === npCurrentId);
                 
                 if(idx !== -1) { 
-                    npNotes[idx].content = area.value; 
+                    npNotes[idx].content = area.innerHTML; 
                     npNotes[idx].title = titleInput.value; 
                     save(); 
                     render();
@@ -1175,8 +1506,8 @@
                     clearTimeout(historyTimeout);
                     historyTimeout = setTimeout(() => {
                         const topState = undoStack[undoStack.length - 1];
-                        if (!topState || topState.title !== titleInput.value || topState.content !== area.value) {
-                            undoStack.push({ title: titleInput.value, content: area.value });
+                        if (!topState || topState.title !== titleInput.value || topState.content !== area.innerHTML) {
+                            undoStack.push({ title: titleInput.value, content: area.innerHTML });
                             if (undoStack.length > 50) undoStack.shift(); // Limit stack size
                             redoStack = []; // Clear redo stack on new input
                         }
@@ -1186,7 +1517,7 @@
 
             document.getElementById('np-undo-btn').onclick = () => {
                 const currentTitle = titleInput.value;
-                const currentContent = area.value;
+                const currentContent = area.innerHTML;
                 const topState = undoStack[undoStack.length - 1];
 
                 // If currently typed text hasn't been saved to history yet, push it before undoing
@@ -1202,7 +1533,7 @@
                     
                     const prevState = undoStack[undoStack.length - 1];
                     titleInput.value = prevState.title;
-                    area.value = prevState.content;
+                    area.innerHTML = prevState.content;
                     
                     update(false);
                     isUndoingRedoing = false;
@@ -1216,7 +1547,7 @@
                     undoStack.push(nextState);
                     
                     titleInput.value = nextState.title;
-                    area.value = nextState.content;
+                    area.innerHTML = nextState.content;
                     
                     update(false);
                     isUndoingRedoing = false;
@@ -1224,9 +1555,22 @@
             };
 
             document.getElementById('new-note-btn').onclick = () => { const n = { id: Date.now(), title: '', content: '', createdAt: new Date().toISOString() }; npNotes.unshift(n); select(n.id); titleInput.focus(); };
-            document.getElementById('np-delete-btn').onclick = () => { if(npNotes.length <= 1) { npNotes[0].title = ''; npNotes[0].content = ''; area.value = ''; titleInput.value = ''; update(false); render(); return; } npNotes = npNotes.filter(x => x.id !== npCurrentId); select(npNotes[0].id); };
-            document.getElementById('np-copy-btn').onclick = () => { area.select(); document.execCommand('copy'); window.getSelection().removeAllRanges(); const btn = document.getElementById('np-copy-btn'), icon = btn.innerHTML; btn.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-[#51b8cb]"></i>'; if (typeof lucide !== 'undefined') lucide.createIcons(); setTimeout(() => { btn.innerHTML = icon; if (typeof lucide !== 'undefined') lucide.createIcons(); }, 2000); };
-            document.getElementById('np-download-btn').onclick = () => { const b = new Blob([area.value], {type:'text/plain'}), u = URL.createObjectURL(b), a = document.createElement('a'); a.href = u; a.download = `${titleInput.value || 'Untitled'}.txt`; a.click(); };
+            document.getElementById('np-delete-btn').onclick = () => { if(npNotes.length <= 1) { npNotes[0].title = ''; npNotes[0].content = ''; area.innerHTML = ''; titleInput.value = ''; update(false); render(); return; } npNotes = npNotes.filter(x => x.id !== npCurrentId); select(npNotes[0].id); };
+            document.getElementById('np-copy-btn').onclick = () => { 
+                const range = document.createRange();
+                range.selectNodeContents(area);
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+                document.execCommand('copy'); 
+                sel.removeAllRanges(); 
+                
+                const btn = document.getElementById('np-copy-btn'), icon = btn.innerHTML; 
+                btn.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-[#51b8cb]"></i>'; 
+                if (typeof lucide !== 'undefined') lucide.createIcons(); 
+                setTimeout(() => { btn.innerHTML = icon; if (typeof lucide !== 'undefined') lucide.createIcons(); }, 2000); 
+            };
+            document.getElementById('np-download-btn').onclick = () => { const b = new Blob([area.innerText], {type:'text/plain'}), u = URL.createObjectURL(b), a = document.createElement('a'); a.href = u; a.download = `${titleInput.value || 'Untitled'}.txt`; a.click(); };
             
             area.oninput = update; 
             titleInput.oninput = update;
@@ -1257,7 +1601,7 @@
                         doc.querySelectorAll('#cardTitleRestore, #cardDefRestore, #addCategoryBtn, .format-toolbar').forEach(el => el.style.display = 'none');
                         
                         // Hide clear buttons and placeholder texts for screenshot
-                        doc.querySelectorAll('.clear-btn').forEach(btn => btn.style.display = 'none');
+                        doc.querySelectorAll('.clear-btn, .hidden-in-export').forEach(btn => btn.style.display = 'none');
                         doc.querySelectorAll('[contenteditable]').forEach(el => {
                             if (!el.innerText.trim()) el.removeAttribute('data-placeholder');
                         });
