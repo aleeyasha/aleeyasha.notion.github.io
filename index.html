@@ -320,6 +320,15 @@
 
                             <!-- Editable Definition Section -->
                             <div id="cardNotesSection" class="group/def relative py-1 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                                
+                                <!-- Format Toolbar for Notes -->
+                                <div class="format-toolbar absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-lg border border-[#d0ebf0] dark:border-[#333] rounded-xl flex items-center p-1 gap-1 opacity-0 pointer-events-none group-focus-within/def:opacity-100 group-hover/def:opacity-100 group-focus-within/def:pointer-events-auto group-hover/def:pointer-events-auto transition-all z-20 translate-y-2 group-hover/def:translate-y-0 group-focus-within/def:translate-y-0">
+                                    <button onmousedown="event.preventDefault(); execFormat('undo')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors" title="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); execFormat('redo')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors" title="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
+                                    <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                    <button onmousedown="event.preventDefault(); execFormat('bold')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors" title="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
+                                </div>
+
                                 <div id="cardDef" contenteditable="true" data-placeholder="Enter definition or notes..." class="font-medium leading-relaxed whitespace-pre-wrap outline-none" style="text-decoration: none; min-height: 1.5em;"></div>
                                 
                                 <button onclick="clearDef()" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 group-hover/def:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" title="Remove Notes Section">
@@ -636,6 +645,14 @@
             setTimeout(() => document.getElementById('cardType').focus(), 50);
         };
 
+        window.execFormat = function(cmd, val = null) {
+            document.execCommand(cmd, false, val);
+            document.getElementById('cardDef').focus();
+            document.getElementById('inputDef').value = document.getElementById('cardDef').innerHTML;
+            showDefPlaceholder = true;
+            syncCardState();
+        };
+
         function setupEventListeners() {
             document.getElementById('imageInput').addEventListener('change', handleImageUpload);
             document.getElementById('btnDownload').addEventListener('click', downloadPNG);
@@ -672,7 +689,7 @@
             });
 
             document.getElementById('cardDef').addEventListener('input', (e) => {
-                document.getElementById('inputDef').value = e.target.innerText;
+                document.getElementById('inputDef').value = e.target.innerHTML;
                 showDefPlaceholder = true;
                 syncCardState();
             });
@@ -963,7 +980,7 @@
                 const cardDef = document.getElementById('cardDef');
                 cardDef.style.color = textColor; 
                 cardDef.style.fontSize = defSize + 'px'; 
-                if (cardDef.innerText !== definition) cardDef.innerText = definition;
+                if (cardDef.innerHTML !== definition) cardDef.innerHTML = definition;
             } else {
                 notesSection.classList.add('hidden');
                 defRestore.classList.remove('hidden');
@@ -1237,7 +1254,7 @@
                         c.style.borderRadius = '48px'; 
                         
                         // Hide restore buttons during download
-                        doc.querySelectorAll('#cardTitleRestore, #cardDefRestore, #addCategoryBtn').forEach(el => el.style.display = 'none');
+                        doc.querySelectorAll('#cardTitleRestore, #cardDefRestore, #addCategoryBtn, .format-toolbar').forEach(el => el.style.display = 'none');
                         
                         // Hide clear buttons and placeholder texts for screenshot
                         doc.querySelectorAll('.clear-btn').forEach(btn => btn.style.display = 'none');
