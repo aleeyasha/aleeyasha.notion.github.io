@@ -53,7 +53,7 @@
         .color-map-black { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, #000, rgba(0,0,0,0)); }
         #colorMarker { position: absolute; width: 16px; height: 16px; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 0 1px rgba(0,0,0,0.2); pointer-events: none; transform: translate(-50%, -50%); }
 
-        #cardContainer { backface-visibility: hidden; -webkit-font-smoothing: antialiased; margin: 0 auto; transition: all 0.3s ease; }
+        #cardContainer, #notepadContainer { backface-visibility: hidden; -webkit-font-smoothing: antialiased; margin: 0 auto; transition: all 0.3s ease; }
         .editor-scroll-area { max-height: calc(100vh - 8rem); lg:max-h-[75vh]; overflow-y: auto; scrollbar-gutter: stable; }
 
         #builderArea h2 { color: #222222 !important; }
@@ -98,6 +98,7 @@
         <!-- Main Layout -->
         <div class="w-full max-w-[1800px] px-3 md:px-4 grid grid-cols-1 lg:grid-cols-[450px_1fr] xl:grid-cols-[550px_1fr] gap-6 md:gap-12 items-start">
             
+            <!-- Sidebar Editor -->
             <section id="builderArea" class="bg-white border border-[#d0ebf0] rounded-[1.5rem] md:rounded-[2rem] card-shadow animate-fade-in relative flex flex-col lg:max-h-[85vh] overflow-hidden">
                 <div id="builder-content" class="flex flex-col h-full w-full">
                     <div class="flex items-center justify-between border-b border-gray-100 shrink-0 p-5 md:p-8 pb-4">
@@ -129,76 +130,16 @@
                         <!-- Hidden inputs to maintain application state -->
                         <input type="hidden" id="inputTitle" value="">
                         <textarea id="inputDef" class="hidden"></textarea>
-
-                        <div class="pt-2">
-                            <div class="flex flex-wrap items-center justify-between gap-2">
-                                <div class="flex items-center gap-3">
-                                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] m-0">Reference Images</label>
-                                    
-                                    <div class="relative cursor-pointer group" title="Upload or paste images">
-                                        <input type="file" id="imageInput" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept="image/*" multiple>
-                                        <button class="p-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-gray-400 group-hover:text-[#51b8cb] rounded-lg transition-all shadow-sm group-hover:border-gray-300 dark:group-hover:border-gray-600 outline-none flex items-center justify-center pointer-events-none">
-                                            <i data-lucide="image-plus" class="w-4 h-4"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <!-- Image Layout Dropdown -->
-                                <div class="relative shrink-0 w-24">
-                                    <button id="imageColsBtn" class="w-full px-2 py-1.5 bg-[#e8f6f8] dark:bg-[#222] text-[#51b8cb] text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group border border-transparent hover:border-[#d0ebf0] dark:hover:border-[#333]">
-                                        <span id="currentImageColsText">Auto</span>
-                                        <i data-lucide="chevron-down" class="w-3 h-3 transition-transform group-hover:translate-y-0.5 shrink-0"></i>
-                                    </button>
-                                    <div id="imageColsDropdownMenu" class="hidden absolute right-0 mt-2 w-full bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-50 overflow-hidden">
-                                        <div id="imageColsOptions" class="py-1"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Notepad Content -->
-                <div id="notepad-content" class="hidden absolute inset-0 bg-white dark:bg-[#1a1a1a] z-30 flex flex-col">
-                    <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 shrink-0 p-5 md:p-8 pb-4">
-                        <div class="flex items-center gap-3 md:gap-4">
-                            <button id="close-notepad-btn" class="p-2 md:p-3 bg-[#e8f6f8] dark:bg-[#222] text-[#51b8cb] rounded-lg md:rounded-xl transition-all shadow-sm hover:scale-105 outline-none" title="Back to Cards">
-                                <i data-lucide="arrow-left" class="w-4 h-4 md:w-5 md:h-5"></i>
-                            </button>
-                            <h2 class="text-lg md:text-xl font-bold text-[#222222] dark:text-[#f1f1f1] tracking-tight">Notepad</h2>
-                        </div>
-                        <button id="new-note-btn" class="p-2 md:p-3 bg-[#51b8cb] hover:bg-[#3a98aa] text-white rounded-lg md:rounded-xl transition-all shadow-sm hover:scale-105 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest">
-                            <i data-lucide="plus" class="w-4 h-4 md:w-5 md:h-5"></i> <span class="hidden md:inline">New Note</span>
-                        </button>
-                    </div>
-
-                    <div class="px-5 md:px-8 py-3 border-b border-gray-100 dark:border-gray-800 shrink-0 bg-[#FAFAFA] dark:bg-[#111]">
-                        <div id="notes-list" class="flex gap-2 overflow-x-auto pb-2 custom-scrollbar items-center"></div>
-                    </div>
-
-                    <div class="flex-1 flex flex-col p-5 md:p-8 overflow-y-auto custom-scrollbar relative">
-                        <input type="text" id="note-title" class="np-title-input placeholder:text-gray-300 dark:placeholder:text-gray-600 mb-4 shrink-0" placeholder="Untitled Note">
-                        <div class="flex items-center gap-1.5 md:gap-2 flex-wrap w-full mb-4 pb-4 border-b border-gray-50 dark:border-gray-800 shrink-0">
-                            <button id="np-undo-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
-                            <button id="np-redo-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
-                            <div class="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                            <button id="np-bold-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
-                            <button id="np-highlight-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
-                            <div class="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                            <button id="np-copy-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Copy"><i data-lucide="copy" class="w-4 h-4"></i></button>
-                            <button id="np-download-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Download"><i data-lucide="download" class="w-4 h-4"></i></button>
-                            <div class="ml-auto"><button id="np-delete-btn" class="np-control-btn p-2 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-rose-100 dark:border-rose-900 rounded-lg shadow-sm text-gray-400 hover:text-rose-500" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>
-                        </div>
-                        <div id="note-area" contenteditable="true" data-placeholder="Start typing your thoughts..." class="flex-1 w-full text-gray-700 dark:text-gray-300 placeholder:text-gray-300 dark:placeholder:text-gray-600 outline-none whitespace-pre-wrap font-medium leading-relaxed"></div>
-                        <footer class="mt-4 pt-4 border-t border-gray-50 dark:border-gray-800 flex justify-between items-center shrink-0">
-                            <div id="word-count" class="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest">0 Words</div>
-                            <div id="save-status" class="text-[9px] md:text-[10px] font-bold text-[#51b8cb] uppercase tracking-widest opacity-60">Synced</div>
-                        </footer>
+                        
+                        <!-- Hidden File Input for Image Upload via Context Menu -->
+                        <input type="file" id="imageInput" class="hidden" accept="image/*" multiple>
                     </div>
                 </div>
             </section>
 
-            <section class="lg:sticky lg:top-8 animate-fade-in flex justify-center w-full mb-10 overflow-hidden">
+            <!-- Preview Section -->
+            <section class="lg:sticky lg:top-8 animate-fade-in flex justify-center w-full mb-10 overflow-hidden relative">
+                
                 <!-- Main Preview Card -->
                 <div id="cardContainer" class="rounded-[2rem] md:rounded-[3rem] card-shadow overflow-hidden border-[4px] md:border-[6px] border-[#51b8cb] relative transition-all duration-500 min-h-[400px] md:min-h-[600px] w-full max-w-[1050px] group/maincard" style="background-color: #ffffff;">
                     
@@ -312,8 +253,8 @@
                     </div>
                 </div>
 
-                <!-- Notepad Section matches card container -->
-                <div id="notepad-content" class="hidden rounded-[2rem] md:rounded-[3rem] card-shadow overflow-hidden border-[4px] md:border-[6px] border-[#51b8cb] relative transition-all duration-500 min-h-[400px] md:min-h-[600px] w-full max-w-[1050px] flex flex-col bg-white dark:bg-[#1a1a1a]">
+                <!-- Notepad Section (Swaps with Main Preview Card) -->
+                <div id="notepadContainer" class="hidden rounded-[2rem] md:rounded-[3rem] card-shadow overflow-hidden border-[4px] md:border-[6px] border-[#51b8cb] relative transition-all duration-500 min-h-[400px] md:min-h-[600px] w-full max-w-[1050px] flex-col bg-white dark:bg-[#1a1a1a]">
                     <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 shrink-0 p-5 md:p-8 pb-4">
                         <div class="flex items-center gap-3 md:gap-4">
                             <button id="close-notepad-btn" class="p-2 md:p-3 bg-[#e8f6f8] dark:bg-[#222] text-[#51b8cb] rounded-lg md:rounded-xl transition-all shadow-sm hover:scale-105 outline-none" title="Back to Cards">
@@ -350,6 +291,7 @@
                         </footer>
                     </div>
                 </div>
+
             </section>
         </div>
     </div>
@@ -395,30 +337,25 @@
         let showTitlePlaceholder = true, showDefPlaceholder = true, activeImageIdx = -1;
         let isDraggingImage = false, dragStartX = 0, dragImageIdx = -1, dragStartScale = 100;
 
-        initColorPicker(); initImageColsDropdown(); initBlendDropdown(); initFloatingMenu(); setupEventListeners(); initCards(); initNotepad();
+        initColorPicker(); initBlendDropdown(); initFloatingMenu(); setupEventListeners(); initCards(); initNotepad();
         if (typeof lucide !== 'undefined') lucide.createIcons();
         initPWA();
 
         // Logo handles Notepad opening
         document.getElementById('brand-logo-container').addEventListener('click', () => {
             document.getElementById('cardContainer').classList.add('hidden');
-            document.getElementById('notepad-content').classList.remove('hidden');
+            document.getElementById('notepadContainer').classList.remove('hidden');
+            document.getElementById('notepadContainer').classList.add('flex');
             if (typeof lucide !== 'undefined') lucide.createIcons();
         });
 
-        document.getElementById('main-theme-toggle').addEventListener('click', () => document.documentElement.classList.toggle('dark'));
+        document.getElementById('close-notepad-btn').onclick = () => {
+            document.getElementById('notepadContainer').classList.add('hidden');
+            document.getElementById('notepadContainer').classList.remove('flex');
+            document.getElementById('cardContainer').classList.remove('hidden');
+        };
 
-        function initImageColsDropdown() {
-            const container = document.getElementById('imageColsOptions'), menu = document.getElementById('imageColsDropdownMenu'), btn = document.getElementById('imageColsBtn');
-            [0, 1, 2, 3, 4].forEach(c => {
-                const item = document.createElement('div');
-                item.className = 'dropdown-item text-gray-700 dark:text-gray-300';
-                item.innerText = c === 0 ? 'Auto' : c;
-                item.onclick = (e) => { e.stopPropagation(); selectImageCols(c); menu.classList.add('hidden'); };
-                container.appendChild(item);
-            });
-            btn.onclick = (e) => { e.stopPropagation(); closeAllDropdowns(); menu.classList.toggle('hidden'); };
-        }
+        document.getElementById('main-theme-toggle').addEventListener('click', () => document.documentElement.classList.toggle('dark'));
 
         function initBlendDropdown() {
             const container = document.getElementById('blendOptions'), menu = document.getElementById('blendDropdownMenu'), btn = document.getElementById('blendBtn');
@@ -452,6 +389,19 @@
                 menu.style.left = x + 'px'; menu.style.top = y + 'px';
             });
         }
+
+        window.showFloatingImageBorderMenu = function(x, y) {
+            const menu = document.getElementById('floatingImageBorderMenu');
+            document.getElementById('floatingCategoryMenu').classList.add('hidden');
+            document.getElementById('floatingPreviewMenu').classList.add('hidden');
+            menu.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                const rect = menu.getBoundingClientRect();
+                if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
+                if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
+                menu.style.left = x + 'px'; menu.style.top = y + 'px';
+            });
+        };
 
         window.showCategoryDropdown = function(e) {
             e.stopPropagation();
@@ -543,7 +493,7 @@
         function selectTextSize(size) { currentSelectedSize = size; const label = document.getElementById('toolbarTitleSizeLabel'); if(label) label.innerText = size; updatePreview(); }
         function selectDefSize(size) { currentSelectedDefSize = size; const label = document.getElementById('toolbarDefSizeLabel'); if(label) label.innerText = size; updatePreview(); }
         function selectImageBorder(border) { currentImageBorder = border; updatePreview(); }
-        function selectImageCols(cols) { currentImageCols = cols; document.getElementById('currentImageColsText').innerText = cols === 0 ? 'Auto' : cols; updatePreview(); }
+        function selectImageCols(cols) { currentImageCols = cols; updatePreview(); }
         function selectBlend(blend) { currentBlendPercentage = blend; document.getElementById('blendValueLabel').innerText = blend + '%'; updatePreview(); }
 
         window.clearTitle = function() { document.getElementById('inputTitle').value = ''; currentSelectedCategory = '-'; showTitlePlaceholder = false; updatePreview(); };
@@ -708,7 +658,7 @@
             const finalColor = activeColor, textColor = getDarkerShade(finalColor, 0.4), blend = currentBlendPercentage, textSize = currentSelectedSize, defSize = currentSelectedDefSize, imgBorder = currentImageBorder, imageCols = currentImageCols;
             const bVL = document.getElementById('blendValueLabel'); if (bVL) bVL.style.color = finalColor;
             const card = document.getElementById('cardContainer'); card.style.borderColor = finalColor; card.style.backgroundColor = getLightShade(finalColor, blend);
-            const notepad = document.getElementById('notepad-content'); if (notepad) notepad.style.borderColor = finalColor;
+            const notepad = document.getElementById('notepadContainer'); if (notepad) notepad.style.borderColor = finalColor;
             const dlBtn = document.getElementById('cardDownloadBtn'); if (dlBtn) { dlBtn.style.color = finalColor; dlBtn.style.border = `2px solid ${finalColor}`; }
             const word = document.getElementById('cardWord'); word.style.color = textColor; word.style.fontSize = textSize + 'px'; if (word.innerText !== document.getElementById('inputTitle').value) word.innerText = document.getElementById('inputTitle').value;
             const type = document.getElementById('cardType'), addCatBtn = document.getElementById('addCategoryBtn');
@@ -756,11 +706,6 @@
         }
 
         function initNotepad() {
-            const overlay = document.getElementById('notepad-content');
-            const cardCont = document.getElementById('cardContainer');
-            
-            document.getElementById('close-notepad-btn').onclick = () => { overlay.classList.add('hidden'); cardCont.classList.remove('hidden'); };
-            
             let npNotes = JSON.parse(localStorage.getItem('ali_dashboard_multiple_notes')) || [{ id: Date.now(), title: 'My First Note', content: '', createdAt: new Date().toISOString() }], npCurrentId = npNotes[0]?.id || Date.now();
             const list = document.getElementById('notes-list'), area = document.getElementById('note-area'), titleInput = document.getElementById('note-title'), count = document.getElementById('word-count'), status = document.getElementById('save-status');
             
