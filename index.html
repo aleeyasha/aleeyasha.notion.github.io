@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#51b8cb">
+    <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Notion">
@@ -771,7 +771,7 @@
         function updateFavicon() { document.getElementById('favicon').href = `data:image/svg+xml;base64,${btoa(generateNotebookSVG())}`; }
         function updateBrandLogo() { const c = document.getElementById('brand-logo-container'); if (c) c.innerHTML = generateNotebookSVG(); }
         function createPNGIconFromSVG(svg, size) { return new Promise((resolve) => { const canvas = document.createElement('canvas'); canvas.width = size; canvas.height = size; const ctx = canvas.getContext('2d'), img = new Image(); img.onload = () => { ctx.drawImage(img, 0, 0, size, size); resolve(canvas.toDataURL('image/png')); }; img.onerror = () => resolve(`data:image/svg+xml;base64,${btoa(svg)}`); img.src = `data:image/svg+xml;base64,${btoa(svg)}`; }); }
-        async function initPWA() { try { const svg = generateNotebookSVG(), i192 = await createPNGIconFromSVG(svg, 192), i512 = await createPNGIconFromSVG(svg, 512); document.getElementById('apple-touch-icon').href = i192; const manifest = { name: "Notion", short_name: "Notion", start_url: window.location.href.split('?')[0], display: "standalone", background_color: "#e8f6f8", theme_color: "#51b8cb", icons: [{ src: i192, sizes: "192x192", type: "image/png", purpose: "any maskable" }, { src: i512, sizes: "512x512", type: "image/png", purpose: "any maskable" }] }; document.getElementById('manifest').href = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest)); } catch (e) { console.error("PWA initialization skipped:", e); } }
+        async function initPWA() { try { const svg = generateNotebookSVG(), i192 = await createPNGIconFromSVG(svg, 192), i512 = await createPNGIconFromSVG(svg, 512); document.getElementById('apple-touch-icon').href = i192; const manifest = { name: "Notion", short_name: "Notion", start_url: window.location.href.split('?')[0], display: "standalone", background_color: "#000000", theme_color: "#000000", icons: [{ src: i192, sizes: "192x192", type: "image/png", purpose: "any maskable" }, { src: i512, sizes: "512x512", type: "image/png", purpose: "any maskable" }] }; document.getElementById('manifest').href = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest)); } catch (e) { console.error("PWA initialization skipped:", e); } }
 
         function initNotepad() {
             let npNotes = JSON.parse(localStorage.getItem('ali_dashboard_multiple_notes')) || [{ id: Date.now(), title: 'Note 1', content: '', createdAt: new Date().toISOString() }];
