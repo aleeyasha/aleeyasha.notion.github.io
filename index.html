@@ -62,34 +62,11 @@
         .dark .bg-\[\#FAFAFA\] { background-color: #111 !important; border-color: #333 !important; }
         .dark .bg-white { background-color: #1a1a1a !important; border-color: #333 !important; }
         
-        /* --- Notepad Styles --- */
-        .notepad-container { background: rgba(255,255,255,0.9); backdrop-filter: blur(20px); border: 1px solid rgba(0,0,0,0.05); }
-        .dark .notepad-container { background: rgba(26,26,26,0.9); border: 1px solid rgba(255,255,255,0.05); }
-        #note-area { font-family: 'Caveat', cursive; font-size: 20px; line-height: 1.5; resize: none; background: transparent !important; border: none !important; box-shadow: none !important; }
-        @media (min-width: 768px) { #note-area { font-size: 24px; } }
-        #note-area:focus { outline: none; box-shadow: none !important; }
-        .dark #note-area { color: #cccccc; }
-        .np-control-btn { transition: all 0.2s ease; cursor: pointer; }
-        .dark .np-control-btn { background-color: #1a1a1a; border-color: #333; color: #777; }
-        .np-control-btn:hover { transform: translateY(-1px); }
         .np-title-input { font-family: 'Caveat', cursive !important; background: transparent !important; border: none !important; font-weight: 700; font-size: 24px; letter-spacing: 0.02em; width: 100%; box-shadow: none !important; padding: 0 !important; }
         @media (min-width: 768px) { .np-title-input { font-size: 28px; } }
         .dark .np-title-input { color: #eee; }
         .np-title-input:focus { outline: none; box-shadow: none !important; }
         
-        .note-item { transition: all 0.2s ease; cursor: pointer; }
-        .note-item.active { background-color: #e8f6f8; color: #51b8cb; }
-        .dark .note-item.active { background-color: #222; color: #51b8cb; }
-        .note-item:hover:not(.active) { background-color: rgba(232, 246, 248, 0.5); }
-        .dark .note-item:hover:not(.active) { background-color: rgba(255, 255, 255, 0.05); }
-        
-        .custom-scrollbar::-webkit-scrollbar { height: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #51b8cb; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #3a98aa; }
-        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; }
-        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #555; }
-
         .dropdown-item { padding: 10px 16px; cursor: pointer; font-size: 11px; font-weight: 600; transition: all 0.2s; border-radius: 8px; margin: 0 4px; }
         .dropdown-item:hover { background-color: #e8f6f8; color: #51b8cb; }
         .dark .dropdown-item:hover { background-color: #333; }
@@ -101,7 +78,7 @@
         .resizable-img:active { cursor: ew-resize; box-shadow: 0 0 0 4px rgba(172, 135, 102, 0.3); }
 
         /* Hand-drawn typography */
-        #cardWord, #cardDef, #cardType { font-family: 'Caveat', cursive !important; }
+        #cardWord, #cardDef, #cardType, #note-area { font-family: 'Caveat', cursive !important; }
 
         /* ContentEditable Placeholder Styling */
         [contenteditable]:empty:before {
@@ -116,187 +93,74 @@
 </head>
 <body class="relative min-h-screen">
 
-    <!-- Notepad Overlay -->
-    <div id="notepad-overlay" class="fixed inset-0 z-50 hidden bg-[#e8f6f8] dark:bg-[#0f0f0f] p-0 md:p-10 h-screen overflow-hidden flex flex-col transition-colors duration-500">
-        <div class="absolute top-4 right-4 md:top-8 md:right-8 z-[60]">
-           <button id="close-notepad-btn" class="bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full p-2.5 md:p-3 border border-[#d0ebf0] dark:border-[#333] text-[#51b8cb] hover:scale-105 transition-all outline-none" title="Back to Cards">
-               <i data-lucide="x" class="w-5 h-5"></i>
-           </button>
-        </div>
-        <div class="notepad-container flex-1 rounded-none md:rounded-[3rem] shadow-2xl flex flex-col md:flex-row overflow-hidden max-w-7xl mx-auto w-full relative pt-14 md:pt-0">
-            <!-- Sidebar -->
-            <aside class="w-full md:w-72 border-b md:border-b-0 md:border-r border-gray-100 flex flex-col bg-white/50 dark:bg-black/20 dark:border-gray-800 shrink-0">
-                <div class="p-4 md:p-6 border-b border-gray-100 dark:border-gray-800">
-                    <button id="new-note-btn" class="w-full bg-[#51b8cb] hover:bg-[#3a98aa] text-white py-2.5 md:py-3 px-4 rounded-xl md:rounded-2xl flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-all">
-                        <i data-lucide="plus" class="w-4 h-4"></i> New Note
-                    </button>
-                </div>
-                <div id="notes-list" class="flex-1 overflow-y-auto py-2 md:py-4 max-h-32 md:max-h-none">
-                    <!-- Notes will appear here -->
-                </div>
-            </aside>
-
-            <!-- Main Editor -->
-            <main class="flex-1 flex flex-col p-4 md:p-12 relative h-full">
-                <header class="flex flex-col md:flex-row md:justify-between items-start md:items-center mb-4 md:mb-8 gap-4">
-                    <div class="flex items-center gap-3 md:gap-4 w-full md:w-auto text-inherit pr-10 md:pr-0">
-                        <div class="w-8 h-8 md:w-10 md:h-10 bg-[#51b8cb]/10 rounded-lg md:rounded-xl flex items-center justify-center shrink-0">
-                            <i data-lucide="edit-3" class="text-[#51b8cb] w-4 h-4 md:w-5 md:h-5"></i>
-                        </div>
-                        <div class="flex-1">
-                            <input type="text" id="note-title" class="np-title-input placeholder:text-gray-300 dark:placeholder:text-gray-600" placeholder="Untitled Note">
-                            <p class="text-[9px] md:text-[10px] text-gray-400 font-medium">Auto-save to Workspace</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-1.5 md:gap-2 flex-wrap w-full justify-end md:w-auto">
-                        <button id="np-undo-btn" class="np-control-btn p-2.5 md:p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#51b8cb]" title="Undo">
-                            <i data-lucide="undo" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
-                        </button>
-                        <button id="np-redo-btn" class="np-control-btn p-2.5 md:p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#51b8cb]" title="Redo">
-                            <i data-lucide="redo" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
-                        </button>
-                        
-                        <button id="np-bold-btn" onmousedown="event.preventDefault(); document.execCommand('bold', false, null); updateNpFormatState(); document.getElementById('note-area').dispatchEvent(new Event('input'));" class="np-control-btn p-2.5 md:p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#51b8cb]" title="Bold">
-                            <i data-lucide="bold" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
-                        </button>
-                        <button id="np-highlight-btn" onmousedown="event.preventDefault(); toggleNpHighlight(); updateNpFormatState(); document.getElementById('note-area').dispatchEvent(new Event('input'));" class="np-control-btn p-2.5 md:p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#51b8cb]" title="Highlight">
-                            <i data-lucide="highlighter" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
-                        </button>
-
-                        <div class="w-px h-6 bg-gray-200 dark:bg-gray-800 mx-1"></div>
-
-                        <button id="np-copy-btn" class="np-control-btn p-2.5 md:p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#51b8cb]" title="Copy to Clipboard">
-                            <i data-lucide="copy" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
-                        </button>
-                        <button id="np-download-btn" class="np-control-btn p-2.5 md:p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-[#51b8cb]" title="Download as .txt">
-                            <i data-lucide="download" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
-                        </button>
-                        <button id="np-delete-btn" class="np-control-btn p-2.5 md:p-3 bg-white dark:bg-[#1a1a1a] dark:border-[#333] border border-gray-100 rounded-full shadow-sm text-gray-400 hover:text-red-500" title="Delete Note">
-                            <i data-lucide="trash-2" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
-                        </button>
-                    </div>
-                </header>
-
-                <div id="note-area" contenteditable="true" data-placeholder="Start typing your thoughts..." class="flex-1 w-full text-gray-700 dark:text-gray-300 placeholder:text-gray-300 dark:placeholder:text-gray-600 custom-scrollbar overflow-y-auto outline-none whitespace-pre-wrap"></div>
-                
-                <footer class="mt-4 md:mt-8 pt-4 md:pt-6 border-t border-gray-50 dark:border-gray-800 flex justify-between items-center">
-                    <div id="word-count" class="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest">0 Words</div>
-                    <div id="save-status" class="text-[9px] md:text-[10px] font-bold text-[#51b8cb] uppercase tracking-widest opacity-60">Synced</div>
-                </footer>
-            </main>
-        </div>
-    </div>
-
     <div id="mainLayout" class="relative z-10 w-full flex flex-col items-center pt-4 md:pt-10">
         
         <!-- Main Layout -->
         <div class="w-full max-w-[1800px] px-3 md:px-4 grid grid-cols-1 lg:grid-cols-[450px_1fr] xl:grid-cols-[550px_1fr] gap-6 md:gap-12 items-start">
             
             <section id="builderArea" class="bg-white border border-[#d0ebf0] rounded-[1.5rem] md:rounded-[2rem] card-shadow animate-fade-in relative flex flex-col lg:max-h-[85vh] overflow-hidden">
-                <div class="flex items-center justify-between border-b border-gray-100 shrink-0 p-5 md:p-8 pb-4">
-                    <div class="flex items-center gap-3 md:gap-4">
-                        <!-- Main Icon (Now opens Notepad) -->
-                        <div id="brand-logo-container" class="w-8 h-8 md:w-10 md:h-10 transition-transform duration-300 shrink-0 hover:scale-110" title="Open Notepad">
-                            <!-- SVG injected via JS -->
+                <div id="builder-content" class="flex flex-col h-full w-full">
+                    <div class="flex items-center justify-between border-b border-gray-100 shrink-0 p-5 md:p-8 pb-4">
+                        <div class="flex items-center gap-3 md:gap-4">
+                            <!-- Main Icon (Opens Notepad) -->
+                            <div id="brand-logo-container" class="w-8 h-8 md:w-10 md:h-10 transition-transform duration-300 shrink-0 hover:scale-110" title="Open Notepad">
+                                <!-- SVG injected via JS -->
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <h2 class="text-lg md:text-xl font-bold text-[#222222] dark:text-[#f1f1f1] tracking-tight">Notion</h2>
+                                <button id="main-theme-toggle" class="text-gray-400 hover:text-[#51b8cb] transition-colors outline-none cursor-pointer p-1" title="Toggle Light/Dark Mode">
+                                    <i data-lucide="moon" class="w-4 h-4 md:w-5 md:h-5 dark:hidden"></i>
+                                    <i data-lucide="sun" class="w-4 h-4 md:w-5 md:h-5 hidden dark:block"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <h2 class="text-lg md:text-xl font-bold text-[#222222] dark:text-[#f1f1f1] tracking-tight">Notion</h2>
-                            <button id="main-theme-toggle" class="text-gray-400 hover:text-[#51b8cb] transition-colors outline-none cursor-pointer p-1" title="Toggle Light/Dark Mode">
-                                <i data-lucide="moon" class="w-4 h-4 md:w-5 md:h-5 dark:hidden"></i>
-                                <i data-lucide="sun" class="w-4 h-4 md:w-5 md:h-5 hidden dark:block"></i>
+
+                        <div class="flex items-center gap-2 md:gap-3">
+                            <!-- Install App Button -->
+                            <button id="btnInstallApp" class="hidden p-2 md:p-3 bg-[#e8f6f8] dark:bg-[#222] text-[#51b8cb] rounded-lg md:rounded-xl transition-all shadow-sm hover:scale-105 items-center gap-1" title="Install App">
+                                <i data-lucide="monitor-smartphone" class="w-4 h-4 md:w-5 md:h-5"></i>
                             </button>
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-2 md:gap-3">
-                        <!-- Open Theme Color Button -->
-                        <button id="btnOpenColorModal" class="p-2 md:p-3 bg-[#e8f6f8] dark:bg-[#222] text-[#51b8cb] rounded-lg md:rounded-xl transition-all shadow-sm hover:scale-105" title="Toggle Theme Color">
-                            <i data-lucide="palette" class="w-4 h-4 md:w-5 md:h-5"></i>
-                        </button>
-
-                        <!-- Install App Button (Hidden by default) -->
-                        <button id="btnInstallApp" class="hidden p-2 md:p-3 bg-[#e8f6f8] dark:bg-[#222] text-[#51b8cb] rounded-lg md:rounded-xl transition-all shadow-sm hover:scale-105 items-center gap-1" title="Install App">
-                            <i data-lucide="monitor-smartphone" class="w-4 h-4 md:w-5 md:h-5"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="editor-scroll-area p-5 md:p-8 pt-4 md:pt-6 space-y-6">
-                    <div id="cardTabsContainer" class="flex flex-wrap gap-2 pb-4 border-b border-gray-100 mb-4 md:mb-6 w-full items-center"></div>
-                    
-                    <!-- Hidden inputs to maintain application state without the sidebar UI -->
-                    <input type="hidden" id="inputTitle" value="">
-                    <textarea id="inputDef" class="hidden"></textarea>
-
-                    <div class="pt-2">
-                        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-                            <div class="flex items-center gap-3">
-                                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] m-0">Reference Images</label>
-                                
-                                <div class="relative cursor-pointer group" title="Upload or paste images">
-                                    <input type="file" id="imageInput" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept="image/*" multiple>
-                                    <button class="p-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-gray-400 group-hover:text-[#51b8cb] rounded-lg transition-all shadow-sm group-hover:border-gray-300 dark:group-hover:border-gray-600 outline-none flex items-center justify-center pointer-events-none">
-                                        <i data-lucide="image-plus" class="w-4 h-4"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <!-- Image Layout Dropdown -->
-                            <div class="relative shrink-0 w-24">
-                                <button id="imageColsBtn" class="w-full px-2 py-1.5 bg-[#e8f6f8] dark:bg-[#222] text-[#51b8cb] text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group border border-transparent hover:border-[#d0ebf0] dark:hover:border-[#333]">
-                                    <span id="currentImageColsText">Auto</span>
-                                    <i data-lucide="chevron-down" class="w-3 h-3 transition-transform group-hover:translate-y-0.5 shrink-0"></i>
-                                </button>
-                                <div id="imageColsDropdownMenu" class="hidden absolute right-0 mt-2 w-full bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-50 overflow-hidden">
-                                    <div id="imageColsOptions" class="py-1"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="uploadPreviewContainer" class="flex flex-wrap gap-2 mt-2"></div>
+                    <div class="editor-scroll-area p-5 md:p-8 pt-4 md:pt-6 space-y-6 flex-1">
+                        <div id="cardTabsContainer" class="flex flex-wrap gap-2 pb-4 border-b border-gray-100 mb-4 md:mb-6 w-full items-center"></div>
                         
-                        <p class="text-[9px] text-gray-400 mt-2 italic font-medium uppercase tracking-widest text-center">* Hint: Drag images to reorder, swipe to resize</p>
-                    </div>
+                        <!-- Hidden inputs to maintain application state -->
+                        <input type="hidden" id="inputTitle" value="">
+                        <textarea id="inputDef" class="hidden"></textarea>
 
-                    <div id="themeColorSection" class="hidden bg-[#FAFAFA] dark:bg-[#111] rounded-[1.5rem] md:rounded-[2.5rem] p-5 md:p-8 border border-gray-200 dark:border-[#333] mb-6 md:mb-10 animate-fade-in">
-                        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-                            <label class="block text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest m-0">Card Theme Color</label>
-                            
-                            <div class="flex items-center gap-2">
-                                <!-- Random Palette Button -->
-                                <button id="btnRandomColor" class="p-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-gray-400 hover:text-[#51b8cb] rounded-lg transition-all shadow-sm hover:border-gray-300 dark:hover:border-gray-600 outline-none" title="Generate Random Palette">
-                                    <i data-lucide="shuffle" class="w-4 h-4"></i>
-                                </button>
-
-                                <!-- Background Blend Dropdown -->
-                                <div class="relative shrink-0 w-24 md:w-28">
-                                    <button id="blendBtn" class="w-full px-2 py-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-[#51b8cb] text-[9px] md:text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group hover:border-gray-300 dark:hover:border-gray-600">
-                                        <span class="text-gray-400">Blend</span>
-                                        <span id="blendValueLabel">10%</span>
-                                        <i data-lucide="chevron-down" class="w-3 h-3 text-gray-400 transition-transform group-hover:translate-y-0.5 shrink-0"></i>
+                        <div class="pt-2">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <div class="flex items-center gap-3">
+                                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] m-0">Reference Images</label>
+                                    
+                                    <div class="relative cursor-pointer group" title="Upload or paste images">
+                                        <input type="file" id="imageInput" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept="image/*" multiple>
+                                        <button class="p-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-gray-400 group-hover:text-[#51b8cb] rounded-lg transition-all shadow-sm group-hover:border-gray-300 dark:group-hover:border-gray-600 outline-none flex items-center justify-center pointer-events-none">
+                                            <i data-lucide="image-plus" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Image Layout Dropdown -->
+                                <div class="relative shrink-0 w-24">
+                                    <button id="imageColsBtn" class="w-full px-2 py-1.5 bg-[#e8f6f8] dark:bg-[#222] text-[#51b8cb] text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group border border-transparent hover:border-[#d0ebf0] dark:hover:border-[#333]">
+                                        <span id="currentImageColsText">Auto</span>
+                                        <i data-lucide="chevron-down" class="w-3 h-3 transition-transform group-hover:translate-y-0.5 shrink-0"></i>
                                     </button>
-                                    <div id="blendDropdownMenu" class="hidden absolute right-0 mt-2 w-full bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-50 overflow-hidden">
-                                        <div id="blendOptions" class="py-1"></div>
+                                    <div id="imageColsDropdownMenu" class="hidden absolute right-0 mt-2 w-full bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-50 overflow-hidden">
+                                        <div id="imageColsOptions" class="py-1"></div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <div id="colorMap" class="mb-4 h-32 md:h-48">
-                            <div class="color-map-white"></div>
-                            <div class="color-map-black"></div>
-                            <div id="colorMarker" style="top: 20%; left: 80%;"></div>
-                        </div>
-
-                        <div class="px-1">
-                            <input type="range" id="inputHue" min="0" max="360" value="189" class="cursor-pointer">
                         </div>
                     </div>
                 </div>
             </section>
 
             <section class="lg:sticky lg:top-8 animate-fade-in flex justify-center w-full mb-10 overflow-hidden">
-                <!-- Mobile optimized card container: Responsive Width -->
+                <!-- Main Preview Card -->
                 <div id="cardContainer" class="rounded-[2rem] md:rounded-[3rem] card-shadow overflow-hidden border-[4px] md:border-[6px] border-[#51b8cb] relative transition-all duration-500 min-h-[400px] md:min-h-[600px] w-full max-w-[1050px] group/maincard" style="background-color: #ffffff;">
                     
                     <!-- Quick Download Button -->
@@ -321,8 +185,43 @@
                                         <span id="toolbarTitleSizeLabel">32</span>
                                         <i data-lucide="chevron-down" class="w-3 h-3"></i>
                                     </button>
-                                    <div id="toolbarTitleSizeDropdownMenu" onmousedown="event.preventDefault();" class="hidden absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[60] overflow-hidden w-16 max-h-48 overflow-y-auto custom-scrollbar">
-                                        <!-- Populated via JS -->
+                                    <div id="toolbarTitleSizeDropdownMenu" onmousedown="event.preventDefault();" class="hidden absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[60] overflow-hidden w-16 max-h-48 overflow-y-auto custom-scrollbar"></div>
+                                </div>
+
+                                <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+
+                                <!-- Theme Color Picker Popup -->
+                                <div class="relative">
+                                    <button id="toolbarColorBtn" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors flex items-center justify-center" title="Theme Color">
+                                        <i data-lucide="palette" class="w-4 h-4"></i>
+                                    </button>
+                                    <div id="toolbarColorDropdownMenu" class="hidden absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[60] w-[260px] p-4 cursor-default transition-all">
+                                        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                                            <label class="block text-[10px] font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest m-0">Theme Color</label>
+                                            <div class="flex items-center gap-1">
+                                                <button id="btnRandomColor" class="p-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-gray-400 hover:text-[#51b8cb] rounded-lg transition-all shadow-sm hover:border-gray-300 dark:hover:border-gray-600 outline-none" title="Generate Random Palette">
+                                                    <i data-lucide="shuffle" class="w-3 h-3"></i>
+                                                </button>
+                                                <div class="relative shrink-0 w-20">
+                                                    <button id="blendBtn" class="w-full px-2 py-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-[#51b8cb] text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group hover:border-gray-300 dark:hover:border-gray-600">
+                                                        <span class="text-gray-400">Blend</span>
+                                                        <span id="blendValueLabel">10%</span>
+                                                        <i data-lucide="chevron-down" class="w-3 h-3 text-gray-400 transition-transform group-hover:translate-y-0.5 shrink-0"></i>
+                                                    </button>
+                                                    <div id="blendDropdownMenu" class="hidden absolute right-0 mt-2 w-full bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[70] overflow-hidden">
+                                                        <div id="blendOptions" class="py-1"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="colorMap" class="mb-4 h-32 w-full relative cursor-crosshair border border-gray-200 dark:border-[#333] rounded-xl overflow-hidden bg-red-500">
+                                            <div class="color-map-white absolute inset-0 bg-gradient-to-r from-white to-transparent"></div>
+                                            <div class="color-map-black absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
+                                            <div id="colorMarker" class="absolute w-4 h-4 border-2 border-white rounded-full shadow-sm pointer-events-none transform -translate-x-1/2 -translate-y-1/2" style="top: 20%; left: 80%;"></div>
+                                        </div>
+                                        <div class="px-1">
+                                            <input type="range" id="inputHue" min="0" max="360" value="189" class="w-full cursor-pointer">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -330,7 +229,7 @@
                             <h2 id="cardWord" contenteditable="true" data-placeholder="Enter Term / Title..." class="font-bold tracking-tight leading-tight outline-none flex-1 min-w-[50%]" style="text-decoration: none;"></h2>
                             <span id="cardType" contenteditable="true" data-placeholder="Category..." class="text-sm md:text-xl font-bold px-3 py-1 md:px-4 md:py-1 rounded-none outline-none min-w-[80px] empty:min-w-[100px]"></span>
                             
-                            <button id="addCategoryBtn" onclick="restoreCategory()" class="hidden text-[9px] md:text-[10px] font-bold uppercase tracking-widest px-2 py-1 md:px-3 md:py-1 rounded-lg border-2 border-dashed border-gray-300 dark:border-[#333] text-gray-400 hover:border-[#51b8cb] hover:text-[#51b8cb] transition-all flex items-center gap-1 opacity-100 lg:opacity-0 group-hover/title:opacity-100 outline-none" title="Add Category">
+                            <button id="addCategoryBtn" onclick="showCategoryDropdown(event)" class="hidden text-[9px] md:text-[10px] font-bold uppercase tracking-widest px-2 py-1 md:px-3 md:py-1 rounded-lg border-2 border-dashed border-gray-300 dark:border-[#333] text-gray-400 hover:border-[#51b8cb] hover:text-[#51b8cb] transition-all flex items-center gap-1 opacity-100 lg:opacity-0 group-hover/title:opacity-100 outline-none" title="Add Category">
                                 <i data-lucide="plus" class="w-3 h-3"></i> Add Category
                             </button>
 
@@ -340,16 +239,11 @@
                         </div>
                         
                         <div id="cardContent" class="space-y-0 mt-1 flex-1">
-                            
-                            <!-- Def Restore Button -->
                             <div id="cardDefRestore" onclick="restoreDef()" class="hidden cursor-pointer py-2 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl border-2 border-dashed border-transparent hover:border-[#d0ebf0] dark:hover:border-[#333] text-center text-gray-400 hover:text-[#51b8cb] opacity-100 lg:opacity-0 group-hover/card:opacity-100 transition-all flex items-center justify-center gap-2">
                                 <i data-lucide="plus" class="w-4 h-4"></i> <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Add Notes</span>
                             </div>
 
-                            <!-- Editable Definition Section -->
                             <div id="cardNotesSection" class="group/def relative py-1 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                                
-                                <!-- Format Toolbar for Notes -->
                                 <div class="format-toolbar absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-lg border border-[#d0ebf0] dark:border-[#333] rounded-xl flex items-center p-1 gap-1 opacity-0 pointer-events-none group-focus-within/def:opacity-100 group-hover/def:opacity-100 group-focus-within/def:pointer-events-auto group-hover/def:pointer-events-auto transition-all z-20 translate-y-2 group-hover/def:translate-y-0 group-focus-within/def:translate-y-0">
                                     <button onmousedown="event.preventDefault(); execFormat('undo')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors" title="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
                                     <button onmousedown="event.preventDefault(); execFormat('redo')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors" title="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
@@ -363,14 +257,10 @@
                                             <span id="toolbarDefSizeLabel">24</span>
                                             <i data-lucide="chevron-down" class="w-3 h-3"></i>
                                         </button>
-                                        <div id="toolbarDefSizeDropdownMenu" onmousedown="event.preventDefault();" class="hidden absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[60] overflow-hidden w-16 max-h-48 overflow-y-auto custom-scrollbar">
-                                            <!-- Populated via JS -->
-                                        </div>
+                                        <div id="toolbarDefSizeDropdownMenu" onmousedown="event.preventDefault();" class="hidden absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[60] overflow-hidden w-16 max-h-48 overflow-y-auto custom-scrollbar"></div>
                                     </div>
                                 </div>
-
                                 <div id="cardDef" contenteditable="true" data-placeholder="Enter definition or notes..." class="font-medium leading-relaxed whitespace-pre-wrap outline-none" style="text-decoration: none; min-height: 1.5em;"></div>
-                                
                                 <button onclick="clearDef()" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 group-hover/def:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" title="Remove Notes Section">
                                     <i data-lucide="x" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
                                 </button>
@@ -380,1265 +270,329 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- FIXED Notepad Section - Styled to perfectly match card container -->
+                <div id="notepad-content" class="hidden rounded-[2rem] md:rounded-[3rem] card-shadow overflow-hidden border-[4px] md:border-[6px] border-[#51b8cb] relative transition-all duration-500 min-h-[400px] md:min-h-[600px] w-full max-w-[1050px] flex flex-col bg-white dark:bg-[#1a1a1a]">
+                    <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 shrink-0 p-5 md:p-8 pb-4">
+                        <div class="flex items-center gap-3 md:gap-4">
+                            <button id="close-notepad-btn" class="p-2 md:p-3 bg-[#e8f6f8] dark:bg-[#222] text-[#51b8cb] rounded-lg md:rounded-xl transition-all shadow-sm hover:scale-105 outline-none" title="Back to Cards">
+                                <i data-lucide="arrow-left" class="w-4 h-4 md:w-5 md:h-5"></i>
+                            </button>
+                            <h2 class="text-lg md:text-xl font-bold text-[#222222] dark:text-[#f1f1f1] tracking-tight">Notepad</h2>
+                        </div>
+                        <button id="new-note-btn" class="p-2 md:p-3 bg-[#51b8cb] hover:bg-[#3a98aa] text-white rounded-lg md:rounded-xl transition-all shadow-sm hover:scale-105 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest">
+                            <i data-lucide="plus" class="w-4 h-4 md:w-5 md:h-5"></i> <span class="hidden md:inline">New Note</span>
+                        </button>
+                    </div>
+
+                    <div class="px-5 md:px-8 py-3 border-b border-gray-100 dark:border-gray-800 shrink-0 bg-[#FAFAFA] dark:bg-[#111]">
+                        <div id="notes-list" class="flex gap-2 overflow-x-auto pb-2 custom-scrollbar items-center"></div>
+                    </div>
+
+                    <div class="flex-1 flex flex-col p-5 md:p-8 overflow-y-auto custom-scrollbar relative">
+                        <input type="text" id="note-title" class="np-title-input placeholder:text-gray-300 dark:placeholder:text-gray-600 mb-4 shrink-0" placeholder="Untitled Note">
+                        <div class="flex items-center gap-1.5 md:gap-2 flex-wrap w-full mb-4 pb-4 border-b border-gray-50 dark:border-gray-800 shrink-0">
+                            <button id="np-undo-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] border border-gray-100 dark:border-[#333] rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
+                            <button id="np-redo-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] border border-gray-100 dark:border-[#333] rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
+                            <div class="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                            <button id="np-bold-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] border border-gray-100 dark:border-[#333] rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
+                            <button id="np-highlight-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] border border-gray-100 dark:border-[#333] rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
+                            <div class="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                            <button id="np-copy-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] border border-gray-100 dark:border-[#333] rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Copy"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                            <button id="np-download-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] border border-gray-100 dark:border-[#333] rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Download"><i data-lucide="download" class="w-4 h-4"></i></button>
+                            <div class="ml-auto"><button id="np-delete-btn" class="np-control-btn p-2 bg-white dark:bg-[#1a1a1a] border border-rose-100 dark:border-rose-900 rounded-lg shadow-sm text-gray-400 hover:text-rose-500" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>
+                        </div>
+                        <div id="note-area" contenteditable="true" data-placeholder="Start typing your thoughts..." class="flex-1 w-full text-gray-700 dark:text-gray-300 placeholder:text-gray-300 dark:placeholder:text-gray-600 outline-none whitespace-pre-wrap font-medium leading-relaxed"></div>
+                        <footer class="mt-4 pt-4 border-t border-gray-50 dark:border-gray-800 flex justify-between items-center shrink-0">
+                            <div id="word-count" class="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest">0 Words</div>
+                            <div id="save-status" class="text-[9px] md:text-[10px] font-bold text-[#51b8cb] uppercase tracking-widest opacity-60">Synced</div>
+                        </footer>
+                    </div>
+                </div>
             </section>
         </div>
     </div>
 
-    <!-- Floating Context Category Menu -->
+    <!-- Menus -->
     <div id="floatingCategoryMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-48 py-1">
         <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Set Category</div>
         <div id="floatingCategoryOptions" class="max-h-60 overflow-y-auto custom-scrollbar"></div>
     </div>
-
-    <!-- Floating Context Image Border Menu -->
     <div id="floatingImageBorderMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-32 py-1">
         <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Image Border</div>
         <div id="floatingImageBorderOptions" class="max-h-60 overflow-y-auto custom-scrollbar"></div>
     </div>
+    <div id="floatingPreviewMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-44 py-1">
+        <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Card Actions</div>
+        <div class="py-1">
+            <div onclick="document.getElementById('imageInput').click()" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300"><i data-lucide="image-plus" class="w-4 h-4"></i> Upload Image</div>
+            <div class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300 opacity-60 cursor-default"><i data-lucide="clipboard" class="w-4 h-4"></i> Paste Enabled</div>
+        </div>
+        <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-y border-gray-100 dark:border-gray-800 my-1">Image Layout</div>
+        <div id="floatingLayoutOptions" class="py-1"></div>
+    </div>
 
     <script>
-        const categoryColors = {
-            "Principles of Flight": "#6366f1",
-            "Meteorology": "#0ea5e9",
-            "Navigation": "#10b981",
-            "Flight Planning and Monitoring": "#f59e0b",
-            "Aircraft General Knowledge": "#475569",
-            "Human Performance": "#f43f5e",
-            "Air Law": "#8b5cf6",
-            "Operational Procedures": "#06b6d4",
-            "Mass & Balance": "#f97316",
-            "Performance": "#84cc16",
-            "Communications": "#14b8a6"
-        };
-
+        const categoryColors = { "Principles of Flight": "#6366f1", "Meteorology": "#0ea5e9", "Navigation": "#10b981", "Flight Planning and Monitoring": "#f59e0b", "Aircraft General Knowledge": "#475569", "Human Performance": "#f43f5e", "Air Law": "#8b5cf6", "Operational Procedures": "#06b6d4", "Mass & Balance": "#f97316", "Performance": "#84cc16", "Communications": "#14b8a6" };
         const CONSTANT_ICON_COLOR = "#51b8cb"; 
+        let activeColor = "#51b8cb", hue = 189, saturation = 60, brightness = 80, uploadedImages = [], cards = [], activeCardId = null, isSwitching = false, currentSelectedCategory = "-", currentSelectedSize = 32, currentSelectedDefSize = 24, currentImageBorder = 2, currentImageCols = 0, currentBlendPercentage = 10, deferredPrompt = null, showTitlePlaceholder = true, showDefPlaceholder = true, activeImageIdx = -1, isDraggingImage = false, dragStartX = 0, dragImageIdx = -1, dragStartScale = 100;
 
-        let activeColor = "#51b8cb"; 
-        let hue = 189;
-        let saturation = 60;
-        let brightness = 80;
-        let uploadedImages = []; // Now stores { src, scale }
-
-        let cards = [];
-        let activeCardId = null;
-        let isSwitching = false;
-        let currentSelectedCategory = "-";
-        let currentSelectedSize = 32;
-        let currentSelectedDefSize = 24;
-        let currentImageBorder = 2;
-        let currentImageCols = 0;
-        let currentBlendPercentage = 10;
-        let deferredPrompt = null; // Used to store PWA install prompt event
-        
-        // Visibility state for placeholders
-        let showTitlePlaceholder = true;
-        let showDefPlaceholder = true;
-
-        // Interaction state for image resizing
-        let isDraggingImage = false;
-        let dragStartX = 0;
-        let dragImageIdx = -1;
-        let dragStartScale = 100;
-        let activeImageIdx = -1; // Tracks which image is selected for context menu
-
-        initColorPicker();
-        initImageColsDropdown();
-        initBlendDropdown();
-        initFloatingMenu();
-        setupEventListeners();
-        initCards();
-        initNotepad();
+        initColorPicker(); initImageColsDropdown(); initBlendDropdown(); initFloatingMenu(); setupEventListeners(); initCards(); initNotepad();
         if (typeof lucide !== 'undefined') lucide.createIcons();
-        initPWA(); // Initialize Progressive Web App features
+        initPWA();
 
-        // Logo handles Notepad opening now
         document.getElementById('brand-logo-container').addEventListener('click', () => {
-            const overlay = document.getElementById('notepad-overlay');
-            const main = document.getElementById('mainLayout');
-            overlay.classList.remove('hidden');
-            main.classList.add('hidden');
+            document.getElementById('cardContainer').classList.add('hidden');
+            document.getElementById('notepad-content').classList.remove('hidden');
             if (typeof lucide !== 'undefined') lucide.createIcons();
         });
 
-        // Main Theme Toggle (next to download)
-        document.getElementById('main-theme-toggle').addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-        });
+        document.getElementById('main-theme-toggle').addEventListener('click', () => document.documentElement.classList.toggle('dark'));
 
         function initImageColsDropdown() {
-            const container = document.getElementById('imageColsOptions');
-            const menu = document.getElementById('imageColsDropdownMenu');
-            const btn = document.getElementById('imageColsBtn');
-            const cols = [0, 1, 2, 3, 4];
-            cols.forEach(c => {
-                const item = document.createElement('div');
-                item.className = 'dropdown-item text-gray-700 dark:text-gray-300';
-                item.innerText = c === 0 ? 'Auto' : c;
-                item.onclick = (e) => { e.stopPropagation(); selectImageCols(c); menu.classList.add('hidden'); };
-                container.appendChild(item);
+            const container = document.getElementById('imageColsOptions'), menu = document.getElementById('imageColsDropdownMenu'), btn = document.getElementById('imageColsBtn');
+            [0, 1, 2, 3, 4].forEach(c => {
+                const item = document.createElement('div'); item.className = 'dropdown-item text-gray-700 dark:text-gray-300'; item.innerText = c === 0 ? 'Auto' : c;
+                item.onclick = (e) => { e.stopPropagation(); selectImageCols(c); menu.classList.add('hidden'); }; container.appendChild(item);
             });
             btn.onclick = (e) => { e.stopPropagation(); closeAllDropdowns(); menu.classList.toggle('hidden'); };
         }
 
         function initBlendDropdown() {
-            const container = document.getElementById('blendOptions');
-            const menu = document.getElementById('blendDropdownMenu');
-            const btn = document.getElementById('blendBtn');
-            const blends = [0, 5, 10, 15, 20, 25, 30, 40, 50, 75, 100];
-            blends.forEach(b => {
-                const item = document.createElement('div');
-                item.className = 'dropdown-item text-gray-700 dark:text-gray-300';
-                item.innerText = b + '%';
-                item.onclick = (e) => { e.stopPropagation(); selectBlend(b); menu.classList.add('hidden'); };
-                container.appendChild(item);
+            const container = document.getElementById('blendOptions'), menu = document.getElementById('blendDropdownMenu'), btn = document.getElementById('blendBtn');
+            [0, 5, 10, 15, 20, 25, 30, 40, 50, 75, 100].forEach(b => {
+                const item = document.createElement('div'); item.className = 'dropdown-item text-gray-700 dark:text-gray-300'; item.innerText = b + '%';
+                item.onclick = (e) => { e.stopPropagation(); selectBlend(b); menu.classList.add('hidden'); }; container.appendChild(item);
             });
-            btn.onclick = (e) => { e.stopPropagation(); closeAllDropdowns(); menu.classList.toggle('hidden'); };
+            btn.onclick = (e) => { e.stopPropagation(); const h = menu.classList.contains('hidden'); closeAllDropdowns(); document.getElementById('toolbarColorDropdownMenu').classList.remove('hidden'); if (h) menu.classList.remove('hidden'); };
         }
 
-        function closeAllDropdowns() {
-            document.querySelectorAll('[id$="DropdownMenu"]').forEach(el => el.classList.add('hidden'));
-        }
-
+        function closeAllDropdowns() { document.querySelectorAll('[id$="DropdownMenu"]').forEach(el => el.classList.add('hidden')); }
         window.addEventListener('click', closeAllDropdowns);
+
+        function showFloatingCategoryMenu(x, y) {
+            const menu = document.getElementById('floatingCategoryMenu'); document.getElementById('floatingImageBorderMenu').classList.add('hidden'); menu.classList.remove('hidden');
+            requestAnimationFrame(() => { const rect = menu.getBoundingClientRect(); if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10; if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10; menu.style.left = x + 'px'; menu.style.top = y + 'px'; });
+        }
+
+        window.showCategoryDropdown = function(e) { e.stopPropagation(); const rect = e.currentTarget.getBoundingClientRect(); showFloatingCategoryMenu(rect.left, rect.bottom + 5); };
 
         function initFloatingMenu() {
             const sizes = [12, 14, 16, 18, 20, 24, 28, 32, 40, 48, 64, 80];
+            const colorBtn = document.getElementById('toolbarColorBtn'), colorMenu = document.getElementById('toolbarColorDropdownMenu');
+            if (colorBtn) colorBtn.onclick = (e) => { e.stopPropagation(); const h = colorMenu.classList.contains('hidden'); closeAllDropdowns(); if (h) colorMenu.classList.remove('hidden'); };
+            if (colorMenu) { colorMenu.onmousedown = (e) => e.stopPropagation(); colorMenu.onclick = (e) => e.stopPropagation(); }
 
-            // Populate the new Notes Size dropdown in the toolbar
-            const toolbarDefSizeMenu = document.getElementById('toolbarDefSizeDropdownMenu');
-            const toolbarDefSizeBtn = document.getElementById('toolbarDefSizeBtn');
+            const defMenu = document.getElementById('toolbarDefSizeDropdownMenu'), defBtn = document.getElementById('toolbarDefSizeBtn');
+            if (defBtn) defBtn.onclick = (e) => { e.stopPropagation(); closeAllDropdowns(); defMenu.classList.toggle('hidden'); };
+            sizes.forEach(size => { const item = document.createElement('div'); item.className = 'dropdown-item text-gray-700 dark:text-gray-300 text-center py-1.5'; item.innerText = size; item.onmousedown = (e) => { e.preventDefault(); selectDefSize(size); defMenu.classList.add('hidden'); }; if (defMenu) defMenu.appendChild(item); });
 
-            toolbarDefSizeBtn.onclick = (e) => {
-                e.stopPropagation();
-                closeAllDropdowns();
-                toolbarDefSizeMenu.classList.toggle('hidden');
-            };
+            const titleMenu = document.getElementById('toolbarTitleSizeDropdownMenu'), titleBtn = document.getElementById('toolbarTitleSizeBtn');
+            if (titleBtn) titleBtn.onclick = (e) => { e.stopPropagation(); closeAllDropdowns(); titleMenu.classList.toggle('hidden'); };
+            sizes.forEach(size => { const item = document.createElement('div'); item.className = 'dropdown-item text-gray-700 dark:text-gray-300 text-center py-1.5'; item.innerText = size; item.onmousedown = (e) => { e.preventDefault(); selectTextSize(size); titleMenu.classList.add('hidden'); }; if (titleMenu) titleMenu.appendChild(item); });
 
-            sizes.forEach(size => {
-                const item = document.createElement('div');
-                item.className = 'dropdown-item text-gray-700 dark:text-gray-300 text-center py-1.5';
-                item.innerText = size;
-                item.onmousedown = (e) => {
-                    e.preventDefault(); // keep focus on the notes section
-                    selectDefSize(size);
-                    toolbarDefSizeMenu.classList.add('hidden');
-                };
-                toolbarDefSizeMenu.appendChild(item);
-            });
+            const catMenu = document.getElementById('floatingCategoryMenu'), catContainer = document.getElementById('floatingCategoryOptions');
+            const manualItem = document.createElement('div'); manualItem.className = 'dropdown-item text-[#51b8cb] flex items-center gap-2 italic'; manualItem.innerHTML = `<i data-lucide="edit-3" class="w-3 h-3"></i> Custom Entry...`; manualItem.onclick = (e) => { e.stopPropagation(); restoreCategory(); catMenu.classList.add('hidden'); }; if (catContainer) catContainer.appendChild(manualItem);
+            ["-", ...Object.keys(categoryColors)].forEach(cat => { const item = document.createElement('div'); item.className = 'dropdown-item text-gray-700 dark:text-gray-300'; item.innerText = cat; item.onclick = (e) => { e.stopPropagation(); selectCategory(cat); catMenu.classList.add('hidden'); }; if (catContainer) catContainer.appendChild(item); });
 
-            // Populate the new Title Size dropdown in the toolbar
-            const toolbarTitleSizeMenu = document.getElementById('toolbarTitleSizeDropdownMenu');
-            const toolbarTitleSizeBtn = document.getElementById('toolbarTitleSizeBtn');
+            const imgMenu = document.getElementById('floatingImageBorderMenu'), imgContainer = document.getElementById('floatingImageBorderOptions');
+            [0, 1, 2, 3, 4, 6, 8, 10, 15, 20].forEach(b => { const item = document.createElement('div'); item.className = 'dropdown-item text-gray-700 dark:text-gray-300'; item.innerText = b + 'px'; item.onclick = (e) => { e.stopPropagation(); if (activeImageIdx !== -1 && uploadedImages[activeImageIdx]) { uploadedImages[activeImageIdx].border = b; updatePreview(); } imgMenu.classList.add('hidden'); }; if (imgContainer) imgContainer.appendChild(item); });
 
-            toolbarTitleSizeBtn.onclick = (e) => {
-                e.stopPropagation();
-                closeAllDropdowns();
-                toolbarTitleSizeMenu.classList.toggle('hidden');
-            };
+            const layoutOptions = document.getElementById('floatingLayoutOptions');
+            [0, 1, 2, 3, 4].forEach(c => { const item = document.createElement('div'); item.className = 'dropdown-item text-gray-700 dark:text-gray-300 flex items-center justify-between'; item.innerHTML = `<span>${c === 0 ? 'Auto Layout' : c + ' Columns'}</span>`; item.onclick = (e) => { e.stopPropagation(); selectImageCols(c); document.getElementById('floatingPreviewMenu').classList.add('hidden'); }; if (layoutOptions) layoutOptions.appendChild(item); });
 
-            sizes.forEach(size => {
-                const item = document.createElement('div');
-                item.className = 'dropdown-item text-gray-700 dark:text-gray-300 text-center py-1.5';
-                item.innerText = size;
-                item.onmousedown = (e) => {
-                    e.preventDefault(); // keep focus on the title section
-                    selectTextSize(size);
-                    toolbarTitleSizeMenu.classList.add('hidden');
-                };
-                toolbarTitleSizeMenu.appendChild(item);
-            });
-
-            // Initialize Category Context Menu
-            const catMenu = document.getElementById('floatingCategoryMenu');
-            const catContainer = document.getElementById('floatingCategoryOptions');
-            const categories = ["-", ...Object.keys(categoryColors)];
-            
-            categories.forEach(cat => {
-                const item = document.createElement('div');
-                item.className = 'dropdown-item text-gray-700 dark:text-gray-300';
-                item.innerText = cat;
-                item.onclick = (e) => {
-                    e.stopPropagation();
-                    selectCategory(cat);
-                    catMenu.classList.add('hidden');
-                };
-                catContainer.appendChild(item);
-            });
-
-            // Initialize Image Border Context Menu
-            const imgMenu = document.getElementById('floatingImageBorderMenu');
-            const imgContainer = document.getElementById('floatingImageBorderOptions');
-            const borders = [0, 1, 2, 3, 4, 6, 8, 10, 15, 20];
-            
-            borders.forEach(b => {
-                const item = document.createElement('div');
-                item.className = 'dropdown-item text-gray-700 dark:text-gray-300';
-                item.innerText = b + 'px';
-                item.onclick = (e) => {
-                    e.stopPropagation();
-                    if (activeImageIdx !== -1 && uploadedImages[activeImageIdx]) {
-                        uploadedImages[activeImageIdx].border = b;
-                        updatePreview();
-                    }
-                    imgMenu.classList.add('hidden');
-                };
-                imgContainer.appendChild(item);
-            });
-
-            window.addEventListener('click', () => {
-                catMenu.classList.add('hidden');
-                imgMenu.classList.add('hidden');
-            });
-
-            const typeEl = document.getElementById('cardType');
-            typeEl.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-                showFloatingCategoryMenu(e.clientX, e.clientY);
-            });
+            window.addEventListener('click', () => { if(catMenu) catMenu.classList.add('hidden'); const imgM = document.getElementById('floatingImageBorderMenu'); if(imgM) imgM.classList.add('hidden'); const prevM = document.getElementById('floatingPreviewMenu'); if(prevM) prevM.classList.add('hidden'); });
+            document.getElementById('cardContainer').addEventListener('contextmenu', (e) => { if (e.target.closest('#cardWord') || e.target.closest('#cardType') || e.target.closest('#cardDef') || e.target.closest('[id^="preview-wrapper-"]')) return; e.preventDefault(); const menu = document.getElementById('floatingPreviewMenu'); menu.classList.remove('hidden'); requestAnimationFrame(() => { const rect = menu.getBoundingClientRect(); let x = e.clientX, y = e.clientY; if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10; if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10; menu.style.left = x + 'px'; menu.style.top = y + 'px'; }); });
         }
 
-        function showFloatingCategoryMenu(x, y) {
-            const menu = document.getElementById('floatingCategoryMenu');
-            document.getElementById('floatingImageBorderMenu').classList.add('hidden'); // Hide other menu
-            menu.classList.remove('hidden');
-            
-            requestAnimationFrame(() => {
-                const rect = menu.getBoundingClientRect();
-                if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
-                if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
-                
-                menu.style.left = x + 'px';
-                menu.style.top = y + 'px';
-            });
-        }
-
-        function showFloatingImageBorderMenu(x, y) {
-            const menu = document.getElementById('floatingImageBorderMenu');
-            document.getElementById('floatingCategoryMenu').classList.add('hidden'); // Hide other menu
-            menu.classList.remove('hidden');
-            
-            requestAnimationFrame(() => {
-                const rect = menu.getBoundingClientRect();
-                if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
-                if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
-                
-                menu.style.left = x + 'px';
-                menu.style.top = y + 'px';
-            });
-        }
-
-        function selectCategory(cat) {
-            currentSelectedCategory = cat;
-            if (cat !== '-' && categoryColors[cat]) setManualColor(categoryColors[cat]);
-            updatePreview();
-        }
-
-        function selectTextSize(size) { 
-            currentSelectedSize = size; 
-            const label = document.getElementById('toolbarTitleSizeLabel');
-            if(label) label.innerText = size;
-            updatePreview(); 
-        }
-        
-        function selectDefSize(size) { 
-            currentSelectedDefSize = size; 
-            const label = document.getElementById('toolbarDefSizeLabel');
-            if(label) label.innerText = size;
-            updatePreview(); 
-        }
-        
+        function selectCategory(cat) { currentSelectedCategory = cat; if (cat !== '-' && categoryColors[cat]) setManualColor(categoryColors[cat]); updatePreview(); }
+        function selectTextSize(size) { currentSelectedSize = size; const label = document.getElementById('toolbarTitleSizeLabel'); if(label) label.innerText = size; updatePreview(); }
+        function selectDefSize(size) { currentSelectedDefSize = size; const label = document.getElementById('toolbarDefSizeLabel'); if(label) label.innerText = size; updatePreview(); }
         function selectImageBorder(border) { currentImageBorder = border; updatePreview(); }
         function selectImageCols(cols) { currentImageCols = cols; document.getElementById('currentImageColsText').innerText = cols === 0 ? 'Auto' : cols; updatePreview(); }
         function selectBlend(blend) { currentBlendPercentage = blend; document.getElementById('blendValueLabel').innerText = blend + '%'; updatePreview(); }
-
-        window.clearTitle = function() {
-            document.getElementById('inputTitle').value = '';
-            currentSelectedCategory = '-';
-            showTitlePlaceholder = false;
-            updatePreview();
-        };
-        
-        window.clearDef = function() {
-            document.getElementById('inputDef').value = '';
-            showDefPlaceholder = false;
-            updatePreview();
-        };
-
-        window.restoreTitle = function() {
-            showTitlePlaceholder = true;
-            updatePreview();
-            setTimeout(() => document.getElementById('cardWord').focus(), 50);
-        };
-
-        window.restoreDef = function() {
-            showDefPlaceholder = true;
-            updatePreview();
-            setTimeout(() => document.getElementById('cardDef').focus(), 50);
-        };
-
-        window.restoreCategory = function() {
-            currentSelectedCategory = ''; 
-            updatePreview();
-            setTimeout(() => document.getElementById('cardType').focus(), 50);
-        };
+        window.clearTitle = function() { document.getElementById('inputTitle').value = ''; currentSelectedCategory = '-'; showTitlePlaceholder = false; updatePreview(); };
+        window.clearDef = function() { document.getElementById('inputDef').value = ''; showDefPlaceholder = false; updatePreview(); };
+        window.restoreTitle = function() { showTitlePlaceholder = true; updatePreview(); setTimeout(() => document.getElementById('cardWord').focus(), 50); };
+        window.restoreDef = function() { showDefPlaceholder = true; updatePreview(); setTimeout(() => document.getElementById('cardDef').focus(), 50); };
+        window.restoreCategory = function() { currentSelectedCategory = ''; updatePreview(); setTimeout(() => document.getElementById('cardType').focus(), 50); };
 
         function getSelectionStyle(styleName) {
-            const sel = window.getSelection();
-            if (!sel.rangeCount) return null;
-            let node = sel.anchorNode;
-            if (!node) return null;
+            const sel = window.getSelection(); if (!sel.rangeCount) return null;
+            let node = sel.anchorNode; if (!node) return null;
             let parent = node.nodeType === 3 ? node.parentNode : node;
-            
-            // Only check up to the boundary of the editable area
-            while (parent && parent.id !== 'cardDef' && parent.id !== 'note-area' && parent.tagName !== 'BODY') {
-                if (parent.style && parent.style[styleName]) {
-                    return parent.style[styleName];
-                }
-                parent = parent.parentNode;
-            }
+            while (parent && parent.id !== 'cardDef' && parent.id !== 'note-area' && parent.tagName !== 'BODY') { if (parent.style && parent.style[styleName]) return parent.style[styleName]; parent = parent.parentNode; }
             return null;
         }
 
         function removeStyleFromSelection(styleName) {
-            const sel = window.getSelection();
-            if (!sel.rangeCount) return;
-            
-            // Clean up the parent tree to fix nested span bugs
-            let node = sel.anchorNode;
-            let parent = node.nodeType === 3 ? node.parentNode : node;
-            
-            while (parent && parent.id !== 'cardDef' && parent.id !== 'note-area' && parent.tagName !== 'BODY') {
-                if (parent.style && parent.style[styleName] !== undefined && parent.style[styleName] !== '') {
-                    parent.style[styleName] = '';
-                }
-                if (parent.getAttribute('style') === '') parent.removeAttribute('style');
-                if (styleName === 'color' && parent.hasAttribute('color')) parent.removeAttribute('color');
-                parent = parent.parentNode;
-            }
-            
-            // Clean up children in the selection
-            const range = sel.getRangeAt(0);
-            const container = range.commonAncestorContainer;
-            if (container.nodeType === 1) { 
-                const children = container.querySelectorAll('*');
-                children.forEach(child => {
-                    if (sel.containsNode(child, true)) {
-                        if (child.style && child.style[styleName] !== undefined && child.style[styleName] !== '') {
-                            child.style[styleName] = '';
-                        }
-                        if (child.getAttribute('style') === '') child.removeAttribute('style');
-                        if (styleName === 'color' && child.hasAttribute('color')) child.removeAttribute('color');
-                    }
-                });
-            }
+            const sel = window.getSelection(); if (!sel.rangeCount) return;
+            let node = sel.anchorNode, parent = node.nodeType === 3 ? node.parentNode : node;
+            while (parent && parent.id !== 'cardDef' && parent.id !== 'note-area' && parent.tagName !== 'BODY') { if (parent.style && parent.style[styleName] !== undefined) parent.style[styleName] = ''; if (parent.getAttribute('style') === '') parent.removeAttribute('style'); parent = parent.parentNode; }
+            const range = sel.getRangeAt(0), container = range.commonAncestorContainer;
+            if (container.nodeType === 1) { container.querySelectorAll('*').forEach(child => { if (sel.containsNode(child, true)) { if (child.style && child.style[styleName] !== undefined) child.style[styleName] = ''; if (child.getAttribute('style') === '') child.removeAttribute('style'); } }); }
         }
 
         window.toggleNpHighlight = function() {
-            document.execCommand('styleWithCSS', false, true);
-            let bgStyle = getSelectionStyle('backgroundColor');
-            let isHighlighted = bgStyle && bgStyle !== 'transparent' && bgStyle !== 'rgba(0, 0, 0, 0)';
-            
-            if (isHighlighted) {
-                document.execCommand('hiliteColor', false, 'transparent');
-                document.execCommand('backColor', false, 'transparent');
-                removeStyleFromSelection('backgroundColor');
-            } else {
-                const highlightColor = 'rgba(81, 184, 203, 0.4)'; // A nice semi-transparent cyan default
-                document.execCommand('hiliteColor', false, highlightColor);
-                document.execCommand('backColor', false, highlightColor);
-            }
+            document.execCommand('styleWithCSS', false, true); let bgStyle = getSelectionStyle('backgroundColor');
+            if (bgStyle && bgStyle !== 'transparent' && bgStyle !== 'rgba(0, 0, 0, 0)') { document.execCommand('hiliteColor', false, 'transparent'); removeStyleFromSelection('backgroundColor'); }
+            else { document.execCommand('hiliteColor', false, 'rgba(81, 184, 203, 0.4)'); }
             document.getElementById('note-area').focus();
-        };
-
-        window.updateNpFormatState = function() {
-            if (document.activeElement !== document.getElementById('note-area')) return;
-
-            const isBold = document.queryCommandState('bold');
-            
-            let bgStyle = getSelectionStyle('backgroundColor');
-            let isHighlighted = bgStyle && bgStyle !== 'transparent' && bgStyle !== 'rgba(0, 0, 0, 0)';
-
-            const btnBold = document.getElementById('np-bold-btn');
-            const btnHighlight = document.getElementById('np-highlight-btn');
-
-            if (btnBold) {
-                if (isBold) {
-                    btnBold.classList.add('bg-[#e8f6f8]', 'dark:bg-[#333]', 'text-[#51b8cb]');
-                    btnBold.classList.remove('text-gray-400');
-                } else {
-                    btnBold.classList.remove('bg-[#e8f6f8]', 'dark:bg-[#333]', 'text-[#51b8cb]');
-                    btnBold.classList.add('text-gray-400');
-                }
-            }
-
-            if (btnHighlight) {
-                if (isHighlighted) {
-                    btnHighlight.classList.add('bg-[#e8f6f8]', 'dark:bg-[#333]', 'text-[#51b8cb]');
-                    btnHighlight.classList.remove('text-gray-400');
-                } else {
-                    btnHighlight.classList.remove('bg-[#e8f6f8]', 'dark:bg-[#333]', 'text-[#51b8cb]');
-                    btnHighlight.classList.add('text-gray-400');
-                }
-            }
         };
 
         window.execFormat = function(cmd, val = null) {
             document.execCommand('styleWithCSS', false, true);
-            
-            if (cmd === 'highlight') {
-                let bgStyle = getSelectionStyle('backgroundColor');
-                let isHighlighted = bgStyle && bgStyle !== 'transparent' && bgStyle !== 'rgba(0, 0, 0, 0)';
-                
-                if (isHighlighted) {
-                    // Tell browser to clear it, then manually strip residual inline styles
-                    document.execCommand('hiliteColor', false, 'transparent');
-                    document.execCommand('backColor', false, 'transparent');
-                    removeStyleFromSelection('backgroundColor');
-                } else {
-                    const highlightColor = hexToRgba(activeColor, 0.4);
-                    document.execCommand('hiliteColor', false, highlightColor);
-                    document.execCommand('backColor', false, highlightColor);
-                }
-            } else if (cmd === 'textColor') {
-                let fStyle = getSelectionStyle('color');
-                let activeRgb = hexToRgb(activeColor);
-                let activeRgbString = `rgb(${activeRgb.r}, ${activeRgb.g}, ${activeRgb.b})`.replace(/\s/g, '');
-                
-                let isColored = false;
-                if (fStyle) {
-                    let fColorNorm = fStyle.replace(/\s/g, '').toLowerCase();
-                    if (fColorNorm === activeRgbString.toLowerCase() || fColorNorm === activeColor.toLowerCase()) {
-                        isColored = true;
-                    }
-                }
-                
-                if (isColored) {
-                    // Dummy apply to create boundary, then strip all inline colors to fall back to the dynamic card text color
-                    document.execCommand('foreColor', false, '#000000'); 
-                    removeStyleFromSelection('color');
-                } else {
-                    document.execCommand('foreColor', false, activeColor);
-                }
-            } else {
-                document.execCommand(cmd, false, val);
-            }
-            
-            document.getElementById('cardDef').focus();
-            document.getElementById('inputDef').value = document.getElementById('cardDef').innerHTML;
-            showDefPlaceholder = true;
-            syncCardState();
-            checkFormatState();
+            if (cmd === 'highlight') { let bgStyle = getSelectionStyle('backgroundColor'); if (bgStyle && bgStyle !== 'transparent' && bgStyle !== 'rgba(0, 0, 0, 0)') { document.execCommand('hiliteColor', false, 'transparent'); removeStyleFromSelection('backgroundColor'); } else { document.execCommand('hiliteColor', false, hexToRgba(activeColor, 0.4)); } }
+            else if (cmd === 'textColor') { let fStyle = getSelectionStyle('color'), activeRgbString = `rgb(${hexToRgb(activeColor).r},${hexToRgb(activeColor).g},${hexToRgb(activeColor).b})`; if (fStyle && fStyle.replace(/\s/g, '').toLowerCase() === activeRgbString) { document.execCommand('foreColor', false, '#000000'); removeStyleFromSelection('color'); } else { document.execCommand('foreColor', false, activeColor); } }
+            else document.execCommand(cmd, false, val);
+            document.getElementById('cardDef').focus(); document.getElementById('inputDef').value = document.getElementById('cardDef').innerHTML; syncCardState(); checkFormatState();
         };
 
         function checkFormatState() {
             if (document.activeElement !== document.getElementById('cardDef')) return;
-
-            const isBold = document.queryCommandState('bold');
-            
-            // Use specific inline-style checks instead of inherited browser query logic
-            let bgStyle = getSelectionStyle('backgroundColor');
-            let isHighlighted = bgStyle && bgStyle !== 'transparent' && bgStyle !== 'rgba(0, 0, 0, 0)';
-
-            let fStyle = getSelectionStyle('color');
-            let activeRgb = hexToRgb(activeColor);
-            let activeRgbString = `rgb(${activeRgb.r}, ${activeRgb.g}, ${activeRgb.b})`.replace(/\s/g, '');
-            let isColored = false;
-            if (fStyle) {
-                let fColorNorm = fStyle.replace(/\s/g, '').toLowerCase();
-                if (fColorNorm === activeRgbString.toLowerCase() || fColorNorm === activeColor.toLowerCase()) {
-                    isColored = true;
-                }
-            }
-
-            const btnBold = document.getElementById('btnFormatBold');
-            const btnHighlight = document.getElementById('btnFormatHighlight');
-            const btnColor = document.getElementById('btnFormatColor');
-
-            if (btnBold) {
-                if (isBold) {
-                    btnBold.classList.add('bg-[#e8f6f8]', 'dark:bg-[#333]', 'text-[#51b8cb]');
-                    btnBold.classList.remove('text-gray-500');
-                } else {
-                    btnBold.classList.remove('bg-[#e8f6f8]', 'dark:bg-[#333]', 'text-[#51b8cb]');
-                    btnBold.classList.add('text-gray-500');
-                }
-            }
-
-            if (btnHighlight) {
-                if (isHighlighted) {
-                    btnHighlight.classList.add('bg-[#e8f6f8]', 'dark:bg-[#333]', 'text-[#51b8cb]');
-                    btnHighlight.classList.remove('text-gray-500');
-                } else {
-                    btnHighlight.classList.remove('bg-[#e8f6f8]', 'dark:bg-[#333]', 'text-[#51b8cb]');
-                    btnHighlight.classList.add('text-gray-500');
-                }
-            }
-
-            if (btnColor) {
-                if (isColored) {
-                    btnColor.classList.add('bg-[#e8f6f8]', 'dark:bg-[#333]', 'text-[#51b8cb]');
-                    btnColor.classList.remove('text-gray-500');
-                } else {
-                    btnColor.classList.remove('bg-[#e8f6f8]', 'dark:bg-[#333]', 'text-[#51b8cb]');
-                    btnColor.classList.add('text-gray-500');
-                }
-            }
+            const isBold = document.queryCommandState('bold'); let bgStyle = getSelectionStyle('backgroundColor'), isHighlighted = bgStyle && bgStyle !== 'transparent' && bgStyle !== 'rgba(0, 0, 0, 0)';
+            let fStyle = getSelectionStyle('color'), isColored = fStyle && fStyle.replace(/\s/g, '').toLowerCase() === `rgb(${hexToRgb(activeColor).r},${hexToRgb(activeColor).g},${hexToRgb(activeColor).b})`;
+            const b = document.getElementById('btnFormatBold'), h = document.getElementById('btnFormatHighlight'), c = document.getElementById('btnFormatColor');
+            if (b) { b.classList.toggle('text-[#51b8cb]', isBold); b.classList.toggle('text-gray-500', !isBold); b.classList.toggle('bg-[#e8f6f8]', isBold); b.classList.toggle('dark:bg-[#333]', isBold); }
+            if (h) { h.classList.toggle('text-[#51b8cb]', isHighlighted); h.classList.toggle('text-gray-500', !isHighlighted); h.classList.toggle('bg-[#e8f6f8]', isHighlighted); h.classList.toggle('dark:bg-[#333]', isHighlighted); }
+            if (c) { c.classList.toggle('text-[#51b8cb]', isColored); c.classList.toggle('text-gray-500', !isColored); c.classList.toggle('bg-[#e8f6f8]', isColored); c.classList.toggle('dark:bg-[#333]', isColored); }
         }
 
         function setupEventListeners() {
             document.getElementById('imageInput').addEventListener('change', handleImageUpload);
-            
-            document.addEventListener('selectionchange', () => {
-                if (document.activeElement === document.getElementById('cardDef')) {
-                    checkFormatState();
-                } else if (document.activeElement === document.getElementById('note-area')) {
-                    updateNpFormatState();
-                }
-            });
-
-            // Setup Color Toggle Event
-            document.getElementById('btnOpenColorModal').addEventListener('click', () => {
-                const colorSection = document.getElementById('themeColorSection');
-                colorSection.classList.toggle('hidden');
-            });
-
-            // Direct editing on preview handlers
-            document.getElementById('cardWord').addEventListener('input', (e) => {
-                document.getElementById('inputTitle').value = e.target.innerText;
-                showTitlePlaceholder = true;
-                syncCardState();
-            });
-            
+            document.addEventListener('selectionchange', () => { if (document.activeElement === document.getElementById('cardDef')) checkFormatState(); else if (document.activeElement === document.getElementById('note-area')) updateNpFormatState(); });
+            document.getElementById('cardWord').addEventListener('input', (e) => { document.getElementById('inputTitle').value = e.target.innerText; showTitlePlaceholder = true; syncCardState(); });
             const cardTypeEl = document.getElementById('cardType');
-            cardTypeEl.addEventListener('input', (e) => {
-                const val = e.target.innerText.trim();
-                currentSelectedCategory = val || '-';
-                if (categoryColors[val]) {
-                    setManualColor(categoryColors[val]);
-                }
-                syncCardState();
-            });
-            
-            // Hide category when empty and blurred
-            cardTypeEl.addEventListener('blur', (e) => {
-                if (!e.target.innerText.trim()) {
-                    currentSelectedCategory = '-';
-                    updatePreview();
-                }
-            });
-
-            document.getElementById('cardDef').addEventListener('input', (e) => {
-                document.getElementById('inputDef').value = e.target.innerHTML;
-                showDefPlaceholder = true;
-                syncCardState();
-            });
-            
+            cardTypeEl.addEventListener('input', (e) => { const val = e.target.innerText.trim(); currentSelectedCategory = val || '-'; if (categoryColors[val]) setManualColor(categoryColors[val]); syncCardState(); });
+            cardTypeEl.addEventListener('blur', (e) => { if (!e.target.innerText.trim()) { currentSelectedCategory = '-'; updatePreview(); } });
+            document.getElementById('cardDef').addEventListener('input', (e) => { document.getElementById('inputDef').value = e.target.innerHTML; showDefPlaceholder = true; syncCardState(); });
             document.getElementById('btnRandomColor').addEventListener('click', () => { setManualColor('#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')); });
-
-            document.addEventListener('paste', (event) => {
-                const items = (event.clipboardData || event.originalEvent.clipboardData).items;
-                for (let index in items) {
-                    const item = items[index];
-                    if (item.kind === 'file' && item.type.includes('image')) { processFile(item.getAsFile()); }
-                }
-            });
-
-            // Global move/up events for image resizing
-            window.addEventListener('mousemove', handleImageResizeMove);
-            window.addEventListener('mouseup', handleImageResizeEnd);
-            window.addEventListener('touchmove', handleImageResizeMove, { passive: false });
-            window.addEventListener('touchend', handleImageResizeEnd);
-
-            // Listen for the PWA install prompt event
-            window.addEventListener('beforeinstallprompt', (e) => {
-                // Prevent the mini-infobar from appearing on mobile
-                e.preventDefault();
-                // Stash the event so it can be triggered later.
-                deferredPrompt = e;
-                // Update UI to notify the user they can install the PWA
-                const installBtn = document.getElementById('btnInstallApp');
-                if (installBtn) {
-                    installBtn.classList.remove('hidden');
-                    installBtn.classList.add('flex');
-                }
-            });
-
-            // Listen for successful installation
-            window.addEventListener('appinstalled', () => {
-                const installBtn = document.getElementById('btnInstallApp');
-                if (installBtn) {
-                    installBtn.classList.add('hidden');
-                    installBtn.classList.remove('flex');
-                }
-                console.log('PWA was installed');
-            });
-
-            // Trigger PWA install prompt when button is clicked
-            document.getElementById('btnInstallApp').addEventListener('click', async () => {
-                if (deferredPrompt) {
-                    // Show the install prompt
-                    deferredPrompt.prompt();
-                    // Wait for the user to respond to the prompt
-                    const { outcome } = await deferredPrompt.userChoice;
-                    console.log(`User response to the install prompt: ${outcome}`);
-                    // We've used the prompt, and can't use it again, throw it away
-                    deferredPrompt = null;
-                    // Hide the button
-                    const installBtn = document.getElementById('btnInstallApp');
-                    installBtn.classList.add('hidden');
-                    installBtn.classList.remove('flex');
-                }
-            });
+            document.addEventListener('paste', (event) => { const items = (event.clipboardData || event.originalEvent.clipboardData).items; for (let index in items) { if (items[index].kind === 'file' && items[index].type.includes('image')) processFile(items[index].getAsFile()); } });
+            window.addEventListener('mousemove', handleImageResizeMove); window.addEventListener('mouseup', handleImageResizeEnd); window.addEventListener('touchmove', handleImageResizeMove, { passive: false }); window.addEventListener('touchend', handleImageResizeEnd);
+            window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; const b = document.getElementById('btnInstallApp'); if (b) { b.classList.remove('hidden'); b.classList.add('flex'); } });
+            document.getElementById('btnInstallApp').addEventListener('click', async () => { if (deferredPrompt) { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; const b = document.getElementById('btnInstallApp'); b.classList.add('hidden'); b.classList.remove('flex'); } });
         }
 
-        // Swipe-to-resize logic handlers
-        function handleImageResizeStart(e, idx) {
-            isDraggingImage = true;
-            dragImageIdx = idx;
-            dragStartX = (e.type === 'touchstart') ? e.touches[0].clientX : e.clientX;
-            dragStartScale = uploadedImages[idx].scale;
-            if (e.type === 'mousedown') e.preventDefault();
-        }
-
-        function handleImageResizeMove(e) {
-            if (!isDraggingImage || dragImageIdx === -1) return;
-            const currentX = (e.type === 'touchmove') ? e.touches[0].clientX : e.clientX;
-            const deltaX = currentX - dragStartX;
-            
-            let newScale = dragStartScale + (deltaX * 0.5);
-            newScale = Math.max(10, Math.min(200, newScale)); 
-
-            uploadedImages[dragImageIdx].scale = newScale;
-            
-            const wrapperEl = document.getElementById(`preview-wrapper-${dragImageIdx}`);
-            if (wrapperEl) {
-                wrapperEl.style.width = newScale + '%';
-            }
-
-            if (e.type === 'touchmove') e.preventDefault();
-        }
-
-        function handleImageResizeEnd() {
-            if (isDraggingImage) {
-                isDraggingImage = false;
-                dragImageIdx = -1;
-                updatePreview(); 
-            }
-        }
+        function handleImageResizeStart(e, idx) { isDraggingImage = true; dragImageIdx = idx; dragStartX = (e.type === 'touchstart') ? e.touches[0].clientX : e.clientX; dragStartScale = uploadedImages[idx].scale; if (e.type === 'mousedown') e.preventDefault(); }
+        function handleImageResizeMove(e) { if (!isDraggingImage || dragImageIdx === -1) return; const currentX = (e.type === 'touchmove') ? e.touches[0].clientX : e.clientX, deltaX = currentX - dragStartX; let newScale = Math.max(10, Math.min(200, dragStartScale + (deltaX * 0.5))); uploadedImages[dragImageIdx].scale = newScale; const w = document.getElementById(`preview-wrapper-${dragImageIdx}`); if (w) w.style.width = newScale + '%'; if (e.type === 'touchmove') e.preventDefault(); }
+        function handleImageResizeEnd() { if (isDraggingImage) { isDraggingImage = false; dragImageIdx = -1; updatePreview(); } }
 
         function initColorPicker() {
             const map = document.getElementById('colorMap'), hueSlider = document.getElementById('inputHue');
             hueSlider.addEventListener('input', (e) => { hue = e.target.value; map.style.backgroundColor = `hsl(${hue}, 100%, 50%)`; calculateActiveColor(); });
-            const handleMapSelection = (e) => {
-                const rect = map.getBoundingClientRect();
-                let x = (e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0)) - rect.left;
-                let y = (e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0)) - rect.top;
-                x = Math.max(0, Math.min(x, rect.width)); y = Math.max(0, Math.min(y, rect.height));
-                saturation = (x / rect.width) * 100; brightness = 100 - (y / rect.height) * 100;
-                document.getElementById('colorMarker').style.left = x + 'px'; document.getElementById('colorMarker').style.top = y + 'px';
-                calculateActiveColor();
-            };
-            map.addEventListener('mousedown', (e) => {
-                handleMapSelection(e);
-                const onMouseMove = (moveEvent) => handleMapSelection(moveEvent);
-                const onMouseUp = () => { document.removeEventListener('mousemove', onMouseMove); document.removeEventListener('mouseup', onMouseUp); };
-                document.addEventListener('mousemove', onMouseMove); document.addEventListener('mouseup', onMouseUp);
-            });
+            const handleMapSelection = (e) => { const rect = map.getBoundingClientRect(); let x = (e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0)) - rect.left, y = (e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0)) - rect.top; x = Math.max(0, Math.min(x, rect.width)); y = Math.max(0, Math.min(y, rect.height)); saturation = (x / rect.width) * 100; brightness = 100 - (y / rect.height) * 100; document.getElementById('colorMarker').style.left = x + 'px'; document.getElementById('colorMarker').style.top = y + 'px'; calculateActiveColor(); };
+            map.addEventListener('mousedown', (e) => { handleMapSelection(e); const onMouseMove = (moveEvent) => handleMapSelection(moveEvent), onMouseUp = () => { document.removeEventListener('mousemove', onMouseMove); document.removeEventListener('mouseup', onMouseUp); }; document.addEventListener('mousemove', onMouseMove); document.addEventListener('mouseup', onMouseUp); });
         }
 
-        function calculateActiveColor() {
-            const s = saturation / 100, v = brightness / 100, i = Math.floor(hue / 60), f = hue / 60 - i, p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s);
-            let r, g, b;
-            switch(i % 6) { case 0: r = v, g = t, b = p; break; case 1: r = q, g = v, b = p; break; case 2: r = p, g = v, b = t; break; case 3: r = p, g = q, b = v; break; case 4: r = t, g = p, b = v; break; case 5: r = v, g = p, b = q; break; }
-            activeColor = rgbToHex(Math.round(r * 255), Math.round(g * 255), Math.round(b * 255));
-            updatePreview();
-        }
-
-        function setManualColor(hex, forceHue=null, forceSat=null, forceBri=null) {
-            activeColor = hex;
-            const rgb = hexToRgb(hex), hsb = rgbToHsb(rgb.r, rgb.g, rgb.b);
-            hue = forceHue !== null ? forceHue : hsb.h; saturation = forceSat !== null ? forceSat : hsb.s; brightness = forceBri !== null ? forceBri : hsb.b;
-            const map = document.getElementById('colorMap'), rect = map.getBoundingClientRect();
-            document.getElementById('colorMarker').style.left = (saturation / 100) * (rect.width || 510) + 'px';
-            document.getElementById('colorMarker').style.top = (1 - brightness / 100) * (rect.height || 200) + 'px';
-            document.getElementById('inputHue').value = hue; map.style.backgroundColor = `hsl(${hue}, 100%, 50%)`;
-            updatePreview();
-        }
-
+        function calculateActiveColor() { const s = saturation / 100, v = brightness / 100, i = Math.floor(hue / 60), f = hue / 60 - i, p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s); let r, g, b; switch(i % 6) { case 0: r = v, g = t, b = p; break; case 1: r = q, g = v, b = p; break; case 2: r = p, g = v, b = t; break; case 3: r = p, g = q, b = v; break; case 4: r = t, g = p, b = v; break; case 5: r = v, g = p, b = q; break; } activeColor = rgbToHex(Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)); updatePreview(); }
+        function setManualColor(hex, forceHue=null, forceSat=null, forceBri=null) { activeColor = hex; const rgb = hexToRgb(hex), hsb = rgbToHsb(rgb.r, rgb.g, rgb.b); hue = forceHue !== null ? forceHue : hsb.h; saturation = forceSat !== null ? forceSat : hsb.s; brightness = forceBri !== null ? forceBri : hsb.b; const map = document.getElementById('colorMap'), rect = map.getBoundingClientRect(), marker = document.getElementById('colorMarker'); if (marker) { marker.style.left = (saturation / 100) * (rect.width || 510) + 'px'; marker.style.top = (1 - brightness / 100) * (rect.height || 200) + 'px'; } const hS = document.getElementById('inputHue'); if (hS) hS.value = hue; map.style.backgroundColor = `hsl(${hue}, 100%, 50%)`; updatePreview(); }
         function rgbToHex(r, g, b) { return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase(); }
         function hexToRgb(hex) { const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex); return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : {r:0,g:0,b:0}; }
         function rgbToHsb(r, g, b) { r /= 255; g /= 255; b /= 255; const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min; let h, s, v = max; s = max === 0 ? 0 : d / max; if (max === min) h = 0; else { switch(max) { case r: h = (g - b) / d + (g < b ? 6 : 0); break; case g: h = (b - r) / d + 2; break; case b: h = (r - g) / d + 4; break; } h /= 6; } return { h: h * 360, s: s * 100, b: v * 100 }; }
-
         function handleImageUpload(e) { Array.from(e.target.files).forEach(processFile); e.target.value = ''; }
-        function processFile(file) {
-            const reader = new FileReader();
-            reader.onload = (e) => { uploadedImages.push({ src: e.target.result, scale: 100, border: null }); renderUploadPreviews(); updatePreview(); };
-            reader.readAsDataURL(file);
-        }
-
-        function renderUploadPreviews() {
-            const container = document.getElementById('uploadPreviewContainer'); container.innerHTML = '';
-            uploadedImages.forEach((imgObj, idx) => {
-                const div = document.createElement('div');
-                div.className = "relative group w-24 h-14 rounded-lg overflow-hidden border border-gray-300 bg-white shrink-0";
-                div.innerHTML = `<img src="${imgObj.src}" class="w-full h-full object-cover">
-                    <div class="absolute inset-0 bg-white/85 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-1 transition-opacity">
-                        ${idx > 0 ? `<button onclick="moveImageLeft(${idx})" class="p-1 hover:bg-gray-100 rounded text-gray-800"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></button>` : `<div class="w-[26px]"></div>`}
-                        <button onclick="removeImage(${idx})" class="p-1 hover:bg-rose-100 rounded text-rose-500"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-                        ${idx < uploadedImages.length - 1 ? `<button onclick="moveImageRight(${idx})" class="p-1 hover:bg-gray-100 rounded text-gray-800"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button>` : `<div class="w-[26px]"></div>`}
-                    </div>`;
-                container.appendChild(div);
-            });
-            if(typeof lucide !== 'undefined') lucide.createIcons();
-        }
-
-        function moveImageLeft(idx) { if (idx > 0) { [uploadedImages[idx - 1], uploadedImages[idx]] = [uploadedImages[idx], uploadedImages[idx - 1]]; renderUploadPreviews(); updatePreview(); } }
-        function moveImageRight(idx) { if (idx < uploadedImages.length - 1) { [uploadedImages[idx], uploadedImages[idx + 1]] = [uploadedImages[idx + 1], uploadedImages[idx]]; renderUploadPreviews(); updatePreview(); } }
-        function removeImage(idx) { uploadedImages.splice(idx, 1); renderUploadPreviews(); updatePreview(); }
-
-        function getLightShade(hex, blendPercentage) {
-            const rgb = hexToRgb(hex), factor = blendPercentage / 100;
-            const r = Math.round(255 - (255 - rgb.r) * factor), g = Math.round(255 - (255 - rgb.g) * factor), b = Math.round(255 - (255 - rgb.b) * factor);
-            return `rgb(${r}, ${g}, ${b})`;
-        }
+        function processFile(file) { const reader = new FileReader(); reader.onload = (e) => { uploadedImages.push({ src: e.target.result, scale: 100, border: null }); updatePreview(); }; reader.readAsDataURL(file); }
+        function moveImageLeft(idx) { if (idx > 0) { [uploadedImages[idx - 1], uploadedImages[idx]] = [uploadedImages[idx], uploadedImages[idx - 1]]; updatePreview(); } }
+        function moveImageRight(idx) { if (idx < uploadedImages.length - 1) { [uploadedImages[idx], uploadedImages[idx + 1]] = [uploadedImages[idx + 1], uploadedImages[idx]]; updatePreview(); } }
+        function removeImage(idx) { uploadedImages.splice(idx, 1); updatePreview(); }
+        function getLightShade(hex, blendPercentage) { const rgb = hexToRgb(hex), factor = blendPercentage / 100, r = Math.round(255 - (255 - rgb.r) * factor), g = Math.round(255 - (255 - rgb.g) * factor), b = Math.round(255 - (255 - rgb.b) * factor); return `rgb(${r}, ${g}, ${b})`; }
         function hexToRgba(hex, alpha) { const rgb = hexToRgb(hex); return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`; }
-
         function initCards() { createCard(); }
-        function createCard() {
-            const newCard = { 
-                id: 'card_' + Date.now() + Math.random().toString(36).substr(2, 9), 
-                title: '', category: '-', definition: '', images: [], 
-                color: { hex: "#51b8cb", hue: 189, sat: 60, bri: 80 }, 
-                textSize: 32, defSize: 24, imageBorder: 2, imageCols: 0, blend: 10,
-                showTitlePlaceholder: true, showDefPlaceholder: false
-            };
-            cards.push(newCard); switchCard(newCard.id);
-        }
-
+        function createCard() { const newCard = { id: 'card_' + Date.now() + Math.random().toString(36).substr(2, 9), title: '', category: '-', definition: '', images: [], color: { hex: "#51b8cb", hue: 189, sat: 60, bri: 80 }, textSize: 32, defSize: 24, imageBorder: 2, imageCols: 0, blend: 10, showTitlePlaceholder: true, showDefPlaceholder: false }; cards.push(newCard); switchCard(newCard.id); }
         function switchCard(id) { activeCardId = id; loadCurrentCard(); renderTabs(); }
-        function loadCurrentCard() {
-            isSwitching = true; const card = cards.find(c => c.id === activeCardId); if (!card) return;
-            document.getElementById('inputTitle').value = card.title;
-            
-            showTitlePlaceholder = card.showTitlePlaceholder !== false;
-            showDefPlaceholder = card.showDefPlaceholder !== false;
-            
-            selectCategory(card.category || "-"); selectTextSize(card.textSize || 32); selectDefSize(card.defSize || 24); currentImageBorder = card.imageBorder || 2; selectImageCols(card.imageCols || 0);
-            
-            // Ensure label matches loaded card size
-            const sizeLabel = document.getElementById('toolbarDefSizeLabel');
-            if (sizeLabel) sizeLabel.innerText = card.defSize || 24;
-
-            const titleSizeLabel = document.getElementById('toolbarTitleSizeLabel');
-            if (titleSizeLabel) titleSizeLabel.innerText = card.textSize || 32;
-
-            currentBlendPercentage = card.blend !== undefined ? card.blend : 10;
-            document.getElementById('blendValueLabel').innerText = currentBlendPercentage + '%';
-            
-            document.getElementById('inputDef').value = card.definition; uploadedImages = [...card.images]; renderUploadPreviews();
-            
-            document.getElementById('blendValueLabel').style.color = card.color.hex;
-            activeColor = card.color.hex; hue = card.color.hue; saturation = card.color.sat; brightness = card.color.bri;
-            setManualColor(activeColor, hue, saturation, brightness); isSwitching = false;
-        }
-
-        function syncCardState() {
-            if (!activeCardId || isSwitching) return;
-            const card = cards.find(c => c.id === activeCardId); if (!card) return;
-            card.title = document.getElementById('inputTitle').value; card.category = currentSelectedCategory; card.definition = document.getElementById('inputDef').value;
-            card.images = [...uploadedImages]; card.color = { hex: activeColor, hue: hue, sat: saturation, bri: brightness };
-            card.textSize = currentSelectedSize; card.defSize = currentSelectedDefSize; card.imageBorder = currentImageBorder; card.imageCols = currentImageCols;
-            card.blend = currentBlendPercentage; 
-            card.showTitlePlaceholder = showTitlePlaceholder; card.showDefPlaceholder = showDefPlaceholder;
-            const tabEl = document.getElementById(`tab-text-${activeCardId}`);
-            if (tabEl) tabEl.innerText = card.title.trim() || `Card ${cards.indexOf(card) + 1}`;
-        }
-
+        function loadCurrentCard() { isSwitching = true; const card = cards.find(c => c.id === activeCardId); if (!card) return; document.getElementById('inputTitle').value = card.title; showTitlePlaceholder = card.showTitlePlaceholder !== false; showDefPlaceholder = card.showDefPlaceholder !== false; selectCategory(card.category || "-"); selectTextSize(card.textSize || 32); selectDefSize(card.defSize || 24); currentImageBorder = card.imageBorder || 2; selectImageCols(card.imageCols || 0); const sL = document.getElementById('toolbarDefSizeLabel'); if (sL) sL.innerText = card.defSize || 24; const tL = document.getElementById('toolbarTitleSizeLabel'); if (tL) tL.innerText = card.textSize || 32; currentBlendPercentage = card.blend !== undefined ? card.blend : 10; document.getElementById('blendValueLabel').innerText = currentBlendPercentage + '%'; document.getElementById('inputDef').value = card.definition; uploadedImages = [...card.images]; activeColor = card.color.hex; hue = card.color.hue; saturation = card.color.sat; brightness = card.color.bri; setManualColor(activeColor, hue, saturation, brightness); isSwitching = false; }
+        function syncCardState() { if (!activeCardId || isSwitching) return; const card = cards.find(c => c.id === activeCardId); if (!card) return; card.title = document.getElementById('inputTitle').value; card.category = currentSelectedCategory; card.definition = document.getElementById('inputDef').value; card.images = [...uploadedImages]; card.color = { hex: activeColor, hue: hue, sat: saturation, bri: brightness }; card.textSize = currentSelectedSize; card.defSize = currentSelectedDefSize; card.imageBorder = currentImageBorder; card.imageCols = currentImageCols; card.blend = currentBlendPercentage; card.showTitlePlaceholder = showTitlePlaceholder; card.showDefPlaceholder = showDefPlaceholder; const tE = document.getElementById(`tab-text-${activeCardId}`); if (tE) tE.innerText = card.title.trim() || `Card ${cards.indexOf(card) + 1}`; }
         function deleteCard(e, id) { e.stopPropagation(); if (cards.length <= 1) return; const index = cards.findIndex(c => c.id === id); cards.splice(index, 1); if (activeCardId === id) switchCard(cards[Math.max(0, index - 1)].id); else renderTabs(); }
 
         function renderTabs() {
             const container = document.getElementById('cardTabsContainer'); container.innerHTML = '';
-            cards.forEach((card, index) => {
-                const isActive = card.id === activeCardId;
-                const btn = document.createElement('button');
-                btn.className = `px-4 py-2 text-xs font-bold rounded-xl whitespace-nowrap transition-all flex items-center gap-2 group ${isActive ? 'bg-[#51b8cb] text-white shadow-md' : 'bg-[#e8f6f8] text-gray-500 hover:bg-[#d0ebf0] dark:bg-[#222] dark:hover:bg-[#333]'}`;
-                btn.onclick = () => switchCard(card.id);
-                btn.innerHTML = `<span id="tab-text-${card.id}">${card.title.trim() || `Card ${index + 1}`}</span>`;
-                if (cards.length > 1) {
-                    const del = document.createElement('span'); del.innerHTML = '<i data-lucide="x" class="w-3.5 h-3.5"></i>';
-                    del.className = `p-0.5 rounded-full transition-colors ${isActive ? 'hover:bg-black/20 text-white/80' : 'hover:bg-black/10'}`;
-                    del.onclick = (e) => deleteCard(e, card.id); btn.appendChild(del);
-                }
-                container.appendChild(btn);
-            });
-            const add = document.createElement('button'); add.className = "px-3 py-2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] text-[#51b8cb] rounded-xl hover:bg-[#e8f6f8] transition-all shrink-0";
-            add.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i>'; add.onclick = createCard; container.appendChild(add);
-            if (typeof lucide !== 'undefined') lucide.createIcons();
+            cards.forEach((card, index) => { const isActive = card.id === activeCardId, btn = document.createElement('button'); btn.className = `px-4 py-2 text-xs font-bold rounded-xl whitespace-nowrap transition-all flex items-center gap-2 group ${isActive ? 'bg-[#51b8cb] text-white shadow-md' : 'bg-[#e8f6f8] text-gray-500 hover:bg-[#d0ebf0] dark:bg-[#222] dark:hover:bg-[#333]'}`; btn.onclick = () => switchCard(card.id); btn.innerHTML = `<span id="tab-text-${card.id}">${card.title.trim() || `Card ${index + 1}`}</span>`; if (cards.length > 1) { const del = document.createElement('span'); del.innerHTML = '<i data-lucide="x" class="w-3.5 h-3.5"></i>'; del.className = `p-0.5 rounded-full transition-colors ${isActive ? 'hover:bg-black/20 text-white/80' : 'hover:bg-black/10'}`; del.onclick = (e) => deleteCard(e, card.id); btn.appendChild(del); } container.appendChild(btn); });
+            const add = document.createElement('button'); add.className = "px-3 py-2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] text-[#51b8cb] rounded-xl hover:bg-[#e8f6f8] transition-all shrink-0"; add.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i>'; add.onclick = createCard; container.appendChild(add); if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         function updatePreview() {
-            const title = document.getElementById('inputTitle').value, category = currentSelectedCategory, definition = document.getElementById('inputDef').value, blend = currentBlendPercentage, textSize = currentSelectedSize, defSize = currentSelectedDefSize, imgBorder = currentImageBorder, imageCols = currentImageCols;
-            const finalColor = activeColor;
-            const textColor = getDarkerShade(finalColor, 0.4); // Darkened for better contrast readability
-            document.getElementById('blendValueLabel').style.color = finalColor;
-            
-            const card = document.getElementById('cardContainer'); 
-            card.style.width = '100%'; // Ensures mobile responsive width
-            card.style.maxWidth = '1050px'; // Maintains expected export boundaries
-            card.style.borderColor = finalColor; 
-            card.style.backgroundColor = getLightShade(finalColor, blend);
-
-            const dlBtn = document.getElementById('cardDownloadBtn');
-            if (dlBtn) {
-                dlBtn.style.color = finalColor;
-                dlBtn.style.border = `2px solid ${finalColor}`;
-            }
-            
-            const titleSection = document.getElementById('cardTitleSection');
-            const titleRestore = document.getElementById('cardTitleRestore');
-            const word = document.getElementById('cardWord'); 
-            word.style.color = textColor; 
-            word.style.fontSize = textSize + 'px'; 
-            if (word.innerText !== title) word.innerText = title; 
-            
-            const type = document.getElementById('cardType'); 
-            const addCatBtn = document.getElementById('addCategoryBtn');
-
-            if (category !== '-') { 
-                type.style.backgroundColor = hexToRgba(finalColor, 0.15); 
-                type.style.color = textColor; 
-                if (type.innerText !== category) type.innerText = category; 
-                type.classList.remove('hidden');
-                addCatBtn.classList.add('hidden');
-            } else { 
-                if (type.innerText !== '') type.innerText = ''; 
-                type.classList.add('hidden');
-                addCatBtn.classList.remove('hidden');
-            }
-            
-            if (!title.trim() && !showTitlePlaceholder && (category === '-' || !category.trim())) {
-                titleSection.classList.add('hidden');
-                titleRestore.classList.remove('hidden');
-            } else {
-                titleSection.classList.remove('hidden');
-                titleRestore.classList.add('hidden');
-            }
-            
-            const notesSection = document.getElementById('cardNotesSection'); 
-            const defRestore = document.getElementById('cardDefRestore');
-            if (definition.trim() || showDefPlaceholder) {
-                notesSection.classList.remove('hidden');
-                defRestore.classList.add('hidden');
-                const cardDef = document.getElementById('cardDef');
-                cardDef.style.color = textColor; 
-                cardDef.style.fontSize = defSize + 'px'; 
-                if (cardDef.innerHTML !== definition) cardDef.innerHTML = definition;
-            } else {
-                notesSection.classList.add('hidden');
-                defRestore.classList.remove('hidden');
-            }
-            
-            const cardImages = document.getElementById('cardImagesContainer');
-            if (imageCols === 0) { cardImages.className = `flex flex-wrap gap-4 md:gap-9 w-full justify-center`; cardImages.style.gridTemplateColumns = ''; } 
-            else { cardImages.className = `grid gap-4 md:gap-9 w-full items-start`; cardImages.style.gridTemplateColumns = `repeat(${imageCols}, minmax(0, 1fr))`; }
-            
-            // Explicit padding instead of margin to prevent html2canvas collapse bug
-            cardImages.style.paddingTop = uploadedImages.length > 0 ? '3rem' : '0px';
-            
-            cardImages.innerHTML = '';
+            const finalColor = activeColor, textColor = getDarkerShade(finalColor, 0.4), blend = currentBlendPercentage, textSize = currentSelectedSize, defSize = currentSelectedDefSize, imgBorder = currentImageBorder, imageCols = currentImageCols;
+            const bVL = document.getElementById('blendValueLabel'); if (bVL) bVL.style.color = finalColor;
+            const card = document.getElementById('cardContainer'); card.style.borderColor = finalColor; card.style.backgroundColor = getLightShade(finalColor, blend);
+            const notepad = document.getElementById('notepad-content'); if (notepad) notepad.style.borderColor = finalColor;
+            const word = document.getElementById('cardWord'); word.style.color = textColor; word.style.fontSize = textSize + 'px'; if (word.innerText !== document.getElementById('inputTitle').value) word.innerText = document.getElementById('inputTitle').value;
+            const type = document.getElementById('cardType'), addCatBtn = document.getElementById('addCategoryBtn');
+            if (currentSelectedCategory !== '-') { type.style.backgroundColor = hexToRgba(finalColor, 0.15); type.style.color = textColor; if (type.innerText !== currentSelectedCategory) type.innerText = currentSelectedCategory; type.classList.remove('hidden'); addCatBtn.classList.add('hidden'); }
+            else { type.innerText = ''; type.classList.add('hidden'); addCatBtn.classList.remove('hidden'); }
+            const titleS = document.getElementById('cardTitleSection'), titleR = document.getElementById('cardTitleRestore'); if (!document.getElementById('inputTitle').value.trim() && !showTitlePlaceholder && (currentSelectedCategory === '-' || !currentSelectedCategory.trim())) { titleS.classList.add('hidden'); titleR.classList.remove('hidden'); } else { titleS.classList.remove('hidden'); titleR.classList.add('hidden'); }
+            const notesS = document.getElementById('cardNotesSection'), notesR = document.getElementById('cardDefRestore'); if (document.getElementById('inputDef').value.trim() || showDefPlaceholder) { notesS.classList.remove('hidden'); notesR.classList.add('hidden'); const cD = document.getElementById('cardDef'); cD.style.color = textColor; cD.style.fontSize = defSize + 'px'; if (cD.innerHTML !== document.getElementById('inputDef').value) cD.innerHTML = document.getElementById('inputDef').value; } else { notesS.classList.add('hidden'); notesR.classList.remove('hidden'); }
+            const cardImages = document.getElementById('cardImagesContainer'); if (imageCols === 0) { cardImages.className = `flex flex-wrap gap-4 md:gap-9 w-full justify-center`; cardImages.style.gridTemplateColumns = ''; } else { cardImages.className = `grid gap-4 md:gap-9 w-full items-start`; cardImages.style.gridTemplateColumns = `repeat(${imageCols}, minmax(0, 1fr))`; }
+            cardImages.style.paddingTop = uploadedImages.length > 0 ? '3rem' : '0px'; cardImages.innerHTML = '';
             uploadedImages.forEach((imgObj, idx) => {
-                const wrapper = document.createElement('div');
-                wrapper.id = `preview-wrapper-${idx}`;
-                wrapper.className = "relative group/imgwrapper mx-auto block";
-                wrapper.style.width = `${imgObj.scale}%`;
-
-                const img = document.createElement('img');
-                img.id = `preview-img-${idx}`;
-                img.src = imgObj.src;
-                img.className = "resizable-img h-auto object-cover rounded-[1.5rem] shadow-sm block w-full";
-                
-                const appliedBorder = imgObj.border !== undefined && imgObj.border !== null ? imgObj.border : imgBorder;
-                img.style.border = `${appliedBorder}px solid ${finalColor}`;
-                img.draggable = false;
-                
-                // Add swipe/resize events
-                img.onmousedown = (e) => handleImageResizeStart(e, idx);
-                img.ontouchstart = (e) => handleImageResizeStart(e, idx);
-
-                // Add context menu event
-                img.oncontextmenu = (e) => {
-                    e.preventDefault();
-                    activeImageIdx = idx;
-                    showFloatingImageBorderMenu(e.clientX, e.clientY);
-                };
-
-                // Drag Handle
-                const dragBtn = document.createElement('div');
-                dragBtn.className = "absolute -top-3 -left-3 bg-white dark:bg-[#1a1a1a] rounded-full cursor-grab shadow-md opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all z-10 hidden-in-export flex items-center justify-center hover:scale-110 w-[28px] h-[28px] md:w-[32px] md:h-[32px]";
-                dragBtn.style.color = finalColor;
-                dragBtn.style.border = `2px solid ${finalColor}`;
-                dragBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 md:w-5 md:h-5">
-                    <path d="M12 3 l4 4 H8 Z" />
-                    <path d="M12 21 l4 -4 H8 Z" />
-                    <rect x="5" y="8.5" width="14" height="2" rx="1" />
-                    <rect x="5" y="11.5" width="14" height="2" rx="1" />
-                    <rect x="5" y="14.5" width="14" height="2" rx="1" />
-                </svg>`;
-                dragBtn.title = "Drag to reorder";
-                
-                // Only allow drag-and-drop wrapper when handle is held, prevents conflict with resizing
-                dragBtn.onmousedown = () => { wrapper.draggable = true; };
-                dragBtn.onmouseup = () => { wrapper.draggable = false; };
-                dragBtn.onmouseleave = () => { wrapper.draggable = false; };
-                dragBtn.ontouchstart = () => { wrapper.draggable = true; };
-                dragBtn.ontouchend = () => { wrapper.draggable = false; };
-
-                // Delete Button
-                const delBtn = document.createElement('button');
-                delBtn.className = "absolute -top-3 -right-3 opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all z-10 hidden-in-export flex items-center justify-center hover:scale-110 outline-none p-0 bg-transparent border-none w-[28px] h-[28px] md:w-[32px] md:h-[32px]";
-                delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-full h-full drop-shadow-md">
-                    <defs>
-                        <linearGradient id="delGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stop-color="#ff3333" />
-                            <stop offset="100%" stop-color="#cc0000" />
-                        </linearGradient>
-                    </defs>
-                    <circle cx="12" cy="12" r="11" fill="url(#delGrad)" stroke="#990000" stroke-width="0.5" />
-                    <path d="M8 8 L16 16 M16 8 L8 16" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>`;
-                delBtn.title = "Delete Image";
-                delBtn.onclick = (e) => { e.stopPropagation(); removeImage(idx); };
-
-                wrapper.appendChild(img);
-                wrapper.appendChild(dragBtn);
-                wrapper.appendChild(delBtn);
-
-                // HTML5 Drag and Drop Handlers
-                wrapper.ondragstart = (e) => {
-                    e.dataTransfer.effectAllowed = 'move';
-                    e.dataTransfer.setData('text/plain', idx);
-                    if(e.dataTransfer.setDragImage) { e.dataTransfer.setDragImage(wrapper, 0, 0); }
-                    setTimeout(() => wrapper.classList.add('opacity-50'), 0);
-                };
-                wrapper.ondragend = (e) => {
-                    wrapper.classList.remove('opacity-50');
-                    wrapper.draggable = false;
-                };
-                wrapper.ondragover = (e) => {
-                    e.preventDefault();
-                    e.dataTransfer.dropEffect = 'move';
-                };
-                wrapper.ondragenter = (e) => {
-                    e.preventDefault();
-                    wrapper.classList.add('ring-4', 'ring-[#51b8cb]', 'ring-offset-2', 'rounded-[1.5rem]');
-                };
-                wrapper.ondragleave = (e) => {
-                    wrapper.classList.remove('ring-4', 'ring-[#51b8cb]', 'ring-offset-2', 'rounded-[1.5rem]');
-                };
-                wrapper.ondrop = (e) => {
-                    e.preventDefault();
-                    wrapper.classList.remove('ring-4', 'ring-[#51b8cb]', 'ring-offset-2', 'rounded-[1.5rem]');
-                    const fromIdx = parseInt(e.dataTransfer.getData('text/plain'), 10);
-                    const toIdx = idx;
-                    if (fromIdx !== toIdx && !isNaN(fromIdx)) {
-                        const movedItem = uploadedImages.splice(fromIdx, 1)[0];
-                        uploadedImages.splice(toIdx, 0, movedItem);
-                        renderUploadPreviews();
-                        updatePreview();
-                    }
-                };
-
-                cardImages.appendChild(wrapper);
+                const wrapper = document.createElement('div'); wrapper.id = `preview-wrapper-${idx}`; wrapper.className = "relative group/imgwrapper mx-auto block"; wrapper.style.width = `${imgObj.scale}%`;
+                const img = document.createElement('img'); img.src = imgObj.src; img.className = "resizable-img h-auto object-cover rounded-[1.5rem] shadow-sm block w-full"; img.style.border = `${imgObj.border !== null ? imgObj.border : imgBorder}px solid ${finalColor}`; img.draggable = false;
+                img.onmousedown = (e) => handleImageResizeStart(e, idx); img.ontouchstart = (e) => handleImageResizeStart(e, idx);
+                img.oncontextmenu = (e) => { e.preventDefault(); activeImageIdx = idx; showFloatingImageBorderMenu(e.clientX, e.clientY); };
+                const moveControls = document.createElement('div'); moveControls.className = "absolute -top-3 -left-3 flex gap-1.5 z-10 hidden-in-export opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all";
+                if (idx > 0) { const lB = document.createElement('button'); lB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] md:w-[32px] md:h-[32px] outline-none p-0"; lB.style.color = finalColor; lB.style.border = `2px solid ${finalColor}`; lB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 md:w-5 md:h-5"><path d="M15 18l-6-6 6-6"/></svg>`; lB.onclick = (e) => { e.stopPropagation(); moveImageLeft(idx); }; moveControls.appendChild(lB); }
+                if (idx < uploadedImages.length - 1) { const rB = document.createElement('button'); rB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] md:w-[32px] md:h-[32px] outline-none p-0"; rB.style.color = finalColor; rB.style.border = `2px solid ${finalColor}`; rB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 md:w-5 md:h-5"><path d="M9 18l6-6-6-6"/></svg>`; rB.onclick = (e) => { e.stopPropagation(); moveImageRight(idx); }; moveControls.appendChild(rB); }
+                const delBtn = document.createElement('button'); delBtn.className = "absolute -top-3 -right-3 opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all z-10 hidden-in-export flex items-center justify-center hover:scale-110 outline-none p-0 bg-transparent border-none w-[28px] h-[28px] md:w-[32px] md:h-[32px]"; delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-full h-full drop-shadow-md"><defs><linearGradient id="delGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ff3333" /><stop offset="100%" stop-color="#cc0000" /></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#delGrad)" stroke="#990000" stroke-width="0.5" /><path d="M8 8 L16 16 M16 8 L8 16" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" /></svg>`; delBtn.onclick = (e) => { e.stopPropagation(); removeImage(idx); };
+                wrapper.appendChild(img); if (moveControls.children.length > 0) wrapper.appendChild(moveControls); wrapper.appendChild(delBtn); cardImages.appendChild(wrapper);
             });
-
-            updateFavicon(); updateBrandLogo();
-            const dynamicStyles = document.getElementById('dynamic-card-styles');
-            dynamicStyles.innerHTML = `input[type=range]::-webkit-slider-thumb { background: white !important; border: 3px solid ${finalColor} !important; box-shadow: 0 0 10px ${finalColor}66 !important; } #cardWord, #cardDef, #cardType { text-decoration: none !important; }`;
-            syncCardState();
+            updateFavicon(); updateBrandLogo(); syncCardState();
         }
 
         function getDarkerShade(hex, factor = 0.7) { const rgb = hexToRgb(hex); return rgbToHex(Math.round(rgb.r * factor), Math.round(rgb.g * factor), Math.round(rgb.b * factor)); }
+        function generateNotebookSVG() { const color = CONSTANT_ICON_COLOR, yellow = "#eed142", dark = "#222222"; return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%"><path d="M 25 15 L 75 15 C 80.5 15 85 19.5 85 25 L 85 65 L 65 65 C 62.2 65 60 67.2 60 70 L 60 85 L 25 85 C 19.5 85 15 80.5 15 75 L 15 25 C 15 19.5 19.5 15 25 15 Z" fill="${color}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/><path d="M 85 65 L 65 85 L 65 70 C 65 67.2 67.2 65 70 65 Z" fill="${yellow}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/><g stroke="${dark}" stroke-width="4" fill="${color}"><rect x="12" y="27" width="16" height="6" rx="3" /><rect x="12" y="42" width="16" height="6" rx="3" /><rect x="12" y="57" width="16" height="6" rx="3" /><rect x="12" y="72" width="16" height="6" rx="3" /></g><g fill="${dark}"><circle cx="25" cy="30" r="3" /><circle cx="25" cy="45" r="3" /><circle cx="25" cy="60" r="3" /><circle cx="25" cy="75" r="3" /></g></svg>`.trim(); }
+        function updateFavicon() { document.getElementById('favicon').href = `data:image/svg+xml;base64,${btoa(generateNotebookSVG())}`; }
+        function updateBrandLogo() { const c = document.getElementById('brand-logo-container'); if (c) c.innerHTML = generateNotebookSVG(); }
+        function createPNGIconFromSVG(svg, size) { return new Promise((resolve) => { const canvas = document.createElement('canvas'); canvas.width = size; canvas.height = size; const ctx = canvas.getContext('2d'), img = new Image(); img.onload = () => { ctx.drawImage(img, 0, 0, size, size); resolve(canvas.toDataURL('image/png')); }; img.onerror = () => resolve(`data:image/svg+xml;base64,${btoa(svg)}`); img.src = `data:image/svg+xml;base64,${btoa(svg)}`; }); }
+        async function initPWA() { try { const svg = generateNotebookSVG(), i192 = await createPNGIconFromSVG(svg, 192), i512 = await createPNGIconFromSVG(svg, 512); document.getElementById('apple-touch-icon').href = i192; const manifest = { name: "Notion", short_name: "Notion", start_url: window.location.href.split('?')[0], display: "standalone", background_color: "#e8f6f8", theme_color: "#51b8cb", icons: [{ src: i192, sizes: "192x192", type: "image/png", purpose: "any maskable" }, { src: i512, sizes: "512x512", type: "image/png", purpose: "any maskable" }] }; document.getElementById('manifest').href = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest)); } catch (e) { console.error("PWA initialization skipped:", e); } }
 
-        function generateNotebookSVG() {
-            const color = CONSTANT_ICON_COLOR; 
-            const yellow = "#eed142";
-            const dark = "#222222";
-            return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
-                <!-- Base shape -->
-                <path d="M 25 15 L 75 15 C 80.5 15 85 19.5 85 25 L 85 65 L 65 65 C 62.2 65 60 67.2 60 70 L 60 85 L 25 85 C 19.5 85 15 80.5 15 75 L 15 25 C 15 19.5 19.5 15 25 15 Z" fill="${color}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/>
-                <!-- Folded Corner -->
-                <path d="M 85 65 L 65 85 L 65 70 C 65 67.2 67.2 65 70 65 Z" fill="${yellow}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/>
-                <!-- Rings -->
-                <g stroke="${dark}" stroke-width="4" fill="${color}">
-                    <rect x="12" y="27" width="16" height="6" rx="3" />
-                    <rect x="12" y="42" width="16" height="6" rx="3" />
-                    <rect x="12" y="57" width="16" height="6" rx="3" />
-                    <rect x="12" y="72" width="16" height="6" rx="3" />
-                </g>
-                <g fill="${dark}">
-                    <circle cx="25" cy="30" r="3" />
-                    <circle cx="25" cy="45" r="3" />
-                    <circle cx="25" cy="60" r="3" />
-                    <circle cx="25" cy="75" r="3" />
-                </g>
-            </svg>`.trim();
-        }
-
-        function updateFavicon() { const favicon = document.getElementById('favicon'); favicon.href = `data:image/svg+xml;base64,${btoa(generateNotebookSVG())}`; }
-        function updateBrandLogo() { const container = document.getElementById('brand-logo-container'); if (container) container.innerHTML = generateNotebookSVG(); }
-
-        function createPNGIconFromSVG(svgString, size) {
-            return new Promise((resolve) => {
-                const canvas = document.createElement('canvas');
-                canvas.width = size;
-                canvas.height = size;
-                const ctx = canvas.getContext('2d');
-                const img = new Image();
-                img.onload = () => {
-                    ctx.drawImage(img, 0, 0, size, size);
-                    resolve(canvas.toDataURL('image/png'));
-                };
-                img.onerror = () => resolve(`data:image/svg+xml;base64,${btoa(svgString)}`);
-                img.src = `data:image/svg+xml;base64,${btoa(svgString)}`;
-            });
-        }
-
-        async function initPWA() {
-            try {
-                // Generate PNG icons from the SVG to guarantee browser compatibility natively
-                const svgString = generateNotebookSVG();
-                const icon192 = await createPNGIconFromSVG(svgString, 192);
-                const icon512 = await createPNGIconFromSVG(svgString, 512);
-
-                let startUrl = window.location.href.split('?')[0];
-
-                // Set Apple Touch Icon
-                document.getElementById('apple-touch-icon').href = icon192;
-
-                const manifest = {
-                    name: "Notion",
-                    short_name: "Notion",
-                    start_url: startUrl,
-                    display: "standalone",
-                    background_color: "#e8f6f8",
-                    theme_color: "#51b8cb",
-                    icons: [
-                        {
-                            src: icon192,
-                            sizes: "192x192",
-                            type: "image/png",
-                            purpose: "any maskable"
-                        },
-                        {
-                            src: icon512,
-                            sizes: "512x512",
-                            type: "image/png",
-                            purpose: "any maskable"
-                        }
-                    ]
-                };
-
-                const manifestStr = JSON.stringify(manifest);
-                // Embed the manifest directly as a Data URI to bypass Blob/Cross-Origin restrictions entirely
-                const manifestUrl = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(manifestStr);
-                document.getElementById('manifest').href = manifestUrl;
-            } catch (err) {
-                console.error("PWA initialization skipped:", err);
-            }
+        function updateNpFormatState() {
+            if (document.activeElement !== document.getElementById('note-area')) return;
+            const isBold = document.queryCommandState('bold');
+            let bgStyle = getSelectionStyle('backgroundColor'), isHighlighted = bgStyle && bgStyle !== 'transparent' && bgStyle !== 'rgba(0, 0, 0, 0)';
+            const b = document.getElementById('np-bold-btn'), h = document.getElementById('np-highlight-btn');
+            if (b) { b.classList.toggle('text-[#51b8cb]', isBold); b.classList.toggle('text-gray-500', !isBold); b.classList.toggle('bg-[#e8f6f8]', isBold); b.classList.toggle('dark:bg-[#333]', isBold); }
+            if (h) { h.classList.toggle('text-[#51b8cb]', isHighlighted); h.classList.toggle('text-gray-500', !isHighlighted); h.classList.toggle('bg-[#e8f6f8]', isHighlighted); h.classList.toggle('dark:bg-[#333]', isHighlighted); }
         }
 
         function initNotepad() {
-            const overlay = document.getElementById('notepad-overlay'), main = document.getElementById('mainLayout');
-            document.getElementById('close-notepad-btn').onclick = () => { overlay.classList.add('hidden'); main.classList.remove('hidden'); };
+            const overlay = document.getElementById('notepad-content');
+            const cardCont = document.getElementById('cardContainer');
+            document.getElementById('close-notepad-btn').onclick = () => { overlay.classList.add('hidden'); cardCont.classList.remove('hidden'); };
             
-            let npNotes = JSON.parse(localStorage.getItem('ali_dashboard_multiple_notes')) || [{ id: Date.now(), title: 'My First Note', content: '', createdAt: new Date().toISOString() }];
-            let npCurrentId = npNotes[0]?.id || Date.now();
+            let npNotes = JSON.parse(localStorage.getItem('ali_dashboard_multiple_notes')) || [{ id: Date.now(), title: 'My First Note', content: '', createdAt: new Date().toISOString() }], npCurrentId = npNotes[0]?.id || Date.now();
             const list = document.getElementById('notes-list'), area = document.getElementById('note-area'), titleInput = document.getElementById('note-title'), count = document.getElementById('word-count'), status = document.getElementById('save-status');
+            let undoStack = [], redoStack = [], historyTimeout, isUndoingRedoing = false;
             
-            // Undo/Redo State variables
-            let undoStack = [];
-            let redoStack = [];
-            let historyTimeout;
-            let isUndoingRedoing = false;
-
             function save() { localStorage.setItem('ali_dashboard_multiple_notes', JSON.stringify(npNotes)); status.textContent = 'Synced'; setTimeout(() => status.textContent = 'Ready', 1000); }
-            
-            function render() {
-                list.innerHTML = '';
-                npNotes.forEach(n => {
-                    const el = document.createElement('div');
-                    el.className = `note-item px-6 py-4 border-b border-gray-50 dark:border-gray-800 flex flex-col gap-1 ${n.id === npCurrentId ? 'active' : ''}`;
-                    el.innerHTML = `<div class="font-bold text-xs tracking-wider truncate">${n.title || 'Untitled Note'}</div><div class="text-[10px] text-gray-400 dark:text-gray-500 truncate opacity-60">${n.content.slice(0,35) || 'Empty...'}</div>`;
-                    el.onclick = () => select(n.id);
-                    list.appendChild(el);
-                });
-            }
-            
-            function select(id) { 
-                npCurrentId = id; 
-                const n = npNotes.find(x => x.id === id); 
-                if(n) { 
-                    titleInput.value = n.title; 
-                    area.innerHTML = n.content; 
-                    
-                    // Reset history stacks for the newly selected note
-                    undoStack = [{ title: n.title, content: n.content }];
-                    redoStack = [];
-                } 
-                update(false); 
-                render(); 
-            }
-            
-            function update(pushHistory = true) {
-                const words = area.innerText.trim() ? area.innerText.trim().split(/\s+/).length : 0;
-                count.textContent = `${words} Words`;
-                const idx = npNotes.findIndex(x => x.id === npCurrentId);
-                
-                if(idx !== -1) { 
-                    npNotes[idx].content = area.innerHTML; 
-                    npNotes[idx].title = titleInput.value; 
-                    save(); 
-                    render();
-                }
-                
-                // Push history automatically if user pauses typing for half a second
-                if (pushHistory !== false && !isUndoingRedoing) {
-                    clearTimeout(historyTimeout);
-                    historyTimeout = setTimeout(() => {
-                        const topState = undoStack[undoStack.length - 1];
-                        if (!topState || topState.title !== titleInput.value || topState.content !== area.innerHTML) {
-                            undoStack.push({ title: titleInput.value, content: area.innerHTML });
-                            if (undoStack.length > 50) undoStack.shift(); // Limit stack size
-                            redoStack = []; // Clear redo stack on new input
-                        }
-                    }, 500);
-                }
-            }
+            function render() { list.innerHTML = ''; npNotes.forEach((n, idx) => { const isActive = n.id === npCurrentId, btn = document.createElement('button'); btn.className = `px-4 py-2 text-xs font-bold rounded-xl whitespace-nowrap transition-all flex items-center gap-2 group ${isActive ? 'bg-[#51b8cb] text-white shadow-md' : 'bg-[#e8f6f8] text-gray-500 hover:bg-[#d0ebf0] dark:bg-[#222] dark:hover:bg-[#333]'}`; btn.onclick = () => select(n.id); btn.innerHTML = `<span>${n.title.trim() || `Note ${idx + 1}`}</span>`; list.appendChild(btn); }); }
+            function select(id) { npCurrentId = id; const n = npNotes.find(x => x.id === id); if(n) { titleInput.value = n.title; area.innerHTML = n.content; undoStack = [{ title: n.title, content: n.content }]; redoStack = []; } update(false); render(); }
+            function update(push = true) { const words = area.innerText.trim() ? area.innerText.trim().split(/\s+/).length : 0; count.textContent = `${words} Words`; const idx = npNotes.findIndex(x => x.id === npCurrentId); if(idx !== -1) { npNotes[idx].content = area.innerHTML; npNotes[idx].title = titleInput.value; save(); render(); } if (push !== false && !isUndoingRedoing) { clearTimeout(historyTimeout); historyTimeout = setTimeout(() => { const top = undoStack[undoStack.length - 1]; if (!top || top.title !== titleInput.value || top.content !== area.innerHTML) { undoStack.push({ title: titleInput.value, content: area.innerHTML }); if (undoStack.length > 50) undoStack.shift(); redoStack = []; } }, 500); } }
 
-            document.getElementById('np-undo-btn').onclick = () => {
-                const currentTitle = titleInput.value;
-                const currentContent = area.innerHTML;
-                const topState = undoStack[undoStack.length - 1];
-
-                // If currently typed text hasn't been saved to history yet, push it before undoing
-                if (topState && (topState.title !== currentTitle || topState.content !== currentContent)) {
-                    undoStack.push({ title: currentTitle, content: currentContent });
-                    redoStack = [];
-                }
-
-                if (undoStack.length > 1) {
-                    isUndoingRedoing = true;
-                    const poppedState = undoStack.pop();
-                    redoStack.push(poppedState);
-                    
-                    const prevState = undoStack[undoStack.length - 1];
-                    titleInput.value = prevState.title;
-                    area.innerHTML = prevState.content;
-                    
-                    update(false);
-                    isUndoingRedoing = false;
-                }
-            };
-
-            document.getElementById('np-redo-btn').onclick = () => {
-                if (redoStack.length > 0) {
-                    isUndoingRedoing = true;
-                    const nextState = redoStack.pop();
-                    undoStack.push(nextState);
-                    
-                    titleInput.value = nextState.title;
-                    area.innerHTML = nextState.content;
-                    
-                    update(false);
-                    isUndoingRedoing = false;
-                }
-            };
-
+            document.getElementById('np-undo-btn').onclick = () => { if(undoStack.length > 1) { isUndoingRedoing = true; redoStack.push(undoStack.pop()); const p = undoStack[undoStack.length-1]; titleInput.value = p.title; area.innerHTML = p.content; update(false); isUndoingRedoing = false; } };
+            document.getElementById('np-redo-btn').onclick = () => { if(redoStack.length > 0) { isUndoingRedoing = true; const n = redoStack.pop(); undoStack.push(n); titleInput.value = n.title; area.innerHTML = n.content; update(false); isUndoingRedoing = false; } };
+            document.getElementById('np-bold-btn').onclick = () => { document.execCommand('bold'); updateNpFormatState(); update(); };
+            document.getElementById('np-highlight-btn').onclick = () => { toggleNpHighlight(); updateNpFormatState(); update(); };
             document.getElementById('new-note-btn').onclick = () => { const n = { id: Date.now(), title: '', content: '', createdAt: new Date().toISOString() }; npNotes.unshift(n); select(n.id); titleInput.focus(); };
             document.getElementById('np-delete-btn').onclick = () => { if(npNotes.length <= 1) { npNotes[0].title = ''; npNotes[0].content = ''; area.innerHTML = ''; titleInput.value = ''; update(false); render(); return; } npNotes = npNotes.filter(x => x.id !== npCurrentId); select(npNotes[0].id); };
-            document.getElementById('np-copy-btn').onclick = () => { 
-                const range = document.createRange();
-                range.selectNodeContents(area);
-                const sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(range);
-                document.execCommand('copy'); 
-                sel.removeAllRanges(); 
-                
-                const btn = document.getElementById('np-copy-btn'), icon = btn.innerHTML; 
-                btn.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-[#51b8cb]"></i>'; 
-                if (typeof lucide !== 'undefined') lucide.createIcons(); 
-                setTimeout(() => { btn.innerHTML = icon; if (typeof lucide !== 'undefined') lucide.createIcons(); }, 2000); 
-            };
+            document.getElementById('np-copy-btn').onclick = () => { const r = document.createRange(); r.selectNodeContents(area); const s = window.getSelection(); s.removeAllRanges(); s.addRange(r); document.execCommand('copy'); s.removeAllRanges(); const b = document.getElementById('np-copy-btn'), i = b.innerHTML; b.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-[#51b8cb]"></i>'; if (typeof lucide !== 'undefined') lucide.createIcons(); setTimeout(() => { b.innerHTML = i; if (typeof lucide !== 'undefined') lucide.createIcons(); }, 2000); };
             document.getElementById('np-download-btn').onclick = () => { const b = new Blob([area.innerText], {type:'text/plain'}), u = URL.createObjectURL(b), a = document.createElement('a'); a.href = u; a.download = `${titleInput.value || 'Untitled'}.txt`; a.click(); };
-            
-            area.oninput = update; 
-            titleInput.oninput = update;
-            select(npCurrentId);
+            area.oninput = update; titleInput.oninput = update; select(npCurrentId);
         }
 
-        let isDownloading = false;
         async function downloadPNG() {
-            if (isDownloading) return;
-            isDownloading = true;
-            
-            const card = document.getElementById('cardContainer'), f = document.getElementById('inputTitle').value.trim() || "Card";
+            if (isDownloading) return; isDownloading = true; const card = document.getElementById('cardContainer'), f = document.getElementById('inputTitle').value.trim() || "Card";
             try {
-                // Keep the exact same inline responsive widths during capture
-                card.classList.remove('card-shadow');
-                const imgs = card.querySelectorAll('img');
-                await Promise.all(Array.from(imgs).map(img => img.complete ? Promise.resolve() : new Promise(r => { img.onload = r; img.onerror = r; })));
-                const canvas = await html2canvas(card, { 
-                    scale: 3, 
-                    backgroundColor: null, 
-                    useCORS: true, 
-                    onclone: (doc) => { 
-                        const c = doc.getElementById('cardContainer'); 
-                        c.style.boxShadow = 'none'; 
-                        c.style.borderRadius = '48px'; 
-                        
-                        // Hide restore buttons during download
-                        doc.querySelectorAll('#cardTitleRestore, #cardDefRestore, #addCategoryBtn, .format-toolbar').forEach(el => el.style.display = 'none');
-                        
-                        // Hide clear buttons and placeholder texts for screenshot
-                        doc.querySelectorAll('.clear-btn, .hidden-in-export').forEach(btn => btn.style.display = 'none');
-                        doc.querySelectorAll('[contenteditable]').forEach(el => {
-                            if (!el.innerText.trim()) el.removeAttribute('data-placeholder');
-                        });
-                        
-                        // Hide Notes section completely if it's empty
-                        const clonedDef = doc.getElementById('cardDef');
-                        if (!clonedDef.innerText.trim()) {
-                            doc.getElementById('cardNotesSection').style.display = 'none';
-                        }
-                        
-                        // Hide Title/Category sections if empty
-                        const clonedTitle = doc.getElementById('cardWord');
-                        const clonedType = doc.getElementById('cardType');
-                        if (!clonedType.innerText.trim()) {
-                            clonedType.style.display = 'none';
-                        }
-                        if (!clonedTitle.innerText.trim() && !clonedType.innerText.trim()) {
-                            doc.getElementById('cardTitleSection').style.display = 'none';
-                        }
-                        
-                        // Guarantee spacing in html2canvas clone
-                        const imgContainer = doc.getElementById('cardImagesContainer');
-                        if (imgContainer && imgContainer.children.length > 0) {
-                            imgContainer.style.paddingTop = '3rem';
-                        }
-                        
-                        doc.querySelectorAll('#cardWord, #cardDef, #cardType').forEach(el => el.style.textDecoration = 'none'); 
-                    }
-                });
-                card.classList.add('card-shadow');
-                const link = document.createElement('a'); link.download = `${f}.png`; link.href = canvas.toDataURL('image/png'); link.click();
-            } catch (err) { 
-                console.error("Export failed", err); 
-                card.classList.add('card-shadow'); 
-            } finally {
-                isDownloading = false;
-            }
+                card.classList.remove('card-shadow'); const imgs = card.querySelectorAll('img'); await Promise.all(Array.from(imgs).map(img => img.complete ? Promise.resolve() : new Promise(r => { img.onload = r; img.onerror = r; })));
+                const canvas = await html2canvas(card, { scale: 3, backgroundColor: null, useCORS: true, onclone: (doc) => { 
+                    const c = doc.getElementById('cardContainer'); c.style.boxShadow = 'none'; c.style.borderRadius = '48px'; 
+                    doc.querySelectorAll('#cardTitleRestore, #cardDefRestore, #addCategoryBtn, .format-toolbar, .clear-btn, .hidden-in-export').forEach(el => el.style.display = 'none');
+                    doc.querySelectorAll('[contenteditable]').forEach(el => { if (!el.innerText.trim()) el.removeAttribute('data-placeholder'); });
+                    if (!doc.getElementById('cardDef').innerText.trim()) doc.getElementById('cardNotesSection').style.display = 'none';
+                    if (!doc.getElementById('cardType').innerText.trim()) doc.getElementById('cardType').style.display = 'none';
+                    if (!doc.getElementById('cardWord').innerText.trim() && !doc.getElementById('cardType').innerText.trim()) doc.getElementById('cardTitleSection').style.display = 'none';
+                    if (doc.getElementById('cardImagesContainer').children.length > 0) doc.getElementById('cardImagesContainer').style.paddingTop = '3rem';
+                    doc.querySelectorAll('#cardWord, #cardDef, #cardType').forEach(el => el.style.textDecoration = 'none');
+                }});
+                card.classList.add('card-shadow'); const l = document.createElement('a'); l.download = `${f}.png`; l.href = canvas.toDataURL('image/png'); l.click();
+            } catch (e) { console.error("Export failed", e); card.classList.add('card-shadow'); } finally { isDownloading = false; }
         }
     </script>
 </body>
