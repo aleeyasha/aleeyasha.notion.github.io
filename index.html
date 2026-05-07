@@ -19,6 +19,7 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     
@@ -165,10 +166,14 @@
             cursor: ew-resize; user-select: none; -webkit-user-drag: none; transition: box-shadow 0.2s ease; 
         }
         .resizable-img:active { cursor: ew-resize; box-shadow: 0 0 0 4px rgba(172, 135, 102, 0.3); }
+        
+        .inline-notepad-img {
+            transition: box-shadow 0.2s ease;
+        }
 
         /* Hand-drawn typography */
-        #cardWord, #cardDef, #cardType { font-family: 'Caveat', cursive !important; }
-        #cardDef, #note-area { tab-size: 4; -moz-tab-size: 4; }
+        #cardWord, #cardDef, .card-extra-def-input, #cardType { font-family: 'Caveat', cursive !important; }
+        #cardDef, .card-extra-def-input, #note-area { tab-size: 4; -moz-tab-size: 4; }
         .handdrawn-title { font-family: 'Caveat', cursive !important; }
 
         /* ContentEditable Placeholder Styling */
@@ -228,6 +233,10 @@
                                     </button>
                                     <div id="toolbarTitleSizeDropdownMenu" onmousedown="event.preventDefault();" class="hidden absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[60] overflow-hidden w-16 max-h-48 overflow-y-auto custom-scrollbar"></div>
                                 </div>
+                                <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                <button onmousedown="event.preventDefault(); execFormat('justifyLeft')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-left" title="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
+                                <button onmousedown="event.preventDefault(); execFormat('justifyCenter')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-center" title="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+                                <button onmousedown="event.preventDefault(); execFormat('justifyRight')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-right" title="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
                             </div>
 
                             <h2 id="cardWord" contenteditable="true" data-placeholder="Enter Term / Title..." class="font-bold tracking-tight leading-tight outline-none flex-1 min-w-[50%]" style="text-decoration: none;"></h2>
@@ -254,9 +263,13 @@
                                     <button onmousedown="event.preventDefault(); execFormat('undo')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors" title="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
                                     <button onmousedown="event.preventDefault(); execFormat('redo')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors" title="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
                                     <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                    <button id="btnFormatBold" onmousedown="event.preventDefault(); execFormat('bold')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors" title="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
-                                    <button id="btnFormatHighlight" onmousedown="event.preventDefault(); execFormat('highlight')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors" title="Highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
-                                    <button id="btnFormatColor" onmousedown="event.preventDefault(); execFormat('textColor')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors" title="Text Color"><i data-lucide="palette" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); execFormat('bold')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-bold" title="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); execFormat('highlight')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-highlight" title="Highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); execFormat('textColor')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-color" title="Text Color"><i data-lucide="palette" class="w-4 h-4"></i></button>
+                                    <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                    <button onmousedown="event.preventDefault(); execFormat('justifyLeft')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-left" title="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); execFormat('justifyCenter')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-center" title="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); execFormat('justifyRight')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-right" title="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
                                     <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
                                     <div class="relative">
                                         <button id="toolbarDefSizeBtn" onmousedown="event.preventDefault();" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors flex items-center gap-1 text-[11px] font-bold min-w-[40px] justify-center" title="Font Size">
@@ -272,7 +285,19 @@
                                 </button>
                             </div>
                             
-                            <div id="cardImagesContainer" class="flex flex-wrap gap-4 md:gap-9 w-full justify-center" style="padding-top: 0px;"></div>
+                            <!-- Top Uploaded Images Container -->
+                            <div id="cardImagesContainer" class="flex flex-wrap gap-4 md:gap-9 w-full justify-center mt-2" style="padding-top: 0px;"></div>
+                            
+                            <!-- Dynamic Blocks Container (Note + Image + Note...) -->
+                            <div id="cardBlocksContainer" class="w-full flex flex-col gap-2 mt-2"></div>
+                            
+                            <!-- Add Buttons Row -->
+                            <div class="flex flex-col sm:flex-row gap-2 mt-3 w-full hidden-in-export opacity-100 lg:opacity-0 group-hover/card:opacity-100 transition-all">
+                                <div onclick="addExtraNote()" class="flex-1 cursor-pointer py-2 px-2 md:px-4 rounded-xl md:rounded-2xl border-2 border-dashed border-transparent hover:border-[#d0ebf0] dark:hover:border-[#333] text-center text-gray-400 hover:text-[#51b8cb] transition-all flex items-center justify-center gap-2">
+                                    <i data-lucide="plus" class="w-4 h-4"></i> <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Add Extra Note</span>
+                                </div>
+                            </div>
+                            
                         </div>
                     </div>
                 </div>
@@ -309,6 +334,7 @@
                                 <div class="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-1"></div>
                                 <button id="np-copy-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Copy"><i data-lucide="copy" class="w-4 h-4"></i></button>
                                 <button id="np-download-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Download TXT"><i data-lucide="download" class="w-4 h-4"></i></button>
+                                <button id="np-pdf-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Download PDF"><i data-lucide="file-down" class="w-4 h-4"></i></button>
                             </div>
                         </div>
 
@@ -330,10 +356,17 @@
         <div id="floatingCategoryOptions" class="max-h-60 overflow-y-auto custom-scrollbar"></div>
     </div>
 
-    <!-- Floating Image Border Menu -->
-    <div id="floatingImageBorderMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-32 py-1">
+    <!-- Floating Image Border Menu (Card Images) -->
+    <div id="floatingImageBorderMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-40 py-1">
+        <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Image Align</div>
+        <div class="flex justify-between px-4 py-2">
+            <button onclick="cardImgAlign('left')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" title="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
+            <button onclick="cardImgAlign('center')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" title="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+            <button onclick="cardImgAlign('right')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" title="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+        </div>
+        <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
         <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Image Border</div>
-        <div id="floatingImageBorderOptions" class="max-h-60 overflow-y-auto custom-scrollbar"></div>
+        <div id="floatingImageBorderOptions" class="max-h-40 overflow-y-auto custom-scrollbar"></div>
     </div>
 
     <!-- Preview Context Menu -->
@@ -379,7 +412,6 @@
 
             <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
 
-            <!-- Moved Theme Color Menu Item -->
             <div id="themeColorToggleBtn" class="dropdown-item flex items-center justify-between gap-2 text-gray-700 dark:text-gray-300">
                 <div class="flex items-center gap-2"><i data-lucide="palette" class="w-4 h-4"></i> Theme Color</div>
                 <i data-lucide="chevron-down" class="w-3 h-3 transition-transform" id="themeColorChevron"></i>
@@ -418,6 +450,36 @@
         </div>
     </div>
 
+    <!-- Notepad Image Context Menu -->
+    <div id="floatingNotepadImageMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-48 py-1">
+        <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Image Options</div>
+        <div class="py-1">
+            <div class="flex justify-between px-4 py-2">
+                <button onclick="npImgAction('align-left')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" title="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
+                <button onclick="npImgAction('align-center')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" title="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+                <button onclick="npImgAction('align-right')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" title="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+            </div>
+            <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
+            <div onclick="npImgAction('grow')" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                <i data-lucide="zoom-in" class="w-4 h-4"></i> Increase Size
+            </div>
+            <div onclick="npImgAction('shrink')" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                <i data-lucide="zoom-out" class="w-4 h-4"></i> Decrease Size
+            </div>
+            <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
+            <div onclick="npImgAction('up')" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                <i data-lucide="arrow-up" class="w-4 h-4"></i> Move Up
+            </div>
+            <div onclick="npImgAction('down')" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                <i data-lucide="arrow-down" class="w-4 h-4"></i> Move Down
+            </div>
+            <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
+            <div onclick="npImgAction('delete')" class="dropdown-item flex items-center gap-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10">
+                <i data-lucide="trash-2" class="w-4 h-4"></i> Delete Image
+            </div>
+        </div>
+    </div>
+
     <script>
         const categoryColors = {
             "Principles of Flight": "#6366f1", "Meteorology": "#0ea5e9", "Navigation": "#10b981", "Flight Planning and Monitoring": "#f59e0b",
@@ -427,15 +489,103 @@
         const CONSTANT_ICON_COLOR = "#51b8cb"; 
         
         let activeColor = "#51b8cb", hue = 189, saturation = 60, brightness = 80, uploadedImages = [];
+        let activeBlocks = []; 
         let cards = [], activeCardId = null, isSwitching = false;
-        let currentSelectedCategory = "-", currentSelectedSize = 32, currentSelectedDefSize = 24, currentImageBorder = 2, currentImageCols = 0, currentBlendPercentage = 10, deferredPrompt = null;
-        let showTitlePlaceholder = true, showDefPlaceholder = true, activeImageIdx = -1;
-        let isDraggingImage = false, dragStartX = 0, dragImageIdx = -1, dragStartScale = 100;
+        let currentSelectedCategory = "-", currentSelectedSize = 32, currentSelectedDefSize = 24, currentSelectedExtraDefSize = 24, currentImageBorder = 2, currentImageCols = 0, currentBlendPercentage = 10, deferredPrompt = null;
+        let showTitlePlaceholder = true, showDefPlaceholder = true, activeImageIdx = -1, activeBlockIdx = -1, activeImageIsGroup = false;
+        
+        // Dragging & Resizing States
+        let isDraggingImage = false, dragStartX = 0, dragImageIdx = -1, dragIsGroup = false, dragBlockIdx = -1, dragStartScale = 100;
+        let isResizingNpImage = false, currentNpImage = null, npDragStartX = 0, npStartWidth = 0;
+        
         let imageUndoStack = [], imageRedoStack = [], isImageUndoingRedoing = false, stateBeforeDrag = null;
+
+        window.activeNotepadImage = null;
+
+        window.openNotepadImageMenu = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.activeNotepadImage = e.target;
+            const menu = document.getElementById('floatingNotepadImageMenu');
+            menu.classList.remove('hidden');
+            
+            const rect = menu.getBoundingClientRect();
+            let x = e.clientX, y = e.clientY;
+            if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
+            if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
+            menu.style.left = x + 'px'; 
+            menu.style.top = y + 'px';
+        };
+
+        window.npImgAction = function(action) {
+            const img = window.activeNotepadImage;
+            if (!img) return;
+            
+            if (action === 'grow') {
+                let w = parseInt(img.style.width || 50);
+                img.style.width = Math.min(100, w + 10) + '%';
+            } else if (action === 'shrink') {
+                let w = parseInt(img.style.width || 50);
+                img.style.width = Math.max(10, w - 10) + '%';
+            } else if (action === 'up') {
+                let prev = img.previousElementSibling;
+                if(prev) {
+                    prev.insertAdjacentElement('beforebegin', img);
+                } else if (img.parentNode && img.parentNode.id !== 'note-area') {
+                    img.parentNode.insertAdjacentElement('beforebegin', img);
+                }
+            } else if (action === 'down') {
+                let next = img.nextElementSibling;
+                if(next) {
+                    next.insertAdjacentElement('afterend', img);
+                } else if (img.parentNode && img.parentNode.id !== 'note-area') {
+                    img.parentNode.insertAdjacentElement('afterend', img);
+                }
+            } else if (action === 'delete') {
+                img.remove();
+            } else if (action === 'align-left') {
+                img.style.display = 'inline-block';
+                img.style.float = 'left';
+                img.style.margin = '0.5rem 1rem 0.5rem 0';
+            } else if (action === 'align-center') {
+                img.style.display = 'block';
+                img.style.float = 'none';
+                img.style.margin = '1rem auto';
+            } else if (action === 'align-right') {
+                img.style.display = 'inline-block';
+                img.style.float = 'right';
+                img.style.margin = '0.5rem 0 0.5rem 1rem';
+            }
+            
+            document.getElementById('floatingNotepadImageMenu').classList.add('hidden');
+            document.getElementById('note-area').dispatchEvent(new Event('input', {bubbles: true}));
+        };
+
+        window.cardImgAlign = function(alignType) {
+            if (activeImageIdx !== -1) {
+                pushImageHistory();
+                if (activeImageIsGroup && activeBlockIdx !== -1) {
+                    activeBlocks[activeBlockIdx].images[activeImageIdx].align = alignType;
+                } else {
+                    uploadedImages[activeImageIdx].align = alignType;
+                }
+                updatePreview();
+                syncCardState();
+            }
+            document.getElementById('floatingImageBorderMenu').classList.add('hidden');
+        };
+
+        function saveCardsToStorage() {
+            try {
+                localStorage.setItem('ali_dashboard_cards', JSON.stringify(cards));
+            } catch (e) {
+                console.warn("Storage limit reached or error saving cards", e);
+            }
+        }
 
         window.openCardContextMenu = function(e) {
             if (e.currentTarget && e.currentTarget.id === 'cardContainer') {
-                if (e.target.closest('#cardWord') || e.target.closest('#cardType') || e.target.closest('#cardDef') || e.target.closest('[id^="preview-wrapper-"]')) return;
+                if (e.target.closest('#cardWord') || e.target.closest('#cardType') || e.target.closest('#cardDef') || e.target.closest('.card-extra-def-input') || e.target.closest('[id^="preview-wrapper-"]')) return;
             }
             e.preventDefault();
             e.stopPropagation();
@@ -497,6 +647,51 @@
             });
         };
 
+        window.addExtraNote = function() {
+            activeBlocks.push({ type: 'text', content: '' });
+            updatePreview();
+            setTimeout(() => {
+                const inputs = document.querySelectorAll('.card-extra-def-input');
+                if (inputs.length > 0) inputs[inputs.length - 1].focus();
+            }, 50);
+        };
+        
+        window.removeBlock = function(idx) {
+            activeBlocks.splice(idx, 1);
+            updatePreview();
+            syncCardState();
+        };
+
+        window.removeImageFromGroup = function(blockIdx, imgIdx) {
+            pushImageHistory();
+            activeBlocks[blockIdx].images.splice(imgIdx, 1);
+            if (activeBlocks[blockIdx].images.length === 0) {
+                activeBlocks.splice(blockIdx, 1);
+            }
+            updatePreview();
+            syncCardState();
+        };
+
+        window.moveImageLeftGroup = function(blockIdx, imgIdx) {
+            if (imgIdx > 0) {
+                pushImageHistory();
+                const group = activeBlocks[blockIdx].images;
+                [group[imgIdx - 1], group[imgIdx]] = [group[imgIdx], group[imgIdx - 1]];
+                updatePreview();
+                syncCardState();
+            }
+        };
+
+        window.moveImageRightGroup = function(blockIdx, imgIdx) {
+            const group = activeBlocks[blockIdx].images;
+            if (imgIdx < group.length - 1) {
+                pushImageHistory();
+                [group[imgIdx], group[imgIdx + 1]] = [group[imgIdx + 1], group[imgIdx]];
+                updatePreview();
+                syncCardState();
+            }
+        };
+
         initColorPicker(); 
         initBlendDropdown(); 
         initFloatingMenu(); 
@@ -509,7 +704,10 @@
 
         function pushImageHistory(stateOverride = null) {
             if (isImageUndoingRedoing) return;
-            imageUndoStack.push(stateOverride || JSON.parse(JSON.stringify(uploadedImages)));
+            imageUndoStack.push(stateOverride || {
+                top: JSON.parse(JSON.stringify(uploadedImages)),
+                blocks: JSON.parse(JSON.stringify(activeBlocks))
+            });
             if (imageUndoStack.length > 20) imageUndoStack.shift();
             imageRedoStack = [];
         }
@@ -517,8 +715,13 @@
         function undoImageAction() {
             if (imageUndoStack.length === 0) return;
             isImageUndoingRedoing = true;
-            imageRedoStack.push(JSON.parse(JSON.stringify(uploadedImages)));
-            uploadedImages = imageUndoStack.pop();
+            imageRedoStack.push({
+                top: JSON.parse(JSON.stringify(uploadedImages)),
+                blocks: JSON.parse(JSON.stringify(activeBlocks))
+            });
+            const st = imageUndoStack.pop();
+            uploadedImages = st.top || [];
+            activeBlocks = st.blocks || [];
             updatePreview();
             isImageUndoingRedoing = false;
         }
@@ -526,8 +729,13 @@
         function redoImageAction() {
             if (imageRedoStack.length === 0) return;
             isImageUndoingRedoing = true;
-            imageUndoStack.push(JSON.parse(JSON.stringify(uploadedImages)));
-            uploadedImages = imageRedoStack.pop();
+            imageUndoStack.push({
+                top: JSON.parse(JSON.stringify(uploadedImages)),
+                blocks: JSON.parse(JSON.stringify(activeBlocks))
+            });
+            const st = imageRedoStack.pop();
+            uploadedImages = st.top || [];
+            activeBlocks = st.blocks || [];
             updatePreview();
             isImageUndoingRedoing = false;
         }
@@ -614,6 +822,16 @@
                 if (defMenu) defMenu.appendChild(item);
             });
 
+            const extraDefMenu = document.getElementById('toolbarExtraDefSizeDropdownMenu'), extraDefBtn = document.getElementById('toolbarExtraDefSizeBtn');
+            if (extraDefBtn) extraDefBtn.onclick = (e) => { e.stopPropagation(); closeAllDropdowns(); extraDefMenu.classList.toggle('hidden'); };
+            defSizes.forEach(size => {
+                const item = document.createElement('div');
+                item.className = 'dropdown-item text-gray-700 dark:text-gray-300 text-center py-1.5';
+                item.innerText = size;
+                item.onmousedown = (e) => { e.preventDefault(); selectExtraDefSize(size); extraDefMenu.classList.add('hidden'); };
+                if (extraDefMenu) extraDefMenu.appendChild(item);
+            });
+
             const titleMenu = document.getElementById('toolbarTitleSizeDropdownMenu'), titleBtn = document.getElementById('toolbarTitleSizeBtn');
             if (titleBtn) titleBtn.onclick = (e) => { e.stopPropagation(); closeAllDropdowns(); titleMenu.classList.toggle('hidden'); };
             titleSizes.forEach(size => {
@@ -651,9 +869,13 @@
                     item.innerText = b + 'px';
                     item.onclick = (e) => { 
                         e.stopPropagation(); 
-                        if (activeImageIdx !== -1 && uploadedImages[activeImageIdx]) { 
+                        if (activeImageIdx !== -1) { 
                             pushImageHistory();
-                            uploadedImages[activeImageIdx].border = b; 
+                            if (activeImageIsGroup && activeBlockIdx !== -1) {
+                                activeBlocks[activeBlockIdx].images[activeImageIdx].border = b;
+                            } else {
+                                uploadedImages[activeImageIdx].border = b;
+                            }
                             updatePreview(); 
                         } 
                         imgMenu.classList.add('hidden'); 
@@ -743,6 +965,7 @@
                     if (cards.length > 1) {
                         const index = cards.findIndex(c => c.id === activeCardId);
                         cards.splice(index, 1);
+                        saveCardsToStorage();
                         switchCard(cards[Math.max(0, index - 1)].id);
                     }
                 };
@@ -767,6 +990,9 @@
                 if(catMenu) catMenu.classList.add('hidden'); 
                 const imgM = document.getElementById('floatingImageBorderMenu'); 
                 if(imgM) imgM.classList.add('hidden');
+
+                const npImgMenu = document.getElementById('floatingNotepadImageMenu');
+                if(npImgMenu) npImgMenu.classList.add('hidden');
                 
                 const prevM = document.getElementById('floatingPreviewMenu'); 
                 if(prevM && !prevM.classList.contains('hidden')) {
@@ -798,6 +1024,12 @@
         function selectDefSize(size) { 
             currentSelectedDefSize = size; 
             const label = document.getElementById('toolbarDefSizeLabel'); 
+            if(label) label.innerText = size; 
+            updatePreview(); 
+        }
+        function selectExtraDefSize(size) { 
+            currentSelectedExtraDefSize = size; 
+            const label = document.getElementById('toolbarExtraDefSizeLabel'); 
             if(label) label.innerText = size; 
             updatePreview(); 
         }
@@ -840,7 +1072,7 @@
             const sel = window.getSelection(); if (!sel.rangeCount) return null;
             let node = sel.anchorNode; if (!node) return null;
             let parent = node.nodeType === 3 ? node.parentNode : node;
-            while (parent && parent.id !== 'cardDef' && parent.id !== 'note-area' && parent.tagName !== 'BODY') {
+            while (parent && parent.id !== 'cardDef' && parent.id !== 'cardWord' && !parent.classList.contains('card-extra-def-input') && parent.id !== 'note-area' && parent.tagName !== 'BODY') {
                 if (parent.style && parent.style[styleName]) return parent.style[styleName];
                 parent = parent.parentNode;
             }
@@ -850,7 +1082,7 @@
         function removeStyleFromSelection(styleName) {
             const sel = window.getSelection(); if (!sel.rangeCount) return;
             let node = sel.anchorNode, parent = node.nodeType === 3 ? node.parentNode : node;
-            while (parent && parent.id !== 'cardDef' && parent.tagName !== 'BODY') {
+            while (parent && parent.id !== 'cardDef' && parent.id !== 'cardWord' && !parent.classList.contains('card-extra-def-input') && parent.tagName !== 'BODY') {
                 if (parent.style && parent.style[styleName] !== undefined) parent.style[styleName] = '';
                 if (parent.getAttribute('style') === '') parent.removeAttribute('style');
                 parent = parent.parentNode;
@@ -886,49 +1118,71 @@
                 }
             } else document.execCommand(cmd, false, val);
             
-            document.getElementById('cardDef').focus(); 
-            document.getElementById('inputDef').value = document.getElementById('cardDef').innerHTML;
-            showDefPlaceholder = true; 
+            const activeEl = document.activeElement;
+            if (activeEl && activeEl.classList.contains('card-extra-def-input')) {
+                const idx = activeEl.getAttribute('data-block-idx');
+                if (idx !== null && activeBlocks[idx]) {
+                    activeBlocks[idx].content = activeEl.innerHTML;
+                }
+            } else if (activeEl && activeEl.id === 'cardWord') {
+                document.getElementById('inputTitle').value = activeEl.innerHTML;
+                showTitlePlaceholder = true;
+            } else {
+                const target = document.getElementById('cardDef');
+                if (activeEl !== target) target.focus();
+                document.getElementById('inputDef').value = target.innerHTML;
+                showDefPlaceholder = true; 
+            }
+            
             syncCardState(); 
             checkFormatState();
         };
 
         function checkFormatState() {
-            if (document.activeElement !== document.getElementById('cardDef')) return;
+            const activeEl = document.activeElement;
+            if (!activeEl) return;
+            if (activeEl.id !== 'cardDef' && activeEl.id !== 'cardWord' && !activeEl.classList.contains('card-extra-def-input')) return;
+
             const isBold = document.queryCommandState('bold');
-            let bgStyle = getSelectionStyle('backgroundColor'), isHighlighted = bgStyle && bgStyle !== 'transparent' && bgStyle !== 'rgba(0, 0, 0, 0)';
-            let fStyle = getSelectionStyle('color'), isColored = fStyle && fStyle.replace(/\s/g, '').toLowerCase() === `rgb(${hexToRgb(activeColor).r},${hexToRgb(activeColor).g},${hexToRgb(activeColor).b})`;
+            const isLeft = document.queryCommandState('justifyLeft');
+            const isCenter = document.queryCommandState('justifyCenter');
+            const isRight = document.queryCommandState('justifyRight');
+
+            let bgStyle = getSelectionStyle('backgroundColor');
+            const isHighlighted = bgStyle && bgStyle !== 'transparent' && bgStyle !== 'rgba(0, 0, 0, 0)';
+            let fStyle = getSelectionStyle('color');
+            const activeRgb = hexToRgb(activeColor);
+            const isColored = fStyle && fStyle.replace(/\s/g, '').toLowerCase() === `rgb(${activeRgb.r},${activeRgb.g},${activeRgb.b})`;
             
-            const b = document.getElementById('btnFormatBold'), h = document.getElementById('btnFormatHighlight'), c = document.getElementById('btnFormatColor');
-            if (b) { 
-                b.classList.toggle('text-[#51b8cb]', isBold); 
-                b.classList.toggle('text-gray-500', !isBold); 
-                b.classList.toggle('bg-[#e8f6f8]', isBold); 
-                b.classList.toggle('dark:bg-[#333]', isBold); 
-            }
-            if (h) { 
-                h.classList.toggle('text-[#51b8cb]', isHighlighted); 
-                h.classList.toggle('text-gray-500', !isHighlighted); 
-                h.classList.toggle('bg-[#e8f6f8]', isHighlighted); 
-                h.classList.toggle('dark:bg-[#333]', isHighlighted); 
-            }
-            if (c) { 
-                c.classList.toggle('text-[#51b8cb]', isColored); 
-                c.classList.toggle('text-gray-500', !isColored); 
-                c.classList.toggle('bg-[#e8f6f8]', isColored); 
-                c.classList.toggle('dark:bg-[#333]', isColored); 
-            }
+            const toggleBtns = (selector, isActive) => {
+                document.querySelectorAll(selector).forEach(btn => {
+                    btn.classList.toggle('text-[#51b8cb]', isActive); 
+                    btn.classList.toggle('text-gray-500', !isActive); 
+                    btn.classList.toggle('bg-[#e8f6f8]', isActive); 
+                    btn.classList.toggle('dark:bg-[#333]', isActive); 
+                });
+            };
+
+            toggleBtns('.btn-format-bold', isBold);
+            toggleBtns('.btn-format-left', isLeft);
+            toggleBtns('.btn-format-center', isCenter);
+            toggleBtns('.btn-format-right', isRight);
+            toggleBtns('.btn-format-highlight', isHighlighted);
+            toggleBtns('.btn-format-color', isColored);
         }
 
         function setupEventListeners() {
             document.getElementById('imageInput').addEventListener('change', handleImageUpload);
             
             document.addEventListener('selectionchange', () => { 
-                if (document.activeElement === document.getElementById('cardDef')) checkFormatState(); 
+                const activeEl = document.activeElement;
+                if (activeEl && (activeEl.id === 'cardDef' || activeEl.id === 'cardWord' || activeEl.classList.contains('card-extra-def-input'))) {
+                    checkFormatState(); 
+                }
             });
             
             document.getElementById('cardWord').addEventListener('input', (e) => { 
-                document.getElementById('inputTitle').value = e.target.innerText; 
+                document.getElementById('inputTitle').value = e.target.innerHTML; 
                 showTitlePlaceholder = true; 
                 syncCardState(); 
             });
@@ -960,24 +1214,112 @@
                 }
             });
 
+            // Delegate event listener for block extra notes mapping seamlessly
+            document.getElementById('cardContainer').addEventListener('input', (e) => {
+                if (e.target.classList.contains('card-extra-def-input')) {
+                    const idx = e.target.getAttribute('data-block-idx');
+                    if (idx !== null && activeBlocks[idx]) {
+                        activeBlocks[idx].content = e.target.innerHTML;
+                        syncCardState();
+                    }
+                }
+            });
+            document.getElementById('cardContainer').addEventListener('keydown', (e) => {
+                if (e.target.classList.contains('card-extra-def-input') && e.key === 'Tab') {
+                    e.preventDefault();
+                    document.execCommand('insertText', false, '\t');
+                }
+            });
+
             document.getElementById('btnRandomColor').addEventListener('click', () => { 
                 setManualColor('#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')); 
+            });
+
+            const noteAreaEl = document.getElementById('note-area');
+            if (noteAreaEl) {
+                noteAreaEl.addEventListener('mousedown', (e) => {
+                    if (e.target.tagName === 'IMG' && e.target.classList.contains('inline-notepad-img')) {
+                        const rect = e.target.getBoundingClientRect();
+                        const clickX = e.clientX - rect.left;
+                        const edgeThreshold = 30;
+
+                        if (clickX < edgeThreshold || clickX > rect.width - edgeThreshold) {
+                            isResizingNpImage = true;
+                            currentNpImage = e.target;
+                            npDragStartX = e.clientX;
+                            npStartWidth = (currentNpImage.clientWidth / noteAreaEl.clientWidth) * 100;
+                            e.preventDefault(); // prevent native drag, allowing custom resize
+                        }
+                    }
+                });
+
+                noteAreaEl.addEventListener('mousemove', (e) => {
+                    if (e.target.tagName === 'IMG' && e.target.classList.contains('inline-notepad-img') && !isResizingNpImage) {
+                        const rect = e.target.getBoundingClientRect();
+                        const clickX = e.clientX - rect.left;
+                        if (clickX < 30 || clickX > rect.width - 30) {
+                            e.target.style.cursor = 'ew-resize';
+                        } else {
+                            e.target.style.cursor = 'move';
+                        }
+                    }
+                });
+
+                noteAreaEl.addEventListener('touchstart', (e) => {
+                    if (e.target.tagName === 'IMG' && e.target.classList.contains('inline-notepad-img')) {
+                        const rect = e.target.getBoundingClientRect();
+                        const touchX = e.touches[0].clientX - rect.left;
+                        const edgeThreshold = 30;
+
+                        if (touchX < edgeThreshold || touchX > rect.width - edgeThreshold) {
+                            isResizingNpImage = true;
+                            currentNpImage = e.target;
+                            npDragStartX = e.touches[0].clientX;
+                            npStartWidth = (currentNpImage.clientWidth / noteAreaEl.clientWidth) * 100;
+                            e.preventDefault(); 
+                        }
+                    }
+                });
+            }
+
+            document.getElementById('note-area').addEventListener('contextmenu', (e) => {
+                if (e.target.tagName === 'IMG' && e.target.classList.contains('inline-notepad-img')) {
+                    window.openNotepadImageMenu(e);
+                }
             });
             
             document.addEventListener('paste', (event) => { 
                 const clipboardData = event.clipboardData || event.originalEvent.clipboardData;
                 const items = clipboardData.items; 
                 let isImagePaste = false;
+
+                const isNotepad = event.target && event.target.closest('#notepadContainer') !== null;
                 
                 for (let index in items) { 
                     if (items[index].kind === 'file' && items[index].type.includes('image')) {
-                        processFile(items[index].getAsFile()); 
                         isImagePaste = true;
+                        if (isNotepad) {
+                            const file = items[index].getAsFile();
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                const imgHTML = `&nbsp;<img src="${e.target.result}" class="inline-notepad-img" style="width: 40%; max-width: 100%; height: auto; display: inline-block; margin: 0.25rem 0; border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); vertical-align: middle;" />&nbsp;`;
+                                document.execCommand('insertHTML', false, imgHTML);
+                                document.getElementById('note-area').dispatchEvent(new Event('input', {bubbles: true}));
+                            };
+                            reader.readAsDataURL(file);
+                        } else {
+                            processFile(items[index].getAsFile(), 'blocks'); 
+                        }
                     }
                 } 
                 
+                if (isImagePaste) {
+                    event.preventDefault();
+                    return;
+                }
+                
                 // Force plain text paste to strip unwanted backgrounds and fonts
-                if (!isImagePaste && event.target && event.target.isContentEditable) {
+                if (event.target && event.target.isContentEditable) {
                     const text = clipboardData.getData('text/plain');
                     if (text) {
                         event.preventDefault();
@@ -986,10 +1328,49 @@
                 }
             });
             
-            window.addEventListener('mousemove', handleImageResizeMove); 
-            window.addEventListener('mouseup', handleImageResizeEnd); 
-            window.addEventListener('touchmove', handleImageResizeMove, { passive: false }); 
-            window.addEventListener('touchend', handleImageResizeEnd);
+            window.addEventListener('mousemove', (e) => {
+                handleImageResizeMove(e); 
+                
+                if (isResizingNpImage && currentNpImage) {
+                    const deltaX = e.clientX - npDragStartX;
+                    let newWidth = npStartWidth + (deltaX * 0.3);
+                    newWidth = Math.max(10, Math.min(100, newWidth));
+                    currentNpImage.style.width = newWidth + '%';
+                    e.preventDefault();
+                }
+            });
+
+            window.addEventListener('mouseup', (e) => {
+                handleImageResizeEnd();
+
+                if (isResizingNpImage) {
+                    isResizingNpImage = false;
+                    currentNpImage = null;
+                    if (noteAreaEl) noteAreaEl.dispatchEvent(new Event('input', {bubbles: true}));
+                }
+            });
+            
+            window.addEventListener('touchmove', (e) => {
+                handleImageResizeMove(e);
+
+                if (isResizingNpImage && currentNpImage) {
+                    const deltaX = e.touches[0].clientX - npDragStartX;
+                    let newWidth = npStartWidth + (deltaX * 0.3);
+                    newWidth = Math.max(10, Math.min(100, newWidth));
+                    currentNpImage.style.width = newWidth + '%';
+                    e.preventDefault();
+                }
+            }, { passive: false });
+
+            window.addEventListener('touchend', (e) => {
+                handleImageResizeEnd();
+                
+                if (isResizingNpImage) {
+                    isResizingNpImage = false;
+                    currentNpImage = null;
+                    if (noteAreaEl) noteAreaEl.dispatchEvent(new Event('input', {bubbles: true}));
+                }
+            });
             
             window.addEventListener('beforeinstallprompt', (e) => { 
                 e.preventDefault(); 
@@ -1012,12 +1393,17 @@
             });
         }
 
-        function handleImageResizeStart(e, idx) { 
-            stateBeforeDrag = JSON.parse(JSON.stringify(uploadedImages));
+        function handleImageResizeStart(e, imgIdx, isGroup = false, blockIdx = -1) { 
+            stateBeforeDrag = {
+                top: JSON.parse(JSON.stringify(uploadedImages)),
+                blocks: JSON.parse(JSON.stringify(activeBlocks))
+            };
             isDraggingImage = true; 
-            dragImageIdx = idx; 
+            dragIsGroup = isGroup;
+            dragBlockIdx = blockIdx;
+            dragImageIdx = imgIdx; 
             dragStartX = (e.type === 'touchstart') ? e.touches[0].clientX : e.clientX; 
-            dragStartScale = uploadedImages[idx].scale; 
+            dragStartScale = isGroup ? activeBlocks[blockIdx].images[imgIdx].scale : uploadedImages[imgIdx].scale; 
             if (e.type === 'mousedown') e.preventDefault(); 
         }
         
@@ -1026,19 +1412,30 @@
             const currentX = (e.type === 'touchmove') ? e.touches[0].clientX : e.clientX;
             const deltaX = currentX - dragStartX; 
             let newScale = Math.max(10, Math.min(200, dragStartScale + (deltaX * 0.5))); 
-            uploadedImages[dragImageIdx].scale = newScale; 
-            const w = document.getElementById(`preview-wrapper-${dragImageIdx}`); 
-            if (w) w.style.width = newScale + '%'; 
+            
+            if (dragIsGroup) {
+                activeBlocks[dragBlockIdx].images[dragImageIdx].scale = newScale; 
+                const w = document.getElementById(`preview-wrapper-group-${dragBlockIdx}-${dragImageIdx}`); 
+                if (w) w.style.width = newScale + '%'; 
+            } else {
+                uploadedImages[dragImageIdx].scale = newScale; 
+                const w = document.getElementById(`preview-wrapper-${dragImageIdx}`); 
+                if (w) w.style.width = newScale + '%'; 
+            }
+            
             if (e.type === 'touchmove') e.preventDefault(); 
         }
         
         function handleImageResizeEnd() { 
             if (isDraggingImage) { 
-                if (dragImageIdx !== -1 && uploadedImages[dragImageIdx].scale !== dragStartScale) {
+                const targetScale = dragIsGroup ? activeBlocks[dragBlockIdx].images[dragImageIdx].scale : uploadedImages[dragImageIdx].scale;
+                if (dragImageIdx !== -1 && targetScale !== dragStartScale) {
                     pushImageHistory(stateBeforeDrag);
                 }
                 isDraggingImage = false; 
                 dragImageIdx = -1; 
+                dragBlockIdx = -1;
+                dragIsGroup = false;
                 updatePreview(); 
             } 
         }
@@ -1136,16 +1533,26 @@
             return { h: h * 360, s: s * 100, b: v * 100 }; 
         }
 
-        function handleImageUpload(e) { Array.from(e.target.files).forEach(processFile); e.target.value = ''; }
-        function processFile(file) { 
+        function handleImageUpload(e) { Array.from(e.target.files).forEach(f => processFile(f, 'top')); e.target.value = ''; }
+        
+        function processFile(file, position = 'top') { 
             const reader = new FileReader(); 
             reader.onload = (e) => { 
                 pushImageHistory();
-                uploadedImages.push({ src: e.target.result, scale: 100, border: null }); 
+                if (position === 'blocks') {
+                    if (activeBlocks.length > 0 && activeBlocks[activeBlocks.length - 1].type === 'imageGroup') {
+                        activeBlocks[activeBlocks.length - 1].images.push({ src: e.target.result, scale: 100, border: null, align: 'center' });
+                    } else {
+                        activeBlocks.push({ type: 'imageGroup', images: [{ src: e.target.result, scale: 100, border: null, align: 'center' }] });
+                    }
+                } else {
+                    uploadedImages.push({ src: e.target.result, scale: 100, border: null, align: 'center' }); 
+                }
                 updatePreview(); 
             }; 
             reader.readAsDataURL(file); 
         }
+        
         function moveImageLeft(idx) { 
             if (idx > 0) { 
                 pushImageHistory();
@@ -1153,6 +1560,7 @@
                 updatePreview(); 
             } 
         }
+        
         function moveImageRight(idx) { 
             if (idx < uploadedImages.length - 1) { 
                 pushImageHistory();
@@ -1160,6 +1568,7 @@
                 updatePreview(); 
             } 
         }
+        
         function removeImage(idx) { 
             pushImageHistory();
             uploadedImages.splice(idx, 1); 
@@ -1175,18 +1584,36 @@
         }
         function hexToRgba(hex, alpha) { const rgb = hexToRgb(hex); return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`; }
         
-        function initCards() { createCard(); }
+        function initCards() { 
+            const savedCards = localStorage.getItem('ali_dashboard_cards');
+            if (savedCards) {
+                try {
+                    const parsedCards = JSON.parse(savedCards);
+                    if (parsedCards && parsedCards.length > 0) {
+                        cards = parsedCards;
+                        switchCard(cards[0].id);
+                        return;
+                    }
+                } catch (e) {
+                    console.error("Error loading saved cards", e);
+                }
+            }
+            createCard(); 
+        }
+        
         function createCard() { 
             const newCard = { 
                 id: 'card_' + Date.now() + Math.random().toString(36).substr(2, 9), 
-                title: '', category: '-', definition: '', images: [], 
+                title: '', category: '-', definition: '', blocks: [], images: [],
                 color: { hex: "#51b8cb", hue: 189, sat: 60, bri: 80 }, 
                 textSize: 32, defSize: 24, imageBorder: 2, imageCols: 0, blend: 10, 
                 showTitlePlaceholder: true, showDefPlaceholder: false 
             }; 
-            cards.push(newCard); 
+            cards.push(newCard);
+            saveCardsToStorage(); 
             switchCard(newCard.id); 
         }
+        
         function switchCard(id) { activeCardId = id; loadCurrentCard(); }
         function loadCurrentCard() { 
             isSwitching = true; 
@@ -1196,12 +1623,30 @@
             imageUndoStack = [];
             imageRedoStack = [];
             
+            // Backwards compatibility for older definition setups
+            if (card.extraNotes || card.bottomImages) {
+                card.blocks = [];
+                if (card.extraNotes && card.extraNotes.length > 0) {
+                    card.extraNotes.forEach(note => {
+                        card.blocks.push({ type: 'text', content: note });
+                    });
+                }
+                if (card.bottomImages && card.bottomImages.length > 0) {
+                    card.blocks.push({ type: 'imageGroup', images: [...card.bottomImages] });
+                }
+                delete card.extraNotes;
+                delete card.bottomImages;
+            }
+            if (!card.blocks) card.blocks = [];
+
             document.getElementById('inputTitle').value = card.title; 
             showTitlePlaceholder = card.showTitlePlaceholder !== false; 
             showDefPlaceholder = card.showDefPlaceholder !== false; 
+            
             selectCategory(card.category || "-"); 
             selectTextSize(card.textSize || 32); 
             selectDefSize(card.defSize || 24); 
+            
             currentImageBorder = card.imageBorder || 2; 
             selectImageCols(card.imageCols || 0); 
             
@@ -1211,7 +1656,10 @@
             currentBlendPercentage = card.blend !== undefined ? card.blend : 10; 
             document.getElementById('blendValueLabel').innerText = currentBlendPercentage + '%'; 
             document.getElementById('inputDef').value = card.definition; 
-            uploadedImages = [...card.images]; 
+            
+            uploadedImages = [...(card.images || [])]; 
+            activeBlocks = JSON.parse(JSON.stringify(card.blocks || []));
+
             activeColor = card.color.hex; 
             hue = card.color.hue; saturation = card.color.sat; brightness = card.color.bri; 
             
@@ -1227,15 +1675,21 @@
             card.title = document.getElementById('inputTitle').value; 
             card.category = currentSelectedCategory; 
             card.definition = document.getElementById('inputDef').value; 
+            
             card.images = [...uploadedImages]; 
+            card.blocks = JSON.parse(JSON.stringify(activeBlocks)); 
+
             card.color = { hex: activeColor, hue: hue, sat: saturation, bri: brightness }; 
             card.textSize = currentSelectedSize; 
             card.defSize = currentSelectedDefSize; 
+            card.extraDefSize = currentSelectedExtraDefSize; 
             card.imageBorder = currentImageBorder; 
             card.imageCols = currentImageCols; 
             card.blend = currentBlendPercentage; 
             card.showTitlePlaceholder = showTitlePlaceholder; 
             card.showDefPlaceholder = showDefPlaceholder; 
+
+            saveCardsToStorage();
         }
 
         function updatePreview() {
@@ -1255,7 +1709,7 @@
 
             const word = document.getElementById('cardWord'); 
             word.style.color = textColor; word.style.fontSize = textSize + 'px'; 
-            if (word.innerText !== document.getElementById('inputTitle').value) word.innerText = document.getElementById('inputTitle').value;
+            if (word.innerHTML !== document.getElementById('inputTitle').value) word.innerHTML = document.getElementById('inputTitle').value;
             
             const type = document.getElementById('cardType'), addCatBtn = document.getElementById('addCategoryBtn');
             if (currentSelectedCategory !== '-') { 
@@ -1267,7 +1721,8 @@
             }
             
             const titleS = document.getElementById('cardTitleSection'), titleR = document.getElementById('cardTitleRestore');
-            if (!document.getElementById('inputTitle').value.trim() && !showTitlePlaceholder && (currentSelectedCategory === '-' || !currentSelectedCategory.trim())) { 
+            const titleText = word.innerText ? word.innerText.trim() : '';
+            if (!titleText && !showTitlePlaceholder && (currentSelectedCategory === '-' || !currentSelectedCategory.trim())) { 
                 titleS.classList.add('hidden'); titleR.classList.remove('hidden'); 
             } else { 
                 titleS.classList.remove('hidden'); titleR.classList.add('hidden'); 
@@ -1281,38 +1736,157 @@
             } else { 
                 notesS.classList.add('hidden'); notesR.classList.remove('hidden'); 
             }
-            
+
+            // Top Images
             const cardImages = document.getElementById('cardImagesContainer');
-            if (imageCols === 0) { 
-                cardImages.className = `flex flex-wrap gap-4 md:gap-9 w-full justify-center`; cardImages.style.gridTemplateColumns = ''; 
-            } else { 
-                cardImages.className = `grid gap-4 md:gap-9 w-full items-start`; cardImages.style.gridTemplateColumns = `repeat(${imageCols}, minmax(0, 1fr))`; 
+            if (cardImages) {
+                if (imageCols === 0) { 
+                    cardImages.className = `flex flex-wrap gap-4 md:gap-9 w-full justify-center mt-2`; cardImages.style.gridTemplateColumns = ''; 
+                } else { 
+                    cardImages.className = `grid gap-4 md:gap-9 w-full items-start mt-2`; cardImages.style.gridTemplateColumns = `repeat(${imageCols}, minmax(0, 1fr))`; 
+                }
+                cardImages.style.paddingTop = uploadedImages.length > 0 ? '1rem' : '0px'; cardImages.innerHTML = '';
+                
+                uploadedImages.forEach((imgObj, idx) => {
+                    const wrapper = document.createElement('div'); wrapper.id = `preview-wrapper-${idx}`; 
+                    let alignClass = 'mx-auto'; 
+                    if (imgObj.align === 'left') alignClass = 'mr-auto ml-0';
+                    else if (imgObj.align === 'right') alignClass = 'ml-auto mr-0';
+                    
+                    wrapper.className = `relative group/imgwrapper block ${alignClass}`; 
+                    wrapper.style.width = `${imgObj.scale}%`;
+                    const img = document.createElement('img'); img.src = imgObj.src; img.className = "resizable-img h-auto object-cover rounded-[1.5rem] shadow-sm block w-full";
+                    img.style.border = `${imgObj.border !== null ? imgObj.border : imgBorder}px solid ${finalColor}`; img.draggable = false;
+                    img.onmousedown = (e) => handleImageResizeStart(e, idx, false); img.ontouchstart = (e) => handleImageResizeStart(e, idx, false);
+                    img.oncontextmenu = (e) => { e.preventDefault(); activeImageIdx = idx; activeImageIsGroup = false; activeBlockIdx = -1; showFloatingImageBorderMenu(e.clientX, e.clientY); };
+                    const moveControls = document.createElement('div'); moveControls.className = "absolute -top-3 -left-3 flex gap-1.5 z-10 hidden-in-export opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all";
+                    if (idx > 0) { 
+                        const lB = document.createElement('button'); lB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] md:w-[32px] md:h-[32px] outline-none p-0"; lB.style.color = finalColor; lB.style.border = `2px solid ${finalColor}`; lB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 md:w-5 md:h-5"><path d="M15 18l-6-6 6-6"/></svg>`; 
+                        lB.onclick = (e) => { e.stopPropagation(); moveImageLeft(idx); }; 
+                        moveControls.appendChild(lB); 
+                    }
+                    if (idx < uploadedImages.length - 1) { 
+                        const rB = document.createElement('button'); rB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] md:w-[32px] md:h-[32px] outline-none p-0"; rB.style.color = finalColor; rB.style.border = `2px solid ${finalColor}`; rB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 md:w-5 md:h-5"><path d="M9 18l6-6-6-6"/></svg>`; 
+                        rB.onclick = (e) => { e.stopPropagation(); moveImageRight(idx); }; 
+                        moveControls.appendChild(rB); 
+                    }
+                    const delBtn = document.createElement('button'); delBtn.className = "absolute -top-3 -right-3 opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all z-10 hidden-in-export flex items-center justify-center hover:scale-110 outline-none p-0 bg-transparent border-none w-[28px] h-[28px] md:w-[32px] md:h-[32px]"; delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-full h-full drop-shadow-md"><defs><linearGradient id="delGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ff3333" /><stop offset="100%" stop-color="#cc0000" /></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#delGrad)" stroke="#990000" stroke-width="0.5" /><path d="M8 8 L16 16 M16 8 L8 16" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" /></svg>`; 
+                    delBtn.onclick = (e) => { e.stopPropagation(); removeImage(idx); };
+                    wrapper.appendChild(img); 
+                    if (moveControls.children.length > 0) wrapper.appendChild(moveControls); 
+                    wrapper.appendChild(delBtn); cardImages.appendChild(wrapper);
+                });
             }
-            cardImages.style.paddingTop = uploadedImages.length > 0 ? '3rem' : '0px'; cardImages.innerHTML = '';
+
+            // Sync Dynamic Blocks
+            const blocksContainer = document.getElementById('cardBlocksContainer');
+            if (blocksContainer) {
+                let needsRebuild = false;
+                if (blocksContainer.children.length !== activeBlocks.length) {
+                    needsRebuild = true;
+                } else {
+                    for (let i = 0; i < activeBlocks.length; i++) {
+                        if (blocksContainer.children[i].dataset.blockType !== activeBlocks[i].type) {
+                            needsRebuild = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (needsRebuild) {
+                    blocksContainer.innerHTML = activeBlocks.map((block, idx) => {
+                        if (block.type === 'text') {
+                            return `
+                                <div class="group/extradef relative py-1 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors mt-1" id="block-wrapper-${idx}" data-block-type="text">
+                                    <div class="format-toolbar absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-lg border border-[#d0ebf0] dark:border-[#333] rounded-xl flex items-center p-1 gap-1 opacity-0 pointer-events-none group-focus-within/extradef:opacity-100 group-hover/extradef:opacity-100 group-focus-within/extradef:pointer-events-auto group-hover/extradef:pointer-events-auto transition-all z-20 translate-y-2 group-hover/extradef:translate-y-0 group-focus-within/extradef:translate-y-0">
+                                        <button onmousedown="event.preventDefault(); execFormat('undo')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors"><i data-lucide="undo" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); execFormat('redo')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors"><i data-lucide="redo" class="w-4 h-4"></i></button>
+                                        <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                        <button onmousedown="event.preventDefault(); execFormat('bold')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); execFormat('highlight')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); execFormat('textColor')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-color"><i data-lucide="palette" class="w-4 h-4"></i></button>
+                                        <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                        <button onmousedown="event.preventDefault(); execFormat('justifyLeft')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-left" title="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); execFormat('justifyCenter')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-center" title="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); execFormat('justifyRight')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-right" title="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+                                    </div>
+                                    <div class="card-extra-def-input font-medium leading-relaxed whitespace-pre-wrap outline-none" contenteditable="true" data-placeholder="Enter note here..." style="text-decoration: none; min-height: 1.5em; font-family: 'Caveat', cursive;" data-block-idx="${idx}">${block.content}</div>
+                                    <button onclick="removeBlock(${idx})" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 group-hover/extradef:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" title="Remove Note">
+                                        <i data-lucide="x" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
+                                    </button>
+                                </div>
+                            `;
+                        } else if (block.type === 'imageGroup') {
+                            return `
+                                <div id="block-wrapper-${idx}" data-block-type="imageGroup" class="w-full relative group/blockimg">
+                                    <div id="image-group-${idx}" class="w-full"></div>
+                                </div>
+                            `;
+                        }
+                    }).join('');
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                }
+
+                // Hydrate blocks contents and styles
+                activeBlocks.forEach((block, idx) => {
+                    if (block.type === 'text') {
+                        const el = blocksContainer.querySelector(`[data-block-idx="${idx}"]`);
+                        if (el) {
+                            el.style.color = textColor;
+                            el.style.fontSize = defSize + 'px'; 
+                            if (el.innerHTML !== block.content) {
+                                el.innerHTML = block.content;
+                            }
+                        }
+                    } else if (block.type === 'imageGroup') {
+                        const groupContainer = document.getElementById(`image-group-${idx}`);
+                        if (groupContainer) {
+                            if (imageCols === 0) { 
+                                groupContainer.className = `flex flex-wrap gap-4 md:gap-9 w-full justify-center mt-2`; groupContainer.style.gridTemplateColumns = ''; 
+                            } else { 
+                                groupContainer.className = `grid gap-4 md:gap-9 w-full items-start mt-2`; groupContainer.style.gridTemplateColumns = `repeat(${imageCols}, minmax(0, 1fr))`; 
+                            }
+                            groupContainer.style.paddingTop = '1rem'; 
+                            groupContainer.innerHTML = '';
+                            
+                            block.images.forEach((imgObj, imgIdx) => {
+                                const wrapper = document.createElement('div'); wrapper.id = `preview-wrapper-group-${idx}-${imgIdx}`; 
+                                
+                                let alignClass = 'mx-auto'; 
+                                if (imgObj.align === 'left') alignClass = 'mr-auto ml-0';
+                                else if (imgObj.align === 'right') alignClass = 'ml-auto mr-0';
+                                
+                                wrapper.className = `relative group/imgwrapper block ${alignClass}`; 
+                                wrapper.style.width = `${imgObj.scale}%`;
+                                const img = document.createElement('img'); img.src = imgObj.src; img.className = "resizable-img h-auto object-cover rounded-[1.5rem] shadow-sm block w-full";
+                                img.style.border = `${imgObj.border !== null ? imgObj.border : imgBorder}px solid ${finalColor}`; img.draggable = false;
+                                img.onmousedown = (e) => handleImageResizeStart(e, imgIdx, true, idx); img.ontouchstart = (e) => handleImageResizeStart(e, imgIdx, true, idx);
+                                img.oncontextmenu = (e) => { e.preventDefault(); activeImageIdx = imgIdx; activeImageIsGroup = true; activeBlockIdx = idx; showFloatingImageBorderMenu(e.clientX, e.clientY); };
+                                
+                                const moveControls = document.createElement('div'); moveControls.className = "absolute -top-3 -left-3 flex gap-1.5 z-10 hidden-in-export opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all";
+                                if (imgIdx > 0) { 
+                                    const lB = document.createElement('button'); lB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] outline-none p-0"; lB.style.color = finalColor; lB.style.border = `2px solid ${finalColor}`; lB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M15 18l-6-6 6-6"/></svg>`; 
+                                    lB.onclick = (e) => { e.stopPropagation(); moveImageLeftGroup(idx, imgIdx); }; 
+                                    moveControls.appendChild(lB); 
+                                }
+                                if (imgIdx < block.images.length - 1) { 
+                                    const rB = document.createElement('button'); rB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] outline-none p-0"; rB.style.color = finalColor; rB.style.border = `2px solid ${finalColor}`; rB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M9 18l6-6-6-6"/></svg>`; 
+                                    rB.onclick = (e) => { e.stopPropagation(); moveImageRightGroup(idx, imgIdx); }; 
+                                    moveControls.appendChild(rB); 
+                                }
+                                
+                                const delBtn = document.createElement('button'); delBtn.className = "absolute -top-3 -right-3 opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all z-10 hidden-in-export flex items-center justify-center hover:scale-110 outline-none p-0 bg-transparent border-none w-[28px] h-[28px]"; delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-full h-full drop-shadow-md"><defs><linearGradient id="delGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ff3333" /><stop offset="100%" stop-color="#cc0000" /></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#delGrad)" stroke="#990000" stroke-width="0.5" /><path d="M8 8 L16 16 M16 8 L8 16" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" /></svg>`; 
+                                delBtn.onclick = (e) => { e.stopPropagation(); removeImageFromGroup(idx, imgIdx); };
+                                
+                                wrapper.appendChild(img); 
+                                if (moveControls.children.length > 0) wrapper.appendChild(moveControls); 
+                                wrapper.appendChild(delBtn); groupContainer.appendChild(wrapper);
+                            });
+                        }
+                    }
+                });
+            }
             
-            uploadedImages.forEach((imgObj, idx) => {
-                const wrapper = document.createElement('div'); wrapper.id = `preview-wrapper-${idx}`; wrapper.className = "relative group/imgwrapper mx-auto block"; wrapper.style.width = `${imgObj.scale}%`;
-                const img = document.createElement('img'); img.src = imgObj.src; img.className = "resizable-img h-auto object-cover rounded-[1.5rem] shadow-sm block w-full";
-                img.style.border = `${imgObj.border !== null ? imgObj.border : imgBorder}px solid ${finalColor}`; img.draggable = false;
-                img.onmousedown = (e) => handleImageResizeStart(e, idx); img.ontouchstart = (e) => handleImageResizeStart(e, idx);
-                img.oncontextmenu = (e) => { e.preventDefault(); activeImageIdx = idx; showFloatingImageBorderMenu(e.clientX, e.clientY); };
-                const moveControls = document.createElement('div'); moveControls.className = "absolute -top-3 -left-3 flex gap-1.5 z-10 hidden-in-export opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all";
-                if (idx > 0) { 
-                    const lB = document.createElement('button'); lB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] md:w-[32px] md:h-[32px] outline-none p-0"; lB.style.color = finalColor; lB.style.border = `2px solid ${finalColor}`; lB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 md:w-5 md:h-5"><path d="M15 18l-6-6 6-6"/></svg>`; 
-                    lB.onclick = (e) => { e.stopPropagation(); moveImageLeft(idx); }; 
-                    moveControls.appendChild(lB); 
-                }
-                if (idx < uploadedImages.length - 1) { 
-                    const rB = document.createElement('button'); rB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] md:w-[32px] md:h-[32px] outline-none p-0"; rB.style.color = finalColor; rB.style.border = `2px solid ${finalColor}`; rB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 md:w-5 md:h-5"><path d="M9 18l6-6-6-6"/></svg>`; 
-                    rB.onclick = (e) => { e.stopPropagation(); moveImageRight(idx); }; 
-                    moveControls.appendChild(rB); 
-                }
-                const delBtn = document.createElement('button'); delBtn.className = "absolute -top-3 -right-3 opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all z-10 hidden-in-export flex items-center justify-center hover:scale-110 outline-none p-0 bg-transparent border-none w-[28px] h-[28px] md:w-[32px] md:h-[32px]"; delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-full h-full drop-shadow-md"><defs><linearGradient id="delGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ff3333" /><stop offset="100%" stop-color="#cc0000" /></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#delGrad)" stroke="#990000" stroke-width="0.5" /><path d="M8 8 L16 16 M16 8 L8 16" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" /></svg>`; 
-                delBtn.onclick = (e) => { e.stopPropagation(); removeImage(idx); };
-                wrapper.appendChild(img); 
-                if (moveControls.children.length > 0) wrapper.appendChild(moveControls); 
-                wrapper.appendChild(delBtn); cardImages.appendChild(wrapper);
-            });
             updateFavicon(); updateBrandLogo();
             document.getElementById('dynamic-card-styles').innerHTML = `input[type=range]::-webkit-slider-thumb { background: white !important; border: 3px solid ${finalColor} !important; box-shadow: 0 0 10px ${finalColor}66 !important; } #cardWord, #cardDef, #cardType { text-decoration: none !important; }`;
             syncCardState();
@@ -1488,7 +2062,11 @@
 
             const downloadBtn = document.getElementById('np-download-btn');
             downloadBtn.addEventListener('click', () => { 
-                const textToSave = area.innerText;
+                // Strip HTML safely for TXT export
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = area.innerHTML;
+                const textToSave = tempDiv.innerText || tempDiv.textContent;
+
                 const blob = new Blob([textToSave], { type:'text/plain' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a'); 
@@ -1497,6 +2075,26 @@
                 a.click(); 
                 URL.revokeObjectURL(url);
             });
+
+            const pdfBtn = document.getElementById('np-pdf-btn');
+            if (pdfBtn) {
+                pdfBtn.addEventListener('click', () => {
+                    const element = document.createElement('div');
+                    element.style.padding = '40px';
+                    element.style.color = '#222';
+                    element.innerHTML = `<h1 style="font-family: 'Caveat', cursive !important; font-size: 36px; border-bottom: 2px dashed #d0ebf0; padding-bottom: 10px; margin-bottom: 20px;">${titleInput.value.trim() || 'Untitled Note'}</h1><div style="font-family: 'Caveat', cursive !important; white-space: pre-wrap; word-wrap: break-word; line-height: 1.6; font-size: 26px; font-weight: 500; margin: 0; padding: 0;">${area.innerHTML}</div>`;
+                    
+                    const opt = {
+                      margin:       10,
+                      filename:     `${titleInput.value.trim() || 'Untitled'}.pdf`,
+                      image:        { type: 'jpeg', quality: 0.98 },
+                      html2canvas:  { scale: 2 },
+                      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    };
+                    
+                    html2pdf().set(opt).from(element).save();
+                });
+            }
             
             area.addEventListener('input', update); 
             area.addEventListener('keydown', (e) => {
@@ -1524,7 +2122,13 @@
         async function downloadPNG() {
             if (isDownloading) return; 
             isDownloading = true; 
-            const card = document.getElementById('cardContainer'), f = document.getElementById('inputTitle').value.trim() || "Card";
+            
+            const cardWordEl = document.getElementById('cardWord');
+            const tempDiv = document.createElement('div');
+            if(cardWordEl) tempDiv.innerHTML = cardWordEl.innerHTML;
+            const f = (tempDiv.innerText.trim()) ? tempDiv.innerText.trim() : "Card";
+            
+            const card = document.getElementById('cardContainer');
             try {
                 card.classList.remove('card-shadow'); 
                 const imgs = card.querySelectorAll('img'); 
@@ -1534,13 +2138,24 @@
                     scale: 3, backgroundColor: null, useCORS: true, 
                     onclone: (doc) => { 
                         const c = doc.getElementById('cardContainer'); c.style.boxShadow = 'none'; c.style.borderRadius = '48px'; 
-                        doc.querySelectorAll('#cardTitleRestore, #cardDefRestore, #addCategoryBtn, .format-toolbar, .clear-btn, .hidden-in-export').forEach(el => el.style.display = 'none');
+                        doc.querySelectorAll('#cardTitleRestore, #cardDefRestore, #cardExtraDefRestore, #addCategoryBtn, .format-toolbar, .clear-btn, .hidden-in-export').forEach(el => el.style.display = 'none');
                         doc.querySelectorAll('[contenteditable]').forEach(el => { if (!el.innerText.trim()) el.removeAttribute('data-placeholder'); });
                         if (!doc.getElementById('cardDef').innerText.trim()) doc.getElementById('cardNotesSection').style.display = 'none';
+                        
+                        if (doc.getElementById('cardBlocksContainer')) {
+                            doc.querySelectorAll('.card-extra-def-input').forEach(el => {
+                                if (!el.innerText.trim()) el.parentElement.style.display = 'none';
+                            });
+                        }
+
                         if (!doc.getElementById('cardType').innerText.trim()) doc.getElementById('cardType').style.display = 'none';
                         if (!doc.getElementById('cardWord').innerText.trim() && !doc.getElementById('cardType').innerText.trim()) doc.getElementById('cardTitleSection').style.display = 'none';
-                        if (doc.getElementById('cardImagesContainer').children.length > 0) doc.getElementById('cardImagesContainer').style.paddingTop = '3rem';
-                        doc.querySelectorAll('#cardWord, #cardDef, #cardType').forEach(el => el.style.textDecoration = 'none');
+                        if (doc.getElementById('cardImagesContainer') && doc.getElementById('cardImagesContainer').children.length > 0) {
+                            doc.getElementById('cardImagesContainer').style.paddingTop = '1rem';
+                        }
+                        
+                        // Force handdrawn texts to have correct font
+                        doc.querySelectorAll('#cardWord, #cardDef, .card-extra-def-input, #cardType').forEach(el => el.style.textDecoration = 'none');
                     }
                 });
                 
