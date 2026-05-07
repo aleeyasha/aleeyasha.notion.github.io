@@ -965,12 +965,25 @@
             });
             
             document.addEventListener('paste', (event) => { 
-                const items = (event.clipboardData || event.originalEvent.clipboardData).items; 
+                const clipboardData = event.clipboardData || event.originalEvent.clipboardData;
+                const items = clipboardData.items; 
+                let isImagePaste = false;
+                
                 for (let index in items) { 
                     if (items[index].kind === 'file' && items[index].type.includes('image')) {
                         processFile(items[index].getAsFile()); 
+                        isImagePaste = true;
                     }
                 } 
+                
+                // Force plain text paste to strip unwanted backgrounds and fonts
+                if (!isImagePaste && event.target && event.target.isContentEditable) {
+                    const text = clipboardData.getData('text/plain');
+                    if (text) {
+                        event.preventDefault();
+                        document.execCommand('insertText', false, text);
+                    }
+                }
             });
             
             window.addEventListener('mousemove', handleImageResizeMove); 
