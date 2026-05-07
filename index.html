@@ -288,6 +288,14 @@
             <div onclick="document.getElementById('imageInput').click()" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300">
                 <i data-lucide="image-plus" class="w-4 h-4"></i> Upload Image
             </div>
+            
+            <div id="contextUndoImageBtn" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                <i data-lucide="undo" class="w-4 h-4"></i> Undo Image Action
+            </div>
+            <div id="contextRedoImageBtn" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                <i data-lucide="redo" class="w-4 h-4"></i> Redo Image Action
+            </div>
+            
             <div class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300 opacity-60 cursor-default">
                 <i data-lucide="clipboard" class="w-4 h-4"></i> Paste Enabled
             </div>
@@ -331,10 +339,37 @@
         let currentSelectedCategory = "-", currentSelectedSize = 32, currentSelectedDefSize = 24, currentImageBorder = 2, currentImageCols = 0, currentBlendPercentage = 10, deferredPrompt = null;
         let showTitlePlaceholder = true, showDefPlaceholder = true, activeImageIdx = -1;
         let isDraggingImage = false, dragStartX = 0, dragImageIdx = -1, dragStartScale = 100;
+        
+        let imageUndoStack = [], imageRedoStack = [], isImageUndoingRedoing = false, stateBeforeDrag = null;
 
         initColorPicker(); initBlendDropdown(); initFloatingMenu(); setupEventListeners(); initCards(); initNotepad();
         if (typeof lucide !== 'undefined') lucide.createIcons();
         initPWA();
+
+        function pushImageHistory(stateOverride = null) {
+            if (isImageUndoingRedoing) return;
+            imageUndoStack.push(stateOverride || JSON.parse(JSON.stringify(uploadedImages)));
+            if (imageUndoStack.length > 20) imageUndoStack.shift();
+            imageRedoStack = [];
+        }
+        
+        function undoImageAction() {
+            if (imageUndoStack.length === 0) return;
+            isImageUndoingRedoing = true;
+            imageRedoStack.push(JSON.parse(JSON.stringify(uploadedImages)));
+            uploadedImages = imageUndoStack.pop();
+            updatePreview();
+            isImageUndoingRedoing = false;
+        }
+        
+        function redoImageAction() {
+            if (imageRedoStack.length === 0) return;
+            isImageUndoingRedoing = true;
+            imageUndoStack.push(JSON.parse(JSON.stringify(uploadedImages)));
+            uploadedImages = imageRedoStack.pop();
+            updatePreview();
+            isImageUndoingRedoing = false;
+        }
 
         document.getElementById('context-theme-toggle').addEventListener('click', (e) => {
             e.stopPropagation();
@@ -446,7 +481,15 @@
                     const item = document.createElement('div');
                     item.className = 'dropdown-item text-gray-700 dark:text-gray-300';
                     item.innerText = b + 'px';
-                    item.onclick = (e) => { e.stopPropagation(); if (activeImageIdx !== -1 && uploadedImages[activeImageIdx]) { uploadedImages[activeImageIdx].border = b; updatePreview(); } imgMenu.classList.add('hidden'); };
+                    item.onclick = (e) => { 
+                        e.stopPropagation(); 
+                        if (activeImageIdx !== -1 && uploadedImages[activeImageIdx]) { 
+                            pushImageHistory();
+                            uploadedImages[activeImageIdx].border = b; 
+                            updatePreview(); 
+                        } 
+                        imgMenu.classList.add('hidden'); 
+                    };
                     imgContainer.appendChild(item);
                 });
             }
@@ -477,6 +520,24 @@
                     if (layoutOptions) layoutOptions.classList.toggle('hidden');
                     const chevron = document.getElementById('imageLayoutChevron');
                     if (chevron) chevron.classList.toggle('rotate-180');
+                };
+            }
+
+            const undoImageBtn = document.getElementById('contextUndoImageBtn');
+            if (undoImageBtn) {
+                undoImageBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    undoImageAction();
+                    document.getElementById('floatingPreviewMenu').classList.add('hidden');
+                };
+            }
+            
+            const redoImageBtn = document.getElementById('contextRedoImageBtn');
+            if (redoImageBtn) {
+                redoImageBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    redoImageAction();
+                    document.getElementById('floatingPreviewMenu').classList.add('hidden');
                 };
             }
 
@@ -540,6 +601,17 @@
                     } else {
                         deleteCardBtn.classList.remove('opacity-50', 'pointer-events-none');
                     }
+                }
+                
+                const undoImgBtn = document.getElementById('contextUndoImageBtn');
+                if (undoImgBtn) {
+                    if (imageUndoStack.length === 0) undoImgBtn.classList.add('opacity-50', 'pointer-events-none');
+                    else undoImgBtn.classList.remove('opacity-50', 'pointer-events-none');
+                }
+                const redoImgBtn = document.getElementById('contextRedoImageBtn');
+                if (redoImgBtn) {
+                    if (imageRedoStack.length === 0) redoImgBtn.classList.add('opacity-50', 'pointer-events-none');
+                    else redoImgBtn.classList.remove('opacity-50', 'pointer-events-none');
                 }
 
                 // Populate Other Cards
@@ -681,9 +753,25 @@
             document.getElementById('btnInstallApp').addEventListener('click', async () => { if (deferredPrompt) { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; const b = document.getElementById('btnInstallApp'); b.classList.add('hidden'); b.classList.remove('flex'); } });
         }
 
-        function handleImageResizeStart(e, idx) { isDraggingImage = true; dragImageIdx = idx; dragStartX = (e.type === 'touchstart') ? e.touches[0].clientX : e.clientX; dragStartScale = uploadedImages[idx].scale; if (e.type === 'mousedown') e.preventDefault(); }
+        function handleImageResizeStart(e, idx) { 
+            stateBeforeDrag = JSON.parse(JSON.stringify(uploadedImages));
+            isDraggingImage = true; 
+            dragImageIdx = idx; 
+            dragStartX = (e.type === 'touchstart') ? e.touches[0].clientX : e.clientX; 
+            dragStartScale = uploadedImages[idx].scale; 
+            if (e.type === 'mousedown') e.preventDefault(); 
+        }
         function handleImageResizeMove(e) { if (!isDraggingImage || dragImageIdx === -1) return; const currentX = (e.type === 'touchmove') ? e.touches[0].clientX : e.clientX, deltaX = currentX - dragStartX; let newScale = Math.max(10, Math.min(200, dragStartScale + (deltaX * 0.5))); uploadedImages[dragImageIdx].scale = newScale; const w = document.getElementById(`preview-wrapper-${dragImageIdx}`); if (w) w.style.width = newScale + '%'; if (e.type === 'touchmove') e.preventDefault(); }
-        function handleImageResizeEnd() { if (isDraggingImage) { isDraggingImage = false; dragImageIdx = -1; updatePreview(); } }
+        function handleImageResizeEnd() { 
+            if (isDraggingImage) { 
+                if (dragImageIdx !== -1 && uploadedImages[dragImageIdx].scale !== dragStartScale) {
+                    pushImageHistory(stateBeforeDrag);
+                }
+                isDraggingImage = false; 
+                dragImageIdx = -1; 
+                updatePreview(); 
+            } 
+        }
 
         function initColorPicker() {
             const map = document.getElementById('colorMap'), hueSlider = document.getElementById('inputHue');
@@ -716,16 +804,49 @@
         function hexToRgb(hex) { const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex); return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : {r:0,g:0,b:0}; }
         function rgbToHsb(r, g, b) { r /= 255; g /= 255; b /= 255; const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min; let h, s, v = max; s = max === 0 ? 0 : d / max; if (max === min) h = 0; else { switch(max) { case r: h = (g - b) / d + (g < b ? 6 : 0); break; case g: h = (b - r) / d + 2; break; case b: h = (r - g) / d + 4; break; } h /= 6; } return { h: h * 360, s: s * 100, b: v * 100 }; }
         function handleImageUpload(e) { Array.from(e.target.files).forEach(processFile); e.target.value = ''; }
-        function processFile(file) { const reader = new FileReader(); reader.onload = (e) => { uploadedImages.push({ src: e.target.result, scale: 100, border: null }); updatePreview(); }; reader.readAsDataURL(file); }
-        function moveImageLeft(idx) { if (idx > 0) { [uploadedImages[idx - 1], uploadedImages[idx]] = [uploadedImages[idx], uploadedImages[idx - 1]]; updatePreview(); } }
-        function moveImageRight(idx) { if (idx < uploadedImages.length - 1) { [uploadedImages[idx], uploadedImages[idx + 1]] = [uploadedImages[idx + 1], uploadedImages[idx]]; updatePreview(); } }
-        function removeImage(idx) { uploadedImages.splice(idx, 1); updatePreview(); }
+        function processFile(file) { 
+            const reader = new FileReader(); 
+            reader.onload = (e) => { 
+                pushImageHistory();
+                uploadedImages.push({ src: e.target.result, scale: 100, border: null }); 
+                updatePreview(); 
+            }; 
+            reader.readAsDataURL(file); 
+        }
+        function moveImageLeft(idx) { 
+            if (idx > 0) { 
+                pushImageHistory();
+                [uploadedImages[idx - 1], uploadedImages[idx]] = [uploadedImages[idx], uploadedImages[idx - 1]]; 
+                updatePreview(); 
+            } 
+        }
+        function moveImageRight(idx) { 
+            if (idx < uploadedImages.length - 1) { 
+                pushImageHistory();
+                [uploadedImages[idx], uploadedImages[idx + 1]] = [uploadedImages[idx + 1], uploadedImages[idx]]; 
+                updatePreview(); 
+            } 
+        }
+        function removeImage(idx) { 
+            pushImageHistory();
+            uploadedImages.splice(idx, 1); 
+            updatePreview(); 
+        }
         function getLightShade(hex, blendPercentage) { const rgb = hexToRgb(hex), factor = blendPercentage / 100, r = Math.round(255 - (255 - rgb.r) * factor), g = Math.round(255 - (255 - rgb.g) * factor), b = Math.round(255 - (255 - rgb.b) * factor); return `rgb(${r}, ${g}, ${b})`; }
         function hexToRgba(hex, alpha) { const rgb = hexToRgb(hex); return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`; }
         function initCards() { createCard(); }
         function createCard() { const newCard = { id: 'card_' + Date.now() + Math.random().toString(36).substr(2, 9), title: '', category: '-', definition: '', images: [], color: { hex: "#51b8cb", hue: 189, sat: 60, bri: 80 }, textSize: 32, defSize: 24, imageBorder: 2, imageCols: 0, blend: 10, showTitlePlaceholder: true, showDefPlaceholder: false }; cards.push(newCard); switchCard(newCard.id); }
         function switchCard(id) { activeCardId = id; loadCurrentCard(); }
-        function loadCurrentCard() { isSwitching = true; const card = cards.find(c => c.id === activeCardId); if (!card) return; document.getElementById('inputTitle').value = card.title; showTitlePlaceholder = card.showTitlePlaceholder !== false; showDefPlaceholder = card.showDefPlaceholder !== false; selectCategory(card.category || "-"); selectTextSize(card.textSize || 32); selectDefSize(card.defSize || 24); currentImageBorder = card.imageBorder || 2; selectImageCols(card.imageCols || 0); const sL = document.getElementById('toolbarDefSizeLabel'); if (sL) sL.innerText = card.defSize || 24; const tL = document.getElementById('toolbarTitleSizeLabel'); if (tL) tL.innerText = card.textSize || 32; currentBlendPercentage = card.blend !== undefined ? card.blend : 10; document.getElementById('blendValueLabel').innerText = currentBlendPercentage + '%'; document.getElementById('inputDef').value = card.definition; uploadedImages = [...card.images]; activeColor = card.color.hex; hue = card.color.hue; saturation = card.color.sat; brightness = card.color.bri; setManualColor(activeColor, hue, saturation, brightness); isSwitching = false; }
+        function loadCurrentCard() { 
+            isSwitching = true; 
+            const card = cards.find(c => c.id === activeCardId); 
+            if (!card) return; 
+            
+            imageUndoStack = [];
+            imageRedoStack = [];
+            
+            document.getElementById('inputTitle').value = card.title; showTitlePlaceholder = card.showTitlePlaceholder !== false; showDefPlaceholder = card.showDefPlaceholder !== false; selectCategory(card.category || "-"); selectTextSize(card.textSize || 32); selectDefSize(card.defSize || 24); currentImageBorder = card.imageBorder || 2; selectImageCols(card.imageCols || 0); const sL = document.getElementById('toolbarDefSizeLabel'); if (sL) sL.innerText = card.defSize || 24; const tL = document.getElementById('toolbarTitleSizeLabel'); if (tL) tL.innerText = card.textSize || 32; currentBlendPercentage = card.blend !== undefined ? card.blend : 10; document.getElementById('blendValueLabel').innerText = currentBlendPercentage + '%'; document.getElementById('inputDef').value = card.definition; uploadedImages = [...card.images]; activeColor = card.color.hex; hue = card.color.hue; saturation = card.color.sat; brightness = card.color.bri; setManualColor(activeColor, hue, saturation, brightness); isSwitching = false; 
+        }
         function syncCardState() { if (!activeCardId || isSwitching) return; const card = cards.find(c => c.id === activeCardId); if (!card) return; card.title = document.getElementById('inputTitle').value; card.category = currentSelectedCategory; card.definition = document.getElementById('inputDef').value; card.images = [...uploadedImages]; card.color = { hex: activeColor, hue: hue, sat: saturation, bri: brightness }; card.textSize = currentSelectedSize; card.defSize = currentSelectedDefSize; card.imageBorder = currentImageBorder; card.imageCols = currentImageCols; card.blend = currentBlendPercentage; card.showTitlePlaceholder = showTitlePlaceholder; card.showDefPlaceholder = showDefPlaceholder; }
 
         function updatePreview() {
@@ -770,7 +891,7 @@
         function generateNotebookSVG() { const color = CONSTANT_ICON_COLOR, yellow = "#eed142", dark = "#222222"; return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%"><path d="M 25 15 L 75 15 C 80.5 15 85 19.5 85 25 L 85 65 L 65 65 C 62.2 65 60 67.2 60 70 L 60 85 L 25 85 C 19.5 85 15 80.5 15 75 L 15 25 C 15 19.5 19.5 15 25 15 Z" fill="${color}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/><path d="M 85 65 L 65 85 L 65 70 C 65 67.2 67.2 65 70 65 Z" fill="${yellow}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/><g stroke="${dark}" stroke-width="4" fill="${color}"><rect x="12" y="27" width="16" height="6" rx="3" /><rect x="12" y="42" width="16" height="6" rx="3" /><rect x="12" y="57" width="16" height="6" rx="3" /><rect x="12" y="72" width="16" height="6" rx="3" /></g><g fill="${dark}"><circle cx="25" cy="30" r="3" /><circle cx="25" cy="45" r="3" /><circle cx="25" cy="60" r="3" /><circle cx="25" cy="75" r="3" /></g></svg>`.trim(); }
         function updateFavicon() { document.getElementById('favicon').href = `data:image/svg+xml;base64,${btoa(generateNotebookSVG())}`; }
         function updateBrandLogo() { const c = document.getElementById('brand-logo-container'); if (c) c.innerHTML = generateNotebookSVG(); }
-        function createPNGIconFromSVG(svg, size) { return new Promise((resolve) => { const canvas = document.createElement('canvas'); canvas.width = size; canvas.height = size; const ctx = canvas.getContext('2d'), img = new Image(); img.onload = () => { ctx.drawImage(img, 0, 0, size, size); resolve(canvas.toDataURL('image/png')); }; img.onerror = () => resolve(`data:image/svg+xml;base64,${btoa(svg)}`); img.src = `data:image/svg+xml;base64,${btoa(svg)}`; }); }
+        function createPNGIconFromSVG(svg, size) { return new Promise((resolve) => { const canvas = document.createElement('canvas'); canvas.width = size; canvas.height = size; const ctx = canvas.getContext('2d'), img = new Image(); img.onload = () => { ctx.fillStyle = '#000000'; ctx.fillRect(0, 0, size, size); const p = size * 0.15; ctx.drawImage(img, p, p, size - p * 2, size - p * 2); resolve(canvas.toDataURL('image/png')); }; img.onerror = () => resolve(`data:image/svg+xml;base64,${btoa(svg)}`); img.src = `data:image/svg+xml;base64,${btoa(svg)}`; }); }
         async function initPWA() { try { const svg = generateNotebookSVG(), i192 = await createPNGIconFromSVG(svg, 192), i512 = await createPNGIconFromSVG(svg, 512); document.getElementById('apple-touch-icon').href = i192; const manifest = { name: "Notion", short_name: "Notion", start_url: window.location.href.split('?')[0], display: "standalone", background_color: "#000000", theme_color: "#000000", icons: [{ src: i192, sizes: "192x192", type: "image/png", purpose: "any maskable" }, { src: i512, sizes: "512x512", type: "image/png", purpose: "any maskable" }] }; document.getElementById('manifest').href = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest)); } catch (e) { console.error("PWA initialization skipped:", e); } }
 
         function initNotepad() {
