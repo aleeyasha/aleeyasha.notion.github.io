@@ -117,13 +117,40 @@
         .dark .bg-white { background-color: #1a1a1a !important; border-color: #333 !important; }
         
         .np-title-input { 
-            font-family: 'Caveat', cursive !important; background: transparent !important; 
-            border: none !important; font-weight: 700; font-size: 24px; letter-spacing: 0.02em; 
-            width: 100%; box-shadow: none !important; padding: 0 !important; 
+            font-family: 'Caveat', cursive !important; 
+            background-color: transparent !important; 
+            border: none !important; 
+            border-bottom: 2px dashed #d0ebf0 !important; 
+            font-weight: 700; 
+            font-size: 24px; 
+            letter-spacing: 0.02em; 
+            width: 100%; 
+            box-shadow: none !important; 
+            padding: 4px 8px !important; 
+            border-radius: 8px 8px 0 0 !important;
+            transition: all 0.3s ease !important;
         }
         @media (min-width: 768px) { .np-title-input { font-size: 28px; } }
-        .dark .np-title-input { color: #eee; }
-        .np-title-input:focus { outline: none; box-shadow: none !important; }
+        .dark .np-title-input { 
+            background-color: transparent !important; 
+            border-bottom-color: #333 !important;
+            color: #eee !important; 
+        }
+        .np-title-input:hover { 
+            background-color: rgba(81, 184, 203, 0.02) !important; 
+        }
+        .dark .np-title-input:hover { 
+            background-color: rgba(255, 255, 255, 0.02) !important; 
+        }
+        .np-title-input:focus { 
+            outline: none !important; 
+            box-shadow: none !important; 
+            border-bottom: 2px solid #51b8cb !important;
+            background-color: rgba(81, 184, 203, 0.05) !important;
+        }
+        .dark .np-title-input:focus { 
+            background-color: rgba(255, 255, 255, 0.05) !important; 
+        }
         
         .dropdown-item { 
             padding: 10px 16px; cursor: pointer; font-size: 11px; font-weight: 600; 
@@ -167,7 +194,7 @@
         
         <!-- App Logo / Title -->
         <header class="w-full flex justify-center mb-6 md:mb-8 pointer-events-none select-none z-20">
-            <div onclick="openCardContextMenu(event)" class="pointer-events-auto cursor-pointer transition-all hover:scale-105" title="Open Card Menu">
+            <div onclick="openCardContextMenu(event)" class="pointer-events-auto cursor-pointer transition-all hover:scale-105" title="Open Menu">
                 <img src="image_c2e349.png" alt="aliyasa logo" class="h-10 md:h-14 object-contain drop-shadow-md" onerror="this.onerror=null; this.outerHTML='<h1 class=\'handdrawn-title text-4xl md:text-5xl font-bold tracking-wider\'><span class=\'text-gray-400\'>ali</span><span class=\'text-[#51b8cb]\'>yasa</span></h1>';">
             </div>
         </header>
@@ -200,43 +227,6 @@
                                         <i data-lucide="chevron-down" class="w-3 h-3"></i>
                                     </button>
                                     <div id="toolbarTitleSizeDropdownMenu" onmousedown="event.preventDefault();" class="hidden absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[60] overflow-hidden w-16 max-h-48 overflow-y-auto custom-scrollbar"></div>
-                                </div>
-
-                                <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-
-                                <!-- Theme Color Picker Popup -->
-                                <div class="relative">
-                                    <button id="toolbarColorBtn" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors flex items-center justify-center" title="Theme Color">
-                                        <i data-lucide="palette" class="w-4 h-4"></i>
-                                    </button>
-                                    <div id="toolbarColorDropdownMenu" class="hidden absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[60] w-[260px] p-4 cursor-default transition-all">
-                                        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
-                                            <label class="block text-[10px] font-bold text-gray-800 dark:text-gray-200 uppercase tracking-widest m-0">Theme Color</label>
-                                            <div class="flex items-center gap-1">
-                                                <button id="btnRandomColor" class="p-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-gray-400 hover:text-[#51b8cb] rounded-lg transition-all shadow-sm hover:border-gray-300 dark:hover:border-gray-600 outline-none" title="Generate Random Palette">
-                                                    <i data-lucide="shuffle" class="w-3 h-3"></i>
-                                                </button>
-                                                <div class="relative shrink-0 w-20">
-                                                    <button id="blendBtn" class="w-full px-2 py-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-[#51b8cb] text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group hover:border-gray-300 dark:hover:border-gray-600">
-                                                        <span class="text-gray-400">Blend</span>
-                                                        <span id="blendValueLabel">10%</span>
-                                                        <i data-lucide="chevron-down" class="w-3 h-3 text-gray-400 transition-transform group-hover:translate-y-0.5 shrink-0"></i>
-                                                    </button>
-                                                    <div id="blendDropdownMenu" class="hidden absolute right-0 mt-2 w-full bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[70] overflow-hidden">
-                                                        <div id="blendOptions" class="py-1"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div id="colorMap" class="mb-4 h-32 w-full relative cursor-crosshair border border-gray-200 dark:border-[#333] rounded-xl overflow-hidden bg-red-500">
-                                            <div class="color-map-white absolute inset-0 bg-gradient-to-r from-white to-transparent"></div>
-                                            <div class="color-map-black absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
-                                            <div id="colorMarker" class="absolute w-4 h-4 border-2 border-white rounded-full shadow-sm pointer-events-none transform -translate-x-1/2 -translate-y-1/2" style="top: 20%; left: 80%;"></div>
-                                        </div>
-                                        <div class="px-1">
-                                            <input type="range" id="inputHue" min="0" max="360" value="189" class="w-full cursor-pointer">
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
 
@@ -347,9 +337,9 @@
     </div>
 
     <!-- Preview Context Menu -->
-    <div id="floatingPreviewMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-48 py-1">
+    <div id="floatingPreviewMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-64 py-1">
         <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 mb-1 flex items-center justify-between">
-            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Card Actions</span>
+            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Menu</span>
             <button id="context-theme-toggle" class="text-gray-400 hover:text-[#51b8cb] transition-colors outline-none cursor-pointer p-1" title="Toggle Light/Dark Mode">
                 <i data-lucide="moon" class="w-3.5 h-3.5 dark:hidden"></i>
                 <i data-lucide="sun" class="w-3.5 h-3.5 hidden dark:block"></i>
@@ -365,10 +355,6 @@
             </div>
             <div id="contextRedoImageBtn" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300">
                 <i data-lucide="redo" class="w-4 h-4"></i> Redo Image Action
-            </div>
-            
-            <div class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300 opacity-60 cursor-default">
-                <i data-lucide="clipboard" class="w-4 h-4"></i> Paste Enabled
             </div>
             
             <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
@@ -390,6 +376,41 @@
                 <i data-lucide="chevron-down" class="w-3 h-3 transition-transform" id="imageLayoutChevron"></i>
             </div>
             <div id="floatingLayoutOptions" class="hidden py-1 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mt-1"></div>
+
+            <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
+
+            <!-- Moved Theme Color Menu Item -->
+            <div id="themeColorToggleBtn" class="dropdown-item flex items-center justify-between gap-2 text-gray-700 dark:text-gray-300">
+                <div class="flex items-center gap-2"><i data-lucide="palette" class="w-4 h-4"></i> Theme Color</div>
+                <i data-lucide="chevron-down" class="w-3 h-3 transition-transform" id="themeColorChevron"></i>
+            </div>
+            <div id="floatingThemeColorOptions" class="hidden py-2 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mt-1 px-3">
+                <div class="flex flex-wrap items-center justify-end gap-2 mb-3">
+                    <div class="flex items-center gap-1">
+                        <button id="btnRandomColor" class="p-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-gray-400 hover:text-[#51b8cb] rounded-lg transition-all shadow-sm hover:border-gray-300 dark:hover:border-gray-600 outline-none" title="Generate Random Palette">
+                            <i data-lucide="shuffle" class="w-3 h-3"></i>
+                        </button>
+                        <div class="relative shrink-0 w-20">
+                            <button id="blendBtn" class="w-full px-2 py-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-[#51b8cb] text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group hover:border-gray-300 dark:hover:border-gray-600">
+                                <span class="text-gray-400">Blend</span>
+                                <span id="blendValueLabel">10%</span>
+                                <i data-lucide="chevron-down" class="w-3 h-3 text-gray-400 transition-transform group-hover:translate-y-0.5 shrink-0"></i>
+                            </button>
+                            <div id="blendDropdownMenu" class="hidden absolute right-0 mt-2 w-full bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[70] overflow-hidden">
+                                <div id="blendOptions" class="py-1"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="colorMap" class="mb-3 h-24 w-full relative cursor-crosshair border border-gray-200 dark:border-[#333] rounded-xl overflow-hidden bg-red-500">
+                    <div class="color-map-white absolute inset-0 bg-gradient-to-r from-white to-transparent"></div>
+                    <div class="color-map-black absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
+                    <div id="colorMarker" class="absolute w-4 h-4 border-2 border-white rounded-full shadow-sm pointer-events-none transform -translate-x-1/2 -translate-y-1/2" style="top: 20%; left: 80%;"></div>
+                </div>
+                <div class="px-1 mb-1">
+                    <input type="range" id="inputHue" min="0" max="360" value="189" class="w-full cursor-pointer">
+                </div>
+            </div>
 
             <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
             <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Other Cards</div>
@@ -537,7 +558,6 @@
                 e.stopPropagation(); 
                 const isHidden = menu.classList.contains('hidden');
                 closeAllDropdowns(); 
-                document.getElementById('toolbarColorDropdownMenu').classList.remove('hidden');
                 if (isHidden) menu.classList.remove('hidden'); 
             };
         }
@@ -581,12 +601,8 @@
         };
 
         function initFloatingMenu() {
-            const defSizes = [12, 14, 16, 18, 20, 24, 28, 32, 40, 48, 64, 80];
+            const defSizes = [24, 28, 32, 36, 40, 48, 64, 80];
             const titleSizes = [32, 36, 40, 48, 56, 64, 72, 80, 96, 120];
-            
-            const colorBtn = document.getElementById('toolbarColorBtn'), colorMenu = document.getElementById('toolbarColorDropdownMenu');
-            if (colorBtn) colorBtn.onclick = (e) => { e.stopPropagation(); const isHidden = colorMenu.classList.contains('hidden'); closeAllDropdowns(); if (isHidden) colorMenu.classList.remove('hidden'); };
-            if (colorMenu) { colorMenu.onmousedown = (e) => e.stopPropagation(); colorMenu.onclick = (e) => e.stopPropagation(); }
 
             const defMenu = document.getElementById('toolbarDefSizeDropdownMenu'), defBtn = document.getElementById('toolbarDefSizeBtn');
             if (defBtn) defBtn.onclick = (e) => { e.stopPropagation(); closeAllDropdowns(); defMenu.classList.toggle('hidden'); };
@@ -675,6 +691,23 @@
                 };
             }
 
+            // Setup Theme Color Toggle in Context Menu
+            const themeColorOptions = document.getElementById('floatingThemeColorOptions');
+            if (themeColorOptions) {
+                themeColorOptions.onmousedown = (e) => e.stopPropagation();
+                themeColorOptions.onclick = (e) => e.stopPropagation();
+            }
+
+            const themeColorToggleBtn = document.getElementById('themeColorToggleBtn');
+            if (themeColorToggleBtn) {
+                themeColorToggleBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    if (themeColorOptions) themeColorOptions.classList.toggle('hidden');
+                    const chevron = document.getElementById('themeColorChevron');
+                    if (chevron) chevron.classList.toggle('rotate-180');
+                };
+            }
+
             const undoImageBtn = document.getElementById('contextUndoImageBtn');
             if (undoImageBtn) {
                 undoImageBtn.onclick = (e) => {
@@ -741,6 +774,10 @@
                     if (layoutOptions) layoutOptions.classList.add('hidden');
                     const chevron = document.getElementById('imageLayoutChevron');
                     if (chevron) chevron.classList.remove('rotate-180');
+                    
+                    if (themeColorOptions) themeColorOptions.classList.add('hidden');
+                    const tChevron = document.getElementById('themeColorChevron');
+                    if (tChevron) tChevron.classList.remove('rotate-180');
                 }
             });
 
@@ -995,6 +1032,8 @@
 
         function initColorPicker() {
             const map = document.getElementById('colorMap'), hueSlider = document.getElementById('inputHue');
+            if (!map || !hueSlider) return;
+            
             hueSlider.addEventListener('input', (e) => { 
                 hue = e.target.value; 
                 map.style.backgroundColor = `hsl(${hue}, 100%, 50%)`; 
@@ -1051,14 +1090,17 @@
             saturation = forceSat !== null ? forceSat : hsb.s; 
             brightness = forceBri !== null ? forceBri : hsb.b;
             
-            const map = document.getElementById('colorMap'), rect = map.getBoundingClientRect();
-            const marker = document.getElementById('colorMarker');
-            if (marker) { 
-                marker.style.left = (saturation / 100) * (rect.width || 510) + 'px'; 
-                marker.style.top = (1 - brightness / 100) * (rect.height || 200) + 'px'; 
+            const map = document.getElementById('colorMap');
+            if (map) {
+                const rect = map.getBoundingClientRect();
+                const marker = document.getElementById('colorMarker');
+                if (marker) { 
+                    marker.style.left = (saturation / 100) * (rect.width || 510) + 'px'; 
+                    marker.style.top = (1 - brightness / 100) * (rect.height || 200) + 'px'; 
+                }
+                map.style.backgroundColor = `hsl(${hue}, 100%, 50%)`; 
             }
             const hS = document.getElementById('inputHue'); if (hS) hS.value = hue;
-            map.style.backgroundColor = `hsl(${hue}, 100%, 50%)`; 
             updatePreview();
         }
 
