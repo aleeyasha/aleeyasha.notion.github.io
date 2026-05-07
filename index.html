@@ -10,7 +10,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Notion">
     
-    <title>Notion</title>
+    <title>Notion Flashcards & Notes</title>
+    
     <!-- Dynamic Favicon & PWA Links -->
     <link id="favicon" rel="icon" type="image/svg+xml">
     <link id="apple-touch-icon" rel="apple-touch-icon">
@@ -20,17 +21,48 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    
     <style>
-        body { font-family: 'Poppins', sans-serif; background-color: #e8f6f8; color: #222222; overflow-x: hidden; transition: background-color 0.3s ease, color 0.3s ease; }
-        .dark body { background-color: #0f0f0f; color: #f1f1f1; }
-        .card-shadow { box-shadow: 0 20px 40px -10px rgba(81, 184, 203, 0.15), 0 0 15px rgba(0, 0, 0, 0.02); }
-        .dark .card-shadow { box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 0, 0, 0.2); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: #e8f6f8; 
+            color: #222222; 
+            overflow-x: hidden; 
+            transition: background-color 0.3s ease, color 0.3s ease; 
+        }
+        .dark body { 
+            background-color: #0f0f0f; 
+            color: #f1f1f1; 
+        }
+        
+        .card-shadow { 
+            box-shadow: 0 20px 40px -10px rgba(81, 184, 203, 0.15), 0 0 15px rgba(0, 0, 0, 0.02); 
+        }
+        .dark .card-shadow { 
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 0, 0, 0.2); 
+        }
+        
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
         
-        input, textarea, select { background-color: #FFFFFF !important; border-color: #d0ebf0 !important; color: #222222 !important; transition: all 0.3s ease !important; }
-        .dark input, .dark textarea, .dark select { background-color: #111 !important; border-color: #333 !important; color: #eee !important; }
-        input:focus, textarea:focus, select:focus { border-color: #51b8cb !important; box-shadow: 0 0 0 2px rgba(81, 184, 203, 0.15) !important; }
+        input, textarea, select { 
+            background-color: #FFFFFF !important; 
+            border-color: #d0ebf0 !important; 
+            color: #222222 !important; 
+            transition: all 0.3s ease !important; 
+        }
+        .dark input, .dark textarea, .dark select { 
+            background-color: #111 !important; 
+            border-color: #333 !important; 
+            color: #eee !important; 
+        }
+        input:focus, textarea:focus, select:focus { 
+            border-color: #51b8cb !important; 
+            box-shadow: 0 0 0 2px rgba(81, 184, 203, 0.15) !important; 
+        }
         
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -39,22 +71,44 @@
 
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]:focus { outline: none; }
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: #d0ebf0; border-radius: 3px; }
+        input[type=range]::-webkit-slider-runnable-track { 
+            width: 100%; height: 6px; cursor: pointer; background: #d0ebf0; border-radius: 3px; 
+        }
         .dark input[type=range]::-webkit-slider-runnable-track { background: #333; }
-        input[type=range]::-webkit-slider-thumb { height: 18px; width: 18px; border-radius: 50%; cursor: pointer; -webkit-appearance: none; margin-top: -6px; }
+        input[type=range]::-webkit-slider-thumb { 
+            height: 18px; width: 18px; border-radius: 50%; cursor: pointer; -webkit-appearance: none; margin-top: -6px; 
+        }
 
-        #inputHue { height: 12px; border-radius: 6px; background: linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%); margin: 15px 0; }
+        #inputHue { 
+            height: 12px; border-radius: 6px; 
+            background: linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%); 
+            margin: 15px 0; 
+        }
         #inputHue::-webkit-slider-runnable-track { background: transparent; height: 12px; }
-        #inputHue::-webkit-slider-thumb { height: 20px; width: 20px; border-radius: 50%; background: white; border: 3px solid #51b8cb; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; -webkit-appearance: none; margin-top: -4px; }
+        #inputHue::-webkit-slider-thumb { 
+            height: 20px; width: 20px; border-radius: 50%; background: white; 
+            border: 3px solid #51b8cb; box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            cursor: pointer; -webkit-appearance: none; margin-top: -4px; 
+        }
 
-        #colorMap { width: 100%; height: 200px; position: relative; cursor: crosshair; border-radius: 12px; overflow: hidden; background-color: red; border: 1px solid #d0ebf0; }
+        #colorMap { 
+            width: 100%; height: 200px; position: relative; cursor: crosshair; 
+            border-radius: 12px; overflow: hidden; background-color: red; border: 1px solid #d0ebf0; 
+        }
         .dark #colorMap { border-color: #333; }
         .color-map-white { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to right, #fff, rgba(255,255,255,0)); }
         .color-map-black { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, #000, rgba(0,0,0,0)); }
-        #colorMarker { position: absolute; width: 16px; height: 16px; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 0 1px rgba(0,0,0,0.2); pointer-events: none; transform: translate(-50%, -50%); }
+        #colorMarker { 
+            position: absolute; width: 16px; height: 16px; border: 3px solid white; 
+            border-radius: 50%; box-shadow: 0 0 0 1px rgba(0,0,0,0.2); 
+            pointer-events: none; transform: translate(-50%, -50%); 
+        }
 
-        #cardContainer, #notepadContainer { backface-visibility: hidden; -webkit-font-smoothing: antialiased; margin: 0 auto; transition: all 0.3s ease; }
-        .editor-scroll-area { max-height: calc(100vh - 8rem); lg:max-h-[75vh]; overflow-y: auto; scrollbar-gutter: stable; }
+        #cardContainer, #notepadContainer { 
+            backface-visibility: hidden; -webkit-font-smoothing: antialiased; 
+            margin: 0 auto; transition: all 0.3s ease; 
+        }
+        .editor-scroll-area { max-height: calc(100vh - 8rem); overflow-y: auto; scrollbar-gutter: stable; }
 
         #builderArea h2 { color: #222222 !important; }
         .dark #builderArea { background-color: #1a1a1a !important; border-color: #333 !important; }
@@ -62,24 +116,33 @@
         .dark .bg-\[\#FAFAFA\] { background-color: #111 !important; border-color: #333 !important; }
         .dark .bg-white { background-color: #1a1a1a !important; border-color: #333 !important; }
         
-        .np-title-input { font-family: 'Caveat', cursive !important; background: transparent !important; border: none !important; font-weight: 700; font-size: 24px; letter-spacing: 0.02em; width: 100%; box-shadow: none !important; padding: 0 !important; }
+        .np-title-input { 
+            font-family: 'Caveat', cursive !important; background: transparent !important; 
+            border: none !important; font-weight: 700; font-size: 24px; letter-spacing: 0.02em; 
+            width: 100%; box-shadow: none !important; padding: 0 !important; 
+        }
         @media (min-width: 768px) { .np-title-input { font-size: 28px; } }
         .dark .np-title-input { color: #eee; }
         .np-title-input:focus { outline: none; box-shadow: none !important; }
         
-        .dropdown-item { padding: 10px 16px; cursor: pointer; font-size: 11px; font-weight: 600; transition: all 0.2s; border-radius: 8px; margin: 0 4px; }
+        .dropdown-item { 
+            padding: 10px 16px; cursor: pointer; font-size: 11px; font-weight: 600; 
+            transition: all 0.2s; border-radius: 8px; margin: 0 4px; 
+        }
         .dropdown-item:hover { background-color: #e8f6f8; color: #51b8cb; }
         .dark .dropdown-item:hover { background-color: #333; }
 
         #brand-logo-container { cursor: pointer; }
 
-        /* Resizable Image Styling */
-        .resizable-img { cursor: ew-resize; user-select: none; -webkit-user-drag: none; transition: box-shadow 0.2s ease; }
+        .resizable-img { 
+            cursor: ew-resize; user-select: none; -webkit-user-drag: none; transition: box-shadow 0.2s ease; 
+        }
         .resizable-img:active { cursor: ew-resize; box-shadow: 0 0 0 4px rgba(172, 135, 102, 0.3); }
 
         /* Hand-drawn typography */
         #cardWord, #cardDef, #cardType { font-family: 'Caveat', cursive !important; }
         #cardDef, #note-area { tab-size: 4; -moz-tab-size: 4; }
+        .handdrawn-title { font-family: 'Caveat', cursive !important; }
 
         /* ContentEditable Placeholder Styling */
         [contenteditable]:empty:before {
@@ -94,13 +157,21 @@
 </head>
 <body class="relative min-h-screen">
 
-    <!-- Hidden inputs to maintain application state (Moved from deleted header) -->
+    <!-- Hidden inputs to maintain application state -->
     <input type="hidden" id="inputTitle" value="">
     <textarea id="inputDef" class="hidden"></textarea>
     <input type="file" id="imageInput" class="hidden" accept="image/*" multiple>
     <button id="btnInstallApp" class="hidden"></button>
 
     <div id="mainLayout" class="relative z-10 w-full flex flex-col items-center pt-8 md:pt-12 pb-10">
+        
+        <!-- App Logo / Title -->
+        <header class="w-full flex justify-center mb-6 md:mb-8 pointer-events-none select-none z-20">
+            <div onclick="openCardContextMenu(event)" class="pointer-events-auto cursor-pointer transition-all hover:scale-105" title="Open Card Menu">
+                <img src="image_c2e349.png" alt="aliyasa logo" class="h-10 md:h-14 object-contain drop-shadow-md" onerror="this.onerror=null; this.outerHTML='<h1 class=\'handdrawn-title text-4xl md:text-5xl font-bold tracking-wider\'><span class=\'text-gray-400\'>ali</span><span class=\'text-[#51b8cb]\'>yasa</span></h1>';">
+            </div>
+        </header>
+
         <main class="w-full px-3 md:px-4 flex justify-center">
             
             <!-- Main Preview Card -->
@@ -339,10 +410,79 @@
         let currentSelectedCategory = "-", currentSelectedSize = 32, currentSelectedDefSize = 24, currentImageBorder = 2, currentImageCols = 0, currentBlendPercentage = 10, deferredPrompt = null;
         let showTitlePlaceholder = true, showDefPlaceholder = true, activeImageIdx = -1;
         let isDraggingImage = false, dragStartX = 0, dragImageIdx = -1, dragStartScale = 100;
-        
         let imageUndoStack = [], imageRedoStack = [], isImageUndoingRedoing = false, stateBeforeDrag = null;
 
-        initColorPicker(); initBlendDropdown(); initFloatingMenu(); setupEventListeners(); initCards(); initNotepad();
+        window.openCardContextMenu = function(e) {
+            if (e.currentTarget && e.currentTarget.id === 'cardContainer') {
+                if (e.target.closest('#cardWord') || e.target.closest('#cardType') || e.target.closest('#cardDef') || e.target.closest('[id^="preview-wrapper-"]')) return;
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const deleteCardBtn = document.getElementById('contextDeleteCardBtn');
+            if (deleteCardBtn) {
+                if (cards.length <= 1) {
+                    deleteCardBtn.classList.add('opacity-50', 'pointer-events-none');
+                } else {
+                    deleteCardBtn.classList.remove('opacity-50', 'pointer-events-none');
+                }
+            }
+            
+            const undoImgBtn = document.getElementById('contextUndoImageBtn');
+            if (undoImgBtn) {
+                if (imageUndoStack.length === 0) undoImgBtn.classList.add('opacity-50', 'pointer-events-none');
+                else undoImgBtn.classList.remove('opacity-50', 'pointer-events-none');
+            }
+            const redoImgBtn = document.getElementById('contextRedoImageBtn');
+            if (redoImgBtn) {
+                if (imageRedoStack.length === 0) redoImgBtn.classList.add('opacity-50', 'pointer-events-none');
+                else redoImgBtn.classList.remove('opacity-50', 'pointer-events-none');
+            }
+
+            // Populate Other Cards
+            const cardsListContainer = document.getElementById('contextOtherCardsList');
+            if (cardsListContainer) {
+                cardsListContainer.innerHTML = '';
+                const otherCards = cards.filter(c => c.id !== activeCardId);
+                if (otherCards.length === 0) {
+                    const emptyItem = document.createElement('div');
+                    emptyItem.className = 'dropdown-item text-gray-400 dark:text-gray-500 italic cursor-default opacity-60';
+                    emptyItem.innerText = 'No other cards';
+                    cardsListContainer.appendChild(emptyItem);
+                } else {
+                    otherCards.forEach((c) => {
+                        const item = document.createElement('div');
+                        item.className = 'dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300';
+                        item.innerHTML = `<i data-lucide="layout-template" class="w-4 h-4"></i> <span class="truncate">${c.title.trim() || 'Card ' + (cards.indexOf(c) + 1)}</span>`;
+                        item.onclick = (evt) => {
+                            evt.stopPropagation();
+                            switchCard(c.id);
+                            document.getElementById('floatingPreviewMenu').classList.add('hidden');
+                        };
+                        cardsListContainer.appendChild(item);
+                    });
+                }
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            }
+
+            const menu = document.getElementById('floatingPreviewMenu');
+            menu.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                const rect = menu.getBoundingClientRect();
+                let x = e.clientX, y = e.clientY;
+                if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
+                if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
+                menu.style.left = x + 'px'; menu.style.top = y + 'px';
+            });
+        };
+
+        initColorPicker(); 
+        initBlendDropdown(); 
+        initFloatingMenu(); 
+        setupEventListeners(); 
+        initCards(); 
+        initNotepad();
+        
         if (typeof lucide !== 'undefined') lucide.createIcons();
         initPWA();
 
@@ -377,14 +517,22 @@
         });
 
         function initBlendDropdown() {
-            const container = document.getElementById('blendOptions'), menu = document.getElementById('blendDropdownMenu'), btn = document.getElementById('blendBtn');
+            const container = document.getElementById('blendOptions');
+            const menu = document.getElementById('blendDropdownMenu');
+            const btn = document.getElementById('blendBtn');
+            
             [0, 5, 10, 15, 20, 25, 30, 40, 50, 75, 100].forEach(b => {
                 const item = document.createElement('div');
                 item.className = 'dropdown-item text-gray-700 dark:text-gray-300';
                 item.innerText = b + '%';
-                item.onclick = (e) => { e.stopPropagation(); selectBlend(b); menu.classList.add('hidden'); };
+                item.onclick = (e) => { 
+                    e.stopPropagation(); 
+                    selectBlend(b); 
+                    menu.classList.add('hidden'); 
+                };
                 container.appendChild(item);
             });
+            
             btn.onclick = (e) => { 
                 e.stopPropagation(); 
                 const isHidden = menu.classList.contains('hidden');
@@ -394,7 +542,9 @@
             };
         }
 
-        function closeAllDropdowns() { document.querySelectorAll('[id$="DropdownMenu"]').forEach(el => el.classList.add('hidden')); }
+        function closeAllDropdowns() { 
+            document.querySelectorAll('[id$="DropdownMenu"]').forEach(el => el.classList.add('hidden')); 
+        }
         window.addEventListener('click', closeAllDropdowns);
 
         function showFloatingCategoryMenu(x, y) {
@@ -405,7 +555,8 @@
                 const rect = menu.getBoundingClientRect();
                 if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
                 if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
-                menu.style.left = x + 'px'; menu.style.top = y + 'px';
+                menu.style.left = x + 'px'; 
+                menu.style.top = y + 'px';
             });
         }
 
@@ -418,7 +569,8 @@
                 const rect = menu.getBoundingClientRect();
                 if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
                 if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
-                menu.style.left = x + 'px'; menu.style.top = y + 'px';
+                menu.style.left = x + 'px'; 
+                menu.style.top = y + 'px';
             });
         };
 
@@ -580,7 +732,9 @@
 
             window.addEventListener('click', () => { 
                 if(catMenu) catMenu.classList.add('hidden'); 
-                const imgM = document.getElementById('floatingImageBorderMenu'); if(imgM) imgM.classList.add('hidden');
+                const imgM = document.getElementById('floatingImageBorderMenu'); 
+                if(imgM) imgM.classList.add('hidden');
+                
                 const prevM = document.getElementById('floatingPreviewMenu'); 
                 if(prevM && !prevM.classList.contains('hidden')) {
                     prevM.classList.add('hidden');
@@ -590,80 +744,60 @@
                 }
             });
 
-            document.getElementById('cardContainer').addEventListener('contextmenu', (e) => {
-                if (e.target.closest('#cardWord') || e.target.closest('#cardType') || e.target.closest('#cardDef') || e.target.closest('[id^="preview-wrapper-"]')) return;
-                e.preventDefault();
-                
-                const deleteCardBtn = document.getElementById('contextDeleteCardBtn');
-                if (deleteCardBtn) {
-                    if (cards.length <= 1) {
-                        deleteCardBtn.classList.add('opacity-50', 'pointer-events-none');
-                    } else {
-                        deleteCardBtn.classList.remove('opacity-50', 'pointer-events-none');
-                    }
-                }
-                
-                const undoImgBtn = document.getElementById('contextUndoImageBtn');
-                if (undoImgBtn) {
-                    if (imageUndoStack.length === 0) undoImgBtn.classList.add('opacity-50', 'pointer-events-none');
-                    else undoImgBtn.classList.remove('opacity-50', 'pointer-events-none');
-                }
-                const redoImgBtn = document.getElementById('contextRedoImageBtn');
-                if (redoImgBtn) {
-                    if (imageRedoStack.length === 0) redoImgBtn.classList.add('opacity-50', 'pointer-events-none');
-                    else redoImgBtn.classList.remove('opacity-50', 'pointer-events-none');
-                }
-
-                // Populate Other Cards
-                const cardsListContainer = document.getElementById('contextOtherCardsList');
-                if (cardsListContainer) {
-                    cardsListContainer.innerHTML = '';
-                    const otherCards = cards.filter(c => c.id !== activeCardId);
-                    if (otherCards.length === 0) {
-                        const emptyItem = document.createElement('div');
-                        emptyItem.className = 'dropdown-item text-gray-400 dark:text-gray-500 italic cursor-default opacity-60';
-                        emptyItem.innerText = 'No other cards';
-                        cardsListContainer.appendChild(emptyItem);
-                    } else {
-                        otherCards.forEach((c) => {
-                            const item = document.createElement('div');
-                            item.className = 'dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300';
-                            item.innerHTML = `<i data-lucide="layout-template" class="w-4 h-4"></i> <span class="truncate">${c.title.trim() || 'Card ' + (cards.indexOf(c) + 1)}</span>`;
-                            item.onclick = (evt) => {
-                                evt.stopPropagation();
-                                switchCard(c.id);
-                                document.getElementById('floatingPreviewMenu').classList.add('hidden');
-                            };
-                            cardsListContainer.appendChild(item);
-                        });
-                    }
-                    if (typeof lucide !== 'undefined') lucide.createIcons();
-                }
-
-                const menu = document.getElementById('floatingPreviewMenu');
-                menu.classList.remove('hidden');
-                requestAnimationFrame(() => {
-                    const rect = menu.getBoundingClientRect();
-                    let x = e.clientX, y = e.clientY;
-                    if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
-                    if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
-                    menu.style.left = x + 'px'; menu.style.top = y + 'px';
-                });
-            });
+            document.getElementById('cardContainer').addEventListener('contextmenu', window.openCardContextMenu);
         }
 
-        function selectCategory(cat) { currentSelectedCategory = cat; if (cat !== '-' && categoryColors[cat]) setManualColor(categoryColors[cat]); updatePreview(); }
-        function selectTextSize(size) { currentSelectedSize = size; const label = document.getElementById('toolbarTitleSizeLabel'); if(label) label.innerText = size; updatePreview(); }
-        function selectDefSize(size) { currentSelectedDefSize = size; const label = document.getElementById('toolbarDefSizeLabel'); if(label) label.innerText = size; updatePreview(); }
+        function selectCategory(cat) { 
+            currentSelectedCategory = cat; 
+            if (cat !== '-' && categoryColors[cat]) setManualColor(categoryColors[cat]); 
+            updatePreview(); 
+        }
+        function selectTextSize(size) { 
+            currentSelectedSize = size; 
+            const label = document.getElementById('toolbarTitleSizeLabel'); 
+            if(label) label.innerText = size; 
+            updatePreview(); 
+        }
+        function selectDefSize(size) { 
+            currentSelectedDefSize = size; 
+            const label = document.getElementById('toolbarDefSizeLabel'); 
+            if(label) label.innerText = size; 
+            updatePreview(); 
+        }
         function selectImageBorder(border) { currentImageBorder = border; updatePreview(); }
         function selectImageCols(cols) { currentImageCols = cols; updatePreview(); }
-        function selectBlend(blend) { currentBlendPercentage = blend; document.getElementById('blendValueLabel').innerText = blend + '%'; updatePreview(); }
+        function selectBlend(blend) { 
+            currentBlendPercentage = blend; 
+            document.getElementById('blendValueLabel').innerText = blend + '%'; 
+            updatePreview(); 
+        }
 
-        window.clearTitle = function() { document.getElementById('inputTitle').value = ''; currentSelectedCategory = '-'; showTitlePlaceholder = false; updatePreview(); };
-        window.clearDef = function() { document.getElementById('inputDef').value = ''; showDefPlaceholder = false; updatePreview(); };
-        window.restoreTitle = function() { showTitlePlaceholder = true; updatePreview(); setTimeout(() => document.getElementById('cardWord').focus(), 50); };
-        window.restoreDef = function() { showDefPlaceholder = true; updatePreview(); setTimeout(() => document.getElementById('cardDef').focus(), 50); };
-        window.restoreCategory = function() { currentSelectedCategory = ''; updatePreview(); setTimeout(() => document.getElementById('cardType').focus(), 50); };
+        window.clearTitle = function() { 
+            document.getElementById('inputTitle').value = ''; 
+            currentSelectedCategory = '-'; 
+            showTitlePlaceholder = false; 
+            updatePreview(); 
+        };
+        window.clearDef = function() { 
+            document.getElementById('inputDef').value = ''; 
+            showDefPlaceholder = false; 
+            updatePreview(); 
+        };
+        window.restoreTitle = function() { 
+            showTitlePlaceholder = true; 
+            updatePreview(); 
+            setTimeout(() => document.getElementById('cardWord').focus(), 50); 
+        };
+        window.restoreDef = function() { 
+            showDefPlaceholder = true; 
+            updatePreview(); 
+            setTimeout(() => document.getElementById('cardDef').focus(), 50); 
+        };
+        window.restoreCategory = function() { 
+            currentSelectedCategory = ''; 
+            updatePreview(); 
+            setTimeout(() => document.getElementById('cardType').focus(), 50); 
+        };
 
         function getSelectionStyle(styleName) {
             const sel = window.getSelection(); if (!sel.rangeCount) return null;
@@ -700,20 +834,26 @@
             if (cmd === 'highlight') {
                 let bgStyle = getSelectionStyle('backgroundColor');
                 if (bgStyle && bgStyle !== 'transparent' && bgStyle !== 'rgba(0, 0, 0, 0)') {
-                    document.execCommand('hiliteColor', false, 'transparent'); removeStyleFromSelection('backgroundColor');
+                    document.execCommand('hiliteColor', false, 'transparent'); 
+                    removeStyleFromSelection('backgroundColor');
                 } else {
                     document.execCommand('hiliteColor', false, hexToRgba(activeColor, 0.4));
                 }
             } else if (cmd === 'textColor') {
                 let fStyle = getSelectionStyle('color'), activeRgbString = `rgb(${hexToRgb(activeColor).r},${hexToRgb(activeColor).g},${hexToRgb(activeColor).b})`;
                 if (fStyle && fStyle.replace(/\s/g, '').toLowerCase() === activeRgbString) {
-                    document.execCommand('foreColor', false, '#000000'); removeStyleFromSelection('color');
+                    document.execCommand('foreColor', false, '#000000'); 
+                    removeStyleFromSelection('color');
                 } else {
                     document.execCommand('foreColor', false, activeColor);
                 }
             } else document.execCommand(cmd, false, val);
-            document.getElementById('cardDef').focus(); document.getElementById('inputDef').value = document.getElementById('cardDef').innerHTML;
-            showDefPlaceholder = true; syncCardState(); checkFormatState();
+            
+            document.getElementById('cardDef').focus(); 
+            document.getElementById('inputDef').value = document.getElementById('cardDef').innerHTML;
+            showDefPlaceholder = true; 
+            syncCardState(); 
+            checkFormatState();
         };
 
         function checkFormatState() {
@@ -721,24 +861,61 @@
             const isBold = document.queryCommandState('bold');
             let bgStyle = getSelectionStyle('backgroundColor'), isHighlighted = bgStyle && bgStyle !== 'transparent' && bgStyle !== 'rgba(0, 0, 0, 0)';
             let fStyle = getSelectionStyle('color'), isColored = fStyle && fStyle.replace(/\s/g, '').toLowerCase() === `rgb(${hexToRgb(activeColor).r},${hexToRgb(activeColor).g},${hexToRgb(activeColor).b})`;
+            
             const b = document.getElementById('btnFormatBold'), h = document.getElementById('btnFormatHighlight'), c = document.getElementById('btnFormatColor');
-            if (b) { b.classList.toggle('text-[#51b8cb]', isBold); b.classList.toggle('text-gray-500', !isBold); b.classList.toggle('bg-[#e8f6f8]', isBold); b.classList.toggle('dark:bg-[#333]', isBold); }
-            if (h) { h.classList.toggle('text-[#51b8cb]', isHighlighted); h.classList.toggle('text-gray-500', !isHighlighted); h.classList.toggle('bg-[#e8f6f8]', isHighlighted); h.classList.toggle('dark:bg-[#333]', isHighlighted); }
-            if (c) { c.classList.toggle('text-[#51b8cb]', isColored); c.classList.toggle('text-gray-500', !isColored); c.classList.toggle('bg-[#e8f6f8]', isColored); c.classList.toggle('dark:bg-[#333]', isColored); }
+            if (b) { 
+                b.classList.toggle('text-[#51b8cb]', isBold); 
+                b.classList.toggle('text-gray-500', !isBold); 
+                b.classList.toggle('bg-[#e8f6f8]', isBold); 
+                b.classList.toggle('dark:bg-[#333]', isBold); 
+            }
+            if (h) { 
+                h.classList.toggle('text-[#51b8cb]', isHighlighted); 
+                h.classList.toggle('text-gray-500', !isHighlighted); 
+                h.classList.toggle('bg-[#e8f6f8]', isHighlighted); 
+                h.classList.toggle('dark:bg-[#333]', isHighlighted); 
+            }
+            if (c) { 
+                c.classList.toggle('text-[#51b8cb]', isColored); 
+                c.classList.toggle('text-gray-500', !isColored); 
+                c.classList.toggle('bg-[#e8f6f8]', isColored); 
+                c.classList.toggle('dark:bg-[#333]', isColored); 
+            }
         }
 
         function setupEventListeners() {
             document.getElementById('imageInput').addEventListener('change', handleImageUpload);
+            
             document.addEventListener('selectionchange', () => { 
                 if (document.activeElement === document.getElementById('cardDef')) checkFormatState(); 
             });
-            document.getElementById('cardWord').addEventListener('input', (e) => { document.getElementById('inputTitle').value = e.target.innerText; showTitlePlaceholder = true; syncCardState(); });
+            
+            document.getElementById('cardWord').addEventListener('input', (e) => { 
+                document.getElementById('inputTitle').value = e.target.innerText; 
+                showTitlePlaceholder = true; 
+                syncCardState(); 
+            });
+            
             const cardTypeEl = document.getElementById('cardType');
-            cardTypeEl.addEventListener('input', (e) => { const val = e.target.innerText.trim(); currentSelectedCategory = val || '-'; if (categoryColors[val]) setManualColor(categoryColors[val]); syncCardState(); });
-            cardTypeEl.addEventListener('blur', (e) => { if (!e.target.innerText.trim()) { currentSelectedCategory = '-'; updatePreview(); } });
+            cardTypeEl.addEventListener('input', (e) => { 
+                const val = e.target.innerText.trim(); 
+                currentSelectedCategory = val || '-'; 
+                if (categoryColors[val]) setManualColor(categoryColors[val]); 
+                syncCardState(); 
+            });
+            cardTypeEl.addEventListener('blur', (e) => { 
+                if (!e.target.innerText.trim()) { 
+                    currentSelectedCategory = '-'; 
+                    updatePreview(); 
+                } 
+            });
             
             const cardDefEl = document.getElementById('cardDef');
-            cardDefEl.addEventListener('input', (e) => { document.getElementById('inputDef').value = e.target.innerHTML; showDefPlaceholder = true; syncCardState(); });
+            cardDefEl.addEventListener('input', (e) => { 
+                document.getElementById('inputDef').value = e.target.innerHTML; 
+                showDefPlaceholder = true; 
+                syncCardState(); 
+            });
             cardDefEl.addEventListener('keydown', (e) => {
                 if (e.key === 'Tab') {
                     e.preventDefault();
@@ -746,11 +923,43 @@
                 }
             });
 
-            document.getElementById('btnRandomColor').addEventListener('click', () => { setManualColor('#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')); });
-            document.addEventListener('paste', (event) => { const items = (event.clipboardData || event.originalEvent.clipboardData).items; for (let index in items) { if (items[index].kind === 'file' && items[index].type.includes('image')) processFile(items[index].getAsFile()); } });
-            window.addEventListener('mousemove', handleImageResizeMove); window.addEventListener('mouseup', handleImageResizeEnd); window.addEventListener('touchmove', handleImageResizeMove, { passive: false }); window.addEventListener('touchend', handleImageResizeEnd);
-            window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; const b = document.getElementById('btnInstallApp'); if (b) { b.classList.remove('hidden'); b.classList.add('flex'); } });
-            document.getElementById('btnInstallApp').addEventListener('click', async () => { if (deferredPrompt) { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; const b = document.getElementById('btnInstallApp'); b.classList.add('hidden'); b.classList.remove('flex'); } });
+            document.getElementById('btnRandomColor').addEventListener('click', () => { 
+                setManualColor('#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')); 
+            });
+            
+            document.addEventListener('paste', (event) => { 
+                const items = (event.clipboardData || event.originalEvent.clipboardData).items; 
+                for (let index in items) { 
+                    if (items[index].kind === 'file' && items[index].type.includes('image')) {
+                        processFile(items[index].getAsFile()); 
+                    }
+                } 
+            });
+            
+            window.addEventListener('mousemove', handleImageResizeMove); 
+            window.addEventListener('mouseup', handleImageResizeEnd); 
+            window.addEventListener('touchmove', handleImageResizeMove, { passive: false }); 
+            window.addEventListener('touchend', handleImageResizeEnd);
+            
+            window.addEventListener('beforeinstallprompt', (e) => { 
+                e.preventDefault(); 
+                deferredPrompt = e; 
+                const b = document.getElementById('btnInstallApp'); 
+                if (b) { 
+                    b.classList.remove('hidden'); 
+                    b.classList.add('flex'); 
+                } 
+            });
+            document.getElementById('btnInstallApp').addEventListener('click', async () => { 
+                if (deferredPrompt) { 
+                    deferredPrompt.prompt(); 
+                    await deferredPrompt.userChoice; 
+                    deferredPrompt = null; 
+                    const b = document.getElementById('btnInstallApp'); 
+                    b.classList.add('hidden'); 
+                    b.classList.remove('flex'); 
+                } 
+            });
         }
 
         function handleImageResizeStart(e, idx) { 
@@ -761,7 +970,18 @@
             dragStartScale = uploadedImages[idx].scale; 
             if (e.type === 'mousedown') e.preventDefault(); 
         }
-        function handleImageResizeMove(e) { if (!isDraggingImage || dragImageIdx === -1) return; const currentX = (e.type === 'touchmove') ? e.touches[0].clientX : e.clientX, deltaX = currentX - dragStartX; let newScale = Math.max(10, Math.min(200, dragStartScale + (deltaX * 0.5))); uploadedImages[dragImageIdx].scale = newScale; const w = document.getElementById(`preview-wrapper-${dragImageIdx}`); if (w) w.style.width = newScale + '%'; if (e.type === 'touchmove') e.preventDefault(); }
+        
+        function handleImageResizeMove(e) { 
+            if (!isDraggingImage || dragImageIdx === -1) return; 
+            const currentX = (e.type === 'touchmove') ? e.touches[0].clientX : e.clientX;
+            const deltaX = currentX - dragStartX; 
+            let newScale = Math.max(10, Math.min(200, dragStartScale + (deltaX * 0.5))); 
+            uploadedImages[dragImageIdx].scale = newScale; 
+            const w = document.getElementById(`preview-wrapper-${dragImageIdx}`); 
+            if (w) w.style.width = newScale + '%'; 
+            if (e.type === 'touchmove') e.preventDefault(); 
+        }
+        
         function handleImageResizeEnd() { 
             if (isDraggingImage) { 
                 if (dragImageIdx !== -1 && uploadedImages[dragImageIdx].scale !== dragStartScale) {
@@ -775,34 +995,92 @@
 
         function initColorPicker() {
             const map = document.getElementById('colorMap'), hueSlider = document.getElementById('inputHue');
-            hueSlider.addEventListener('input', (e) => { hue = e.target.value; map.style.backgroundColor = `hsl(${hue}, 100%, 50%)`; calculateActiveColor(); });
+            hueSlider.addEventListener('input', (e) => { 
+                hue = e.target.value; 
+                map.style.backgroundColor = `hsl(${hue}, 100%, 50%)`; 
+                calculateActiveColor(); 
+            });
+            
             const handleMapSelection = (e) => {
-                const rect = map.getBoundingClientRect(); let x = (e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0)) - rect.left, y = (e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0)) - rect.top;
-                x = Math.max(0, Math.min(x, rect.width)); y = Math.max(0, Math.min(y, rect.height));
-                saturation = (x / rect.width) * 100; brightness = 100 - (y / rect.height) * 100;
-                document.getElementById('colorMarker').style.left = x + 'px'; document.getElementById('colorMarker').style.top = y + 'px'; calculateActiveColor();
+                const rect = map.getBoundingClientRect(); 
+                let x = (e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0)) - rect.left;
+                let y = (e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0)) - rect.top;
+                
+                x = Math.max(0, Math.min(x, rect.width)); 
+                y = Math.max(0, Math.min(y, rect.height));
+                
+                saturation = (x / rect.width) * 100; 
+                brightness = 100 - (y / rect.height) * 100;
+                
+                document.getElementById('colorMarker').style.left = x + 'px'; 
+                document.getElementById('colorMarker').style.top = y + 'px'; 
+                calculateActiveColor();
             };
-            map.addEventListener('mousedown', (e) => { handleMapSelection(e); const onMouseMove = (moveEvent) => handleMapSelection(moveEvent), onMouseUp = () => { document.removeEventListener('mousemove', onMouseMove); document.removeEventListener('mouseup', onMouseUp); }; document.addEventListener('mousemove', onMouseMove); document.addEventListener('mouseup', onMouseUp); });
+            
+            map.addEventListener('mousedown', (e) => { 
+                handleMapSelection(e); 
+                const onMouseMove = (moveEvent) => handleMapSelection(moveEvent);
+                const onMouseUp = () => { 
+                    document.removeEventListener('mousemove', onMouseMove); 
+                    document.removeEventListener('mouseup', onMouseUp); 
+                }; 
+                document.addEventListener('mousemove', onMouseMove); 
+                document.addEventListener('mouseup', onMouseUp); 
+            });
         }
 
         function calculateActiveColor() {
             const s = saturation / 100, v = brightness / 100, i = Math.floor(hue / 60), f = hue / 60 - i, p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s);
-            let r, g, b; switch(i % 6) { case 0: r = v, g = t, b = p; break; case 1: r = q, g = v, b = p; break; case 2: r = p, g = v, b = t; break; case 3: r = p, g = q, b = v; break; case 4: r = t, g = p, b = v; break; case 5: r = v, g = p, b = q; break; }
-            activeColor = rgbToHex(Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)); updatePreview();
+            let r, g, b; 
+            switch(i % 6) { 
+                case 0: r = v, g = t, b = p; break; 
+                case 1: r = q, g = v, b = p; break; 
+                case 2: r = p, g = v, b = t; break; 
+                case 3: r = p, g = q, b = v; break; 
+                case 4: r = t, g = p, b = v; break; 
+                case 5: r = v, g = p, b = q; break; 
+            }
+            activeColor = rgbToHex(Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)); 
+            updatePreview();
         }
 
         function setManualColor(hex, forceHue=null, forceSat=null, forceBri=null) {
-            activeColor = hex; const rgb = hexToRgb(hex), hsb = rgbToHsb(rgb.r, rgb.g, rgb.b); hue = forceHue !== null ? forceHue : hsb.h; saturation = forceSat !== null ? forceSat : hsb.s; brightness = forceBri !== null ? forceBri : hsb.b;
+            activeColor = hex; 
+            const rgb = hexToRgb(hex), hsb = rgbToHsb(rgb.r, rgb.g, rgb.b); 
+            hue = forceHue !== null ? forceHue : hsb.h; 
+            saturation = forceSat !== null ? forceSat : hsb.s; 
+            brightness = forceBri !== null ? forceBri : hsb.b;
+            
             const map = document.getElementById('colorMap'), rect = map.getBoundingClientRect();
             const marker = document.getElementById('colorMarker');
-            if (marker) { marker.style.left = (saturation / 100) * (rect.width || 510) + 'px'; marker.style.top = (1 - brightness / 100) * (rect.height || 200) + 'px'; }
+            if (marker) { 
+                marker.style.left = (saturation / 100) * (rect.width || 510) + 'px'; 
+                marker.style.top = (1 - brightness / 100) * (rect.height || 200) + 'px'; 
+            }
             const hS = document.getElementById('inputHue'); if (hS) hS.value = hue;
-            map.style.backgroundColor = `hsl(${hue}, 100%, 50%)`; updatePreview();
+            map.style.backgroundColor = `hsl(${hue}, 100%, 50%)`; 
+            updatePreview();
         }
 
         function rgbToHex(r, g, b) { return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase(); }
         function hexToRgb(hex) { const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex); return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : {r:0,g:0,b:0}; }
-        function rgbToHsb(r, g, b) { r /= 255; g /= 255; b /= 255; const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min; let h, s, v = max; s = max === 0 ? 0 : d / max; if (max === min) h = 0; else { switch(max) { case r: h = (g - b) / d + (g < b ? 6 : 0); break; case g: h = (b - r) / d + 2; break; case b: h = (r - g) / d + 4; break; } h /= 6; } return { h: h * 360, s: s * 100, b: v * 100 }; }
+        function rgbToHsb(r, g, b) { 
+            r /= 255; g /= 255; b /= 255; 
+            const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min; 
+            let h, s, v = max; 
+            s = max === 0 ? 0 : d / max; 
+            if (max === min) h = 0; 
+            else { 
+                switch(max) { 
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break; 
+                    case g: h = (b - r) / d + 2; break; 
+                    case b: h = (r - g) / d + 4; break; 
+                } 
+                h /= 6; 
+            } 
+            return { h: h * 360, s: s * 100, b: v * 100 }; 
+        }
+
         function handleImageUpload(e) { Array.from(e.target.files).forEach(processFile); e.target.value = ''; }
         function processFile(file) { 
             const reader = new FileReader(); 
@@ -832,10 +1110,28 @@
             uploadedImages.splice(idx, 1); 
             updatePreview(); 
         }
-        function getLightShade(hex, blendPercentage) { const rgb = hexToRgb(hex), factor = blendPercentage / 100, r = Math.round(255 - (255 - rgb.r) * factor), g = Math.round(255 - (255 - rgb.g) * factor), b = Math.round(255 - (255 - rgb.b) * factor); return `rgb(${r}, ${g}, ${b})`; }
+        
+        function getLightShade(hex, blendPercentage) { 
+            const rgb = hexToRgb(hex), factor = blendPercentage / 100, 
+            r = Math.round(255 - (255 - rgb.r) * factor), 
+            g = Math.round(255 - (255 - rgb.g) * factor), 
+            b = Math.round(255 - (255 - rgb.b) * factor); 
+            return `rgb(${r}, ${g}, ${b})`; 
+        }
         function hexToRgba(hex, alpha) { const rgb = hexToRgb(hex); return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`; }
+        
         function initCards() { createCard(); }
-        function createCard() { const newCard = { id: 'card_' + Date.now() + Math.random().toString(36).substr(2, 9), title: '', category: '-', definition: '', images: [], color: { hex: "#51b8cb", hue: 189, sat: 60, bri: 80 }, textSize: 32, defSize: 24, imageBorder: 2, imageCols: 0, blend: 10, showTitlePlaceholder: true, showDefPlaceholder: false }; cards.push(newCard); switchCard(newCard.id); }
+        function createCard() { 
+            const newCard = { 
+                id: 'card_' + Date.now() + Math.random().toString(36).substr(2, 9), 
+                title: '', category: '-', definition: '', images: [], 
+                color: { hex: "#51b8cb", hue: 189, sat: 60, bri: 80 }, 
+                textSize: 32, defSize: 24, imageBorder: 2, imageCols: 0, blend: 10, 
+                showTitlePlaceholder: true, showDefPlaceholder: false 
+            }; 
+            cards.push(newCard); 
+            switchCard(newCard.id); 
+        }
         function switchCard(id) { activeCardId = id; loadCurrentCard(); }
         function loadCurrentCard() { 
             isSwitching = true; 
@@ -845,31 +1141,100 @@
             imageUndoStack = [];
             imageRedoStack = [];
             
-            document.getElementById('inputTitle').value = card.title; showTitlePlaceholder = card.showTitlePlaceholder !== false; showDefPlaceholder = card.showDefPlaceholder !== false; selectCategory(card.category || "-"); selectTextSize(card.textSize || 32); selectDefSize(card.defSize || 24); currentImageBorder = card.imageBorder || 2; selectImageCols(card.imageCols || 0); const sL = document.getElementById('toolbarDefSizeLabel'); if (sL) sL.innerText = card.defSize || 24; const tL = document.getElementById('toolbarTitleSizeLabel'); if (tL) tL.innerText = card.textSize || 32; currentBlendPercentage = card.blend !== undefined ? card.blend : 10; document.getElementById('blendValueLabel').innerText = currentBlendPercentage + '%'; document.getElementById('inputDef').value = card.definition; uploadedImages = [...card.images]; activeColor = card.color.hex; hue = card.color.hue; saturation = card.color.sat; brightness = card.color.bri; setManualColor(activeColor, hue, saturation, brightness); isSwitching = false; 
+            document.getElementById('inputTitle').value = card.title; 
+            showTitlePlaceholder = card.showTitlePlaceholder !== false; 
+            showDefPlaceholder = card.showDefPlaceholder !== false; 
+            selectCategory(card.category || "-"); 
+            selectTextSize(card.textSize || 32); 
+            selectDefSize(card.defSize || 24); 
+            currentImageBorder = card.imageBorder || 2; 
+            selectImageCols(card.imageCols || 0); 
+            
+            const sL = document.getElementById('toolbarDefSizeLabel'); if (sL) sL.innerText = card.defSize || 24; 
+            const tL = document.getElementById('toolbarTitleSizeLabel'); if (tL) tL.innerText = card.textSize || 32; 
+            
+            currentBlendPercentage = card.blend !== undefined ? card.blend : 10; 
+            document.getElementById('blendValueLabel').innerText = currentBlendPercentage + '%'; 
+            document.getElementById('inputDef').value = card.definition; 
+            uploadedImages = [...card.images]; 
+            activeColor = card.color.hex; 
+            hue = card.color.hue; saturation = card.color.sat; brightness = card.color.bri; 
+            
+            setManualColor(activeColor, hue, saturation, brightness); 
+            isSwitching = false; 
         }
-        function syncCardState() { if (!activeCardId || isSwitching) return; const card = cards.find(c => c.id === activeCardId); if (!card) return; card.title = document.getElementById('inputTitle').value; card.category = currentSelectedCategory; card.definition = document.getElementById('inputDef').value; card.images = [...uploadedImages]; card.color = { hex: activeColor, hue: hue, sat: saturation, bri: brightness }; card.textSize = currentSelectedSize; card.defSize = currentSelectedDefSize; card.imageBorder = currentImageBorder; card.imageCols = currentImageCols; card.blend = currentBlendPercentage; card.showTitlePlaceholder = showTitlePlaceholder; card.showDefPlaceholder = showDefPlaceholder; }
+        
+        function syncCardState() { 
+            if (!activeCardId || isSwitching) return; 
+            const card = cards.find(c => c.id === activeCardId); 
+            if (!card) return; 
+            
+            card.title = document.getElementById('inputTitle').value; 
+            card.category = currentSelectedCategory; 
+            card.definition = document.getElementById('inputDef').value; 
+            card.images = [...uploadedImages]; 
+            card.color = { hex: activeColor, hue: hue, sat: saturation, bri: brightness }; 
+            card.textSize = currentSelectedSize; 
+            card.defSize = currentSelectedDefSize; 
+            card.imageBorder = currentImageBorder; 
+            card.imageCols = currentImageCols; 
+            card.blend = currentBlendPercentage; 
+            card.showTitlePlaceholder = showTitlePlaceholder; 
+            card.showDefPlaceholder = showDefPlaceholder; 
+        }
 
         function updatePreview() {
             const finalColor = activeColor, textColor = getDarkerShade(finalColor, 0.4), blend = currentBlendPercentage, textSize = currentSelectedSize, defSize = currentSelectedDefSize, imgBorder = currentImageBorder, imageCols = currentImageCols;
+            
             const bVL = document.getElementById('blendValueLabel'); if (bVL) bVL.style.color = finalColor;
-            const card = document.getElementById('cardContainer'); card.style.borderColor = finalColor; card.style.backgroundColor = getLightShade(finalColor, blend);
+            const card = document.getElementById('cardContainer'); 
+            card.style.borderColor = finalColor; card.style.backgroundColor = getLightShade(finalColor, blend);
+            
             const notepad = document.getElementById('notepadContainer'); if (notepad) notepad.style.borderColor = finalColor;
             
-            const dlBtn = document.getElementById('cardDownloadBtn'); if (dlBtn) { dlBtn.style.color = finalColor; dlBtn.style.border = `2px solid ${finalColor}`; }
-            const switchPrvBtn = document.getElementById('switchToPreviewBtn'); if (switchPrvBtn) { switchPrvBtn.style.color = finalColor; switchPrvBtn.style.borderColor = finalColor; }
+            const dlBtn = document.getElementById('cardDownloadBtn'); 
+            if (dlBtn) { dlBtn.style.color = finalColor; dlBtn.style.border = `2px solid ${finalColor}`; }
+            
+            const switchPrvBtn = document.getElementById('switchToPreviewBtn'); 
+            if (switchPrvBtn) { switchPrvBtn.style.color = finalColor; switchPrvBtn.style.borderColor = finalColor; }
 
-            const word = document.getElementById('cardWord'); word.style.color = textColor; word.style.fontSize = textSize + 'px'; if (word.innerText !== document.getElementById('inputTitle').value) word.innerText = document.getElementById('inputTitle').value;
+            const word = document.getElementById('cardWord'); 
+            word.style.color = textColor; word.style.fontSize = textSize + 'px'; 
+            if (word.innerText !== document.getElementById('inputTitle').value) word.innerText = document.getElementById('inputTitle').value;
+            
             const type = document.getElementById('cardType'), addCatBtn = document.getElementById('addCategoryBtn');
-            if (currentSelectedCategory !== '-') { type.style.backgroundColor = hexToRgba(finalColor, 0.15); type.style.color = textColor; if (type.innerText !== currentSelectedCategory) type.innerText = currentSelectedCategory; type.classList.remove('hidden'); addCatBtn.classList.add('hidden'); }
-            else { type.innerText = ''; type.classList.add('hidden'); addCatBtn.classList.remove('hidden'); }
+            if (currentSelectedCategory !== '-') { 
+                type.style.backgroundColor = hexToRgba(finalColor, 0.15); type.style.color = textColor; 
+                if (type.innerText !== currentSelectedCategory) type.innerText = currentSelectedCategory; 
+                type.classList.remove('hidden'); addCatBtn.classList.add('hidden'); 
+            } else { 
+                type.innerText = ''; type.classList.add('hidden'); addCatBtn.classList.remove('hidden'); 
+            }
+            
             const titleS = document.getElementById('cardTitleSection'), titleR = document.getElementById('cardTitleRestore');
-            if (!document.getElementById('inputTitle').value.trim() && !showTitlePlaceholder && (currentSelectedCategory === '-' || !currentSelectedCategory.trim())) { titleS.classList.add('hidden'); titleR.classList.remove('hidden'); } else { titleS.classList.remove('hidden'); titleR.classList.add('hidden'); }
+            if (!document.getElementById('inputTitle').value.trim() && !showTitlePlaceholder && (currentSelectedCategory === '-' || !currentSelectedCategory.trim())) { 
+                titleS.classList.add('hidden'); titleR.classList.remove('hidden'); 
+            } else { 
+                titleS.classList.remove('hidden'); titleR.classList.add('hidden'); 
+            }
+            
             const notesS = document.getElementById('cardNotesSection'), notesR = document.getElementById('cardDefRestore');
-            if (document.getElementById('inputDef').value.trim() || showDefPlaceholder) { notesS.classList.remove('hidden'); notesR.classList.add('hidden'); const cD = document.getElementById('cardDef'); cD.style.color = textColor; cD.style.fontSize = defSize + 'px'; if (cD.innerHTML !== document.getElementById('inputDef').value) cD.innerHTML = document.getElementById('inputDef').value; }
-            else { notesS.classList.add('hidden'); notesR.classList.remove('hidden'); }
+            if (document.getElementById('inputDef').value.trim() || showDefPlaceholder) { 
+                notesS.classList.remove('hidden'); notesR.classList.add('hidden'); 
+                const cD = document.getElementById('cardDef'); cD.style.color = textColor; cD.style.fontSize = defSize + 'px'; 
+                if (cD.innerHTML !== document.getElementById('inputDef').value) cD.innerHTML = document.getElementById('inputDef').value; 
+            } else { 
+                notesS.classList.add('hidden'); notesR.classList.remove('hidden'); 
+            }
+            
             const cardImages = document.getElementById('cardImagesContainer');
-            if (imageCols === 0) { cardImages.className = `flex flex-wrap gap-4 md:gap-9 w-full justify-center`; cardImages.style.gridTemplateColumns = ''; } else { cardImages.className = `grid gap-4 md:gap-9 w-full items-start`; cardImages.style.gridTemplateColumns = `repeat(${imageCols}, minmax(0, 1fr))`; }
+            if (imageCols === 0) { 
+                cardImages.className = `flex flex-wrap gap-4 md:gap-9 w-full justify-center`; cardImages.style.gridTemplateColumns = ''; 
+            } else { 
+                cardImages.className = `grid gap-4 md:gap-9 w-full items-start`; cardImages.style.gridTemplateColumns = `repeat(${imageCols}, minmax(0, 1fr))`; 
+            }
             cardImages.style.paddingTop = uploadedImages.length > 0 ? '3rem' : '0px'; cardImages.innerHTML = '';
+            
             uploadedImages.forEach((imgObj, idx) => {
                 const wrapper = document.createElement('div'); wrapper.id = `preview-wrapper-${idx}`; wrapper.className = "relative group/imgwrapper mx-auto block"; wrapper.style.width = `${imgObj.scale}%`;
                 const img = document.createElement('img'); img.src = imgObj.src; img.className = "resizable-img h-auto object-cover rounded-[1.5rem] shadow-sm block w-full";
@@ -877,10 +1242,21 @@
                 img.onmousedown = (e) => handleImageResizeStart(e, idx); img.ontouchstart = (e) => handleImageResizeStart(e, idx);
                 img.oncontextmenu = (e) => { e.preventDefault(); activeImageIdx = idx; showFloatingImageBorderMenu(e.clientX, e.clientY); };
                 const moveControls = document.createElement('div'); moveControls.className = "absolute -top-3 -left-3 flex gap-1.5 z-10 hidden-in-export opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all";
-                if (idx > 0) { const lB = document.createElement('button'); lB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] md:w-[32px] md:h-[32px] outline-none p-0"; lB.style.color = finalColor; lB.style.border = `2px solid ${finalColor}`; lB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 md:w-5 md:h-5"><path d="M15 18l-6-6 6-6"/></svg>`; lB.onclick = (e) => { e.stopPropagation(); moveImageLeft(idx); }; moveControls.appendChild(lB); }
-                if (idx < uploadedImages.length - 1) { const rB = document.createElement('button'); rB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] md:w-[32px] md:h-[32px] outline-none p-0"; rB.style.color = finalColor; rB.style.border = `2px solid ${finalColor}`; rB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 md:w-5 md:h-5"><path d="M9 18l6-6-6-6"/></svg>`; rB.onclick = (e) => { e.stopPropagation(); moveImageRight(idx); }; moveControls.appendChild(rB); }
-                const delBtn = document.createElement('button'); delBtn.className = "absolute -top-3 -right-3 opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all z-10 hidden-in-export flex items-center justify-center hover:scale-110 outline-none p-0 bg-transparent border-none w-[28px] h-[28px] md:w-[32px] md:h-[32px]"; delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-full h-full drop-shadow-md"><defs><linearGradient id="delGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ff3333" /><stop offset="100%" stop-color="#cc0000" /></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#delGrad)" stroke="#990000" stroke-width="0.5" /><path d="M8 8 L16 16 M16 8 L8 16" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" /></svg>`; delBtn.onclick = (e) => { e.stopPropagation(); removeImage(idx); };
-                wrapper.appendChild(img); if (moveControls.children.length > 0) wrapper.appendChild(moveControls); wrapper.appendChild(delBtn); cardImages.appendChild(wrapper);
+                if (idx > 0) { 
+                    const lB = document.createElement('button'); lB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] md:w-[32px] md:h-[32px] outline-none p-0"; lB.style.color = finalColor; lB.style.border = `2px solid ${finalColor}`; lB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 md:w-5 md:h-5"><path d="M15 18l-6-6 6-6"/></svg>`; 
+                    lB.onclick = (e) => { e.stopPropagation(); moveImageLeft(idx); }; 
+                    moveControls.appendChild(lB); 
+                }
+                if (idx < uploadedImages.length - 1) { 
+                    const rB = document.createElement('button'); rB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] md:w-[32px] md:h-[32px] outline-none p-0"; rB.style.color = finalColor; rB.style.border = `2px solid ${finalColor}`; rB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 md:w-5 md:h-5"><path d="M9 18l6-6-6-6"/></svg>`; 
+                    rB.onclick = (e) => { e.stopPropagation(); moveImageRight(idx); }; 
+                    moveControls.appendChild(rB); 
+                }
+                const delBtn = document.createElement('button'); delBtn.className = "absolute -top-3 -right-3 opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all z-10 hidden-in-export flex items-center justify-center hover:scale-110 outline-none p-0 bg-transparent border-none w-[28px] h-[28px] md:w-[32px] md:h-[32px]"; delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-full h-full drop-shadow-md"><defs><linearGradient id="delGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ff3333" /><stop offset="100%" stop-color="#cc0000" /></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#delGrad)" stroke="#990000" stroke-width="0.5" /><path d="M8 8 L16 16 M16 8 L8 16" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" /></svg>`; 
+                delBtn.onclick = (e) => { e.stopPropagation(); removeImage(idx); };
+                wrapper.appendChild(img); 
+                if (moveControls.children.length > 0) wrapper.appendChild(moveControls); 
+                wrapper.appendChild(delBtn); cardImages.appendChild(wrapper);
             });
             updateFavicon(); updateBrandLogo();
             document.getElementById('dynamic-card-styles').innerHTML = `input[type=range]::-webkit-slider-thumb { background: white !important; border: 3px solid ${finalColor} !important; box-shadow: 0 0 10px ${finalColor}66 !important; } #cardWord, #cardDef, #cardType { text-decoration: none !important; }`;
@@ -888,11 +1264,37 @@
         }
 
         function getDarkerShade(hex, factor = 0.7) { const rgb = hexToRgb(hex); return rgbToHex(Math.round(rgb.r * factor), Math.round(rgb.g * factor), Math.round(rgb.b * factor)); }
-        function generateNotebookSVG() { const color = CONSTANT_ICON_COLOR, yellow = "#eed142", dark = "#222222"; return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%"><path d="M 25 15 L 75 15 C 80.5 15 85 19.5 85 25 L 85 65 L 65 65 C 62.2 65 60 67.2 60 70 L 60 85 L 25 85 C 19.5 85 15 80.5 15 75 L 15 25 C 15 19.5 19.5 15 25 15 Z" fill="${color}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/><path d="M 85 65 L 65 85 L 65 70 C 65 67.2 67.2 65 70 65 Z" fill="${yellow}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/><g stroke="${dark}" stroke-width="4" fill="${color}"><rect x="12" y="27" width="16" height="6" rx="3" /><rect x="12" y="42" width="16" height="6" rx="3" /><rect x="12" y="57" width="16" height="6" rx="3" /><rect x="12" y="72" width="16" height="6" rx="3" /></g><g fill="${dark}"><circle cx="25" cy="30" r="3" /><circle cx="25" cy="45" r="3" /><circle cx="25" cy="60" r="3" /><circle cx="25" cy="75" r="3" /></g></svg>`.trim(); }
+        
+        function generateNotebookSVG() { 
+            const color = CONSTANT_ICON_COLOR, yellow = "#eed142", dark = "#222222"; 
+            return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%"><path d="M 25 15 L 75 15 C 80.5 15 85 19.5 85 25 L 85 65 L 65 65 C 62.2 65 60 67.2 60 70 L 60 85 L 25 85 C 19.5 85 15 80.5 15 75 L 15 25 C 15 19.5 19.5 15 25 15 Z" fill="${color}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/><path d="M 85 65 L 65 85 L 65 70 C 65 67.2 67.2 65 70 65 Z" fill="${yellow}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/><g stroke="${dark}" stroke-width="4" fill="${color}"><rect x="12" y="27" width="16" height="6" rx="3" /><rect x="12" y="42" width="16" height="6" rx="3" /><rect x="12" y="57" width="16" height="6" rx="3" /><rect x="12" y="72" width="16" height="6" rx="3" /></g><g fill="${dark}"><circle cx="25" cy="30" r="3" /><circle cx="25" cy="45" r="3" /><circle cx="25" cy="60" r="3" /><circle cx="25" cy="75" r="3" /></g></svg>`.trim(); 
+        }
+        
         function updateFavicon() { document.getElementById('favicon').href = `data:image/svg+xml;base64,${btoa(generateNotebookSVG())}`; }
         function updateBrandLogo() { const c = document.getElementById('brand-logo-container'); if (c) c.innerHTML = generateNotebookSVG(); }
-        function createPNGIconFromSVG(svg, size) { return new Promise((resolve) => { const canvas = document.createElement('canvas'); canvas.width = size; canvas.height = size; const ctx = canvas.getContext('2d'), img = new Image(); img.onload = () => { ctx.clearRect(0, 0, size, size); const p = size * 0.15; ctx.drawImage(img, p, p, size - p * 2, size - p * 2); resolve(canvas.toDataURL('image/png')); }; img.onerror = () => resolve(`data:image/svg+xml;base64,${btoa(svg)}`); img.src = `data:image/svg+xml;base64,${btoa(svg)}`; }); }
-        async function initPWA() { try { const svg = generateNotebookSVG(), i192 = await createPNGIconFromSVG(svg, 192), i512 = await createPNGIconFromSVG(svg, 512); document.getElementById('apple-touch-icon').href = i192; const manifest = { name: "Notion", short_name: "Notion", start_url: window.location.href.split('?')[0], display: "standalone", background_color: "#000000", theme_color: "#000000", icons: [{ src: i192, sizes: "192x192", type: "image/png", purpose: "any maskable" }, { src: i512, sizes: "512x512", type: "image/png", purpose: "any maskable" }] }; document.getElementById('manifest').href = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest)); } catch (e) { console.error("PWA initialization skipped:", e); } }
+        
+        function createPNGIconFromSVG(svg, size) { 
+            return new Promise((resolve) => { 
+                const canvas = document.createElement('canvas'); canvas.width = size; canvas.height = size; 
+                const ctx = canvas.getContext('2d'), img = new Image(); 
+                img.onload = () => { ctx.clearRect(0, 0, size, size); const p = size * 0.15; ctx.drawImage(img, p, p, size - p * 2, size - p * 2); resolve(canvas.toDataURL('image/png')); }; 
+                img.onerror = () => resolve(`data:image/svg+xml;base64,${btoa(svg)}`); 
+                img.src = `data:image/svg+xml;base64,${btoa(svg)}`; 
+            }); 
+        }
+        
+        async function initPWA() { 
+            try { 
+                const svg = generateNotebookSVG(), i192 = await createPNGIconFromSVG(svg, 192), i512 = await createPNGIconFromSVG(svg, 512); 
+                document.getElementById('apple-touch-icon').href = i192; 
+                const manifest = { 
+                    name: "Notion", short_name: "Notion", start_url: window.location.href.split('?')[0], display: "standalone", 
+                    background_color: "#000000", theme_color: "#000000", 
+                    icons: [{ src: i192, sizes: "192x192", type: "image/png", purpose: "any maskable" }, { src: i512, sizes: "512x512", type: "image/png", purpose: "any maskable" }] 
+                }; 
+                document.getElementById('manifest').href = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest)); 
+            } catch (e) { console.error("PWA initialization skipped:", e); } 
+        }
 
         function initNotepad() {
             let npNotes = JSON.parse(localStorage.getItem('ali_dashboard_multiple_notes')) || [{ id: Date.now(), title: 'Note 1', content: '', createdAt: new Date().toISOString() }];
@@ -972,10 +1374,40 @@
                 } 
             }
 
-            document.getElementById('np-undo-btn').onclick = () => { if(undoStack.length > 1) { isUndoingRedoing = true; redoStack.push(undoStack.pop()); const prev = undoStack[undoStack.length-1]; titleInput.value = prev.title; area.innerHTML = prev.content; update(false); isUndoingRedoing = false; } };
-            document.getElementById('np-redo-btn').onclick = () => { if(redoStack.length > 0) { isUndoingRedoing = true; const next = redoStack.pop(); undoStack.push(next); titleInput.value = next.title; area.innerHTML = next.content; update(false); isUndoingRedoing = false; } };
-            document.getElementById('np-bold-btn').onclick = () => { document.execCommand('bold'); updateNpFormatState(); update(); };
-            document.getElementById('np-highlight-btn').onclick = () => { toggleNpHighlight(); updateNpFormatState(); update(); };
+            document.getElementById('np-undo-btn').onclick = () => { 
+                if(undoStack.length > 1) { 
+                    isUndoingRedoing = true; 
+                    redoStack.push(undoStack.pop()); 
+                    const prev = undoStack[undoStack.length-1]; 
+                    titleInput.value = prev.title; 
+                    area.innerHTML = prev.content; 
+                    update(false); 
+                    isUndoingRedoing = false; 
+                } 
+            };
+            document.getElementById('np-redo-btn').onclick = () => { 
+                if(redoStack.length > 0) { 
+                    isUndoingRedoing = true; 
+                    const next = redoStack.pop(); 
+                    undoStack.push(next); 
+                    titleInput.value = next.title; 
+                    area.innerHTML = next.content; 
+                    update(false); 
+                    isUndoingRedoing = false; 
+                } 
+            };
+            document.getElementById('np-bold-btn').onclick = () => { document.execCommand('bold'); update(); };
+            document.getElementById('np-highlight-btn').onclick = () => { 
+                document.execCommand('styleWithCSS', false, true);
+                let bgStyle = getSelectionStyle('backgroundColor');
+                if (bgStyle && bgStyle !== 'transparent' && bgStyle !== 'rgba(0, 0, 0, 0)') {
+                    document.execCommand('hiliteColor', false, 'transparent'); 
+                    removeStyleFromSelection('backgroundColor');
+                } else {
+                    document.execCommand('hiliteColor', false, hexToRgba(activeColor, 0.4));
+                }
+                update(); 
+            };
             
             document.getElementById('new-note-btn').onclick = () => { 
                 const newNum = npNotes.length + 1;
@@ -1035,21 +1467,39 @@
 
         let isDownloading = false;
         async function downloadPNG() {
-            if (isDownloading) return; isDownloading = true; const card = document.getElementById('cardContainer'), f = document.getElementById('inputTitle').value.trim() || "Card";
+            if (isDownloading) return; 
+            isDownloading = true; 
+            const card = document.getElementById('cardContainer'), f = document.getElementById('inputTitle').value.trim() || "Card";
             try {
-                card.classList.remove('card-shadow'); const imgs = card.querySelectorAll('img'); await Promise.all(Array.from(imgs).map(img => img.complete ? Promise.resolve() : new Promise(r => { img.onload = r; img.onerror = r; })));
-                const canvas = await html2canvas(card, { scale: 3, backgroundColor: null, useCORS: true, onclone: (doc) => { 
-                    const c = doc.getElementById('cardContainer'); c.style.boxShadow = 'none'; c.style.borderRadius = '48px'; 
-                    doc.querySelectorAll('#cardTitleRestore, #cardDefRestore, #addCategoryBtn, .format-toolbar, .clear-btn, .hidden-in-export').forEach(el => el.style.display = 'none');
-                    doc.querySelectorAll('[contenteditable]').forEach(el => { if (!el.innerText.trim()) el.removeAttribute('data-placeholder'); });
-                    if (!doc.getElementById('cardDef').innerText.trim()) doc.getElementById('cardNotesSection').style.display = 'none';
-                    if (!doc.getElementById('cardType').innerText.trim()) doc.getElementById('cardType').style.display = 'none';
-                    if (!doc.getElementById('cardWord').innerText.trim() && !doc.getElementById('cardType').innerText.trim()) doc.getElementById('cardTitleSection').style.display = 'none';
-                    if (doc.getElementById('cardImagesContainer').children.length > 0) doc.getElementById('cardImagesContainer').style.paddingTop = '3rem';
-                    doc.querySelectorAll('#cardWord, #cardDef, #cardType').forEach(el => el.style.textDecoration = 'none');
-                }});
-                card.classList.add('card-shadow'); const l = document.createElement('a'); l.download = `${f}.png`; l.href = canvas.toDataURL('image/png'); l.click();
-            } catch (e) { console.error("Export failed", e); card.classList.add('card-shadow'); } finally { isDownloading = false; }
+                card.classList.remove('card-shadow'); 
+                const imgs = card.querySelectorAll('img'); 
+                await Promise.all(Array.from(imgs).map(img => img.complete ? Promise.resolve() : new Promise(r => { img.onload = r; img.onerror = r; })));
+                
+                const canvas = await html2canvas(card, { 
+                    scale: 3, backgroundColor: null, useCORS: true, 
+                    onclone: (doc) => { 
+                        const c = doc.getElementById('cardContainer'); c.style.boxShadow = 'none'; c.style.borderRadius = '48px'; 
+                        doc.querySelectorAll('#cardTitleRestore, #cardDefRestore, #addCategoryBtn, .format-toolbar, .clear-btn, .hidden-in-export').forEach(el => el.style.display = 'none');
+                        doc.querySelectorAll('[contenteditable]').forEach(el => { if (!el.innerText.trim()) el.removeAttribute('data-placeholder'); });
+                        if (!doc.getElementById('cardDef').innerText.trim()) doc.getElementById('cardNotesSection').style.display = 'none';
+                        if (!doc.getElementById('cardType').innerText.trim()) doc.getElementById('cardType').style.display = 'none';
+                        if (!doc.getElementById('cardWord').innerText.trim() && !doc.getElementById('cardType').innerText.trim()) doc.getElementById('cardTitleSection').style.display = 'none';
+                        if (doc.getElementById('cardImagesContainer').children.length > 0) doc.getElementById('cardImagesContainer').style.paddingTop = '3rem';
+                        doc.querySelectorAll('#cardWord, #cardDef, #cardType').forEach(el => el.style.textDecoration = 'none');
+                    }
+                });
+                
+                card.classList.add('card-shadow'); 
+                const l = document.createElement('a'); 
+                l.download = `${f}.png`; 
+                l.href = canvas.toDataURL('image/png'); 
+                l.click();
+            } catch (e) { 
+                console.error("Export failed", e); 
+                card.classList.add('card-shadow'); 
+            } finally { 
+                isDownloading = false; 
+            }
         }
     </script>
 </body>
