@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Notion">
     
-    <title>Notion</title>
+    <title>Notion Flashcards & Notes</title>
     
     <!-- Dynamic Favicon & PWA Links -->
     <link id="favicon" rel="icon" type="image/svg+xml">
@@ -199,7 +199,7 @@
         
         <!-- App Logo / Title -->
         <header class="w-full flex justify-center mb-6 md:mb-8 pointer-events-none select-none z-20">
-            <div onclick="openCardContextMenu(event)" class="pointer-events-auto cursor-pointer transition-all hover:scale-105" title="Open Menu">
+            <div onclick="window.openCardContextMenu(event)" class="pointer-events-auto cursor-pointer transition-all hover:scale-105" title="Open Menu">
                 <img src="image_c2e349.png" alt="aliyasa logo" class="h-10 md:h-14 object-contain drop-shadow-md" onerror="this.onerror=null; this.outerHTML='<h1 class=\'handdrawn-title text-4xl md:text-5xl font-bold tracking-wider\'><span class=\'text-gray-400\'>ali</span><span class=\'text-[#51b8cb]\'>yasa</span></h1>';">
             </div>
         </header>
@@ -210,14 +210,14 @@
             <div id="cardContainer" class="rounded-[2rem] md:rounded-[3rem] card-shadow overflow-hidden border-[4px] md:border-[6px] border-[#51b8cb] relative transition-all duration-500 min-h-[400px] md:min-h-[600px] w-full max-w-[1050px] group/maincard" style="background-color: #ffffff;">
 
                     <!-- Quick Download Button -->
-                    <button id="cardDownloadBtn" onclick="downloadPNG()" class="absolute top-4 right-4 md:top-6 md:right-6 bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md opacity-100 lg:opacity-0 group-hover/maincard:opacity-100 transition-all z-[30] hidden-in-export flex items-center justify-center hover:scale-110 w-[36px] h-[36px] md:w-[44px] md:h-[44px] outline-none" title="Download Card">
+                    <button id="cardDownloadBtn" onclick="window.downloadPNG()" class="absolute top-4 right-4 md:top-6 md:right-6 bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md opacity-100 lg:opacity-0 group-hover/maincard:opacity-100 transition-all z-[30] hidden-in-export flex items-center justify-center hover:scale-110 w-[36px] h-[36px] md:w-[44px] md:h-[44px] outline-none" title="Download Card">
                         <i data-lucide="download" class="w-4 h-4 md:w-5 md:h-5"></i>
                     </button>
 
                     <div class="pt-6 md:pt-10 px-6 md:px-20 pb-8 md:pb-20 group/card flex flex-col h-full">
                         
                         <!-- Title Restore Button -->
-                        <div id="cardTitleRestore" onclick="restoreTitle()" class="hidden cursor-pointer py-2 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl border-2 border-dashed border-transparent hover:border-[#d0ebf0] dark:hover:border-[#333] text-center text-gray-400 hover:text-[#51b8cb] opacity-100 lg:opacity-0 group-hover/card:opacity-100 transition-all flex items-center justify-center gap-2">
+                        <div id="cardTitleRestore" onclick="window.restoreTitle()" class="hidden cursor-pointer py-2 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl border-2 border-dashed border-transparent hover:border-[#d0ebf0] dark:hover:border-[#333] text-center text-gray-400 hover:text-[#51b8cb] opacity-100 lg:opacity-0 group-hover/card:opacity-100 transition-all flex items-center justify-center gap-2">
                             <i data-lucide="plus" class="w-4 h-4"></i> <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Add Title / Category</span>
                         </div>
 
@@ -227,60 +227,77 @@
                             <!-- Format Toolbar for Title -->
                             <div class="format-toolbar absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-lg border border-[#d0ebf0] dark:border-[#333] rounded-xl flex items-center p-1 gap-1 opacity-0 pointer-events-none group-focus-within/title:opacity-100 group-hover/title:opacity-100 group-focus-within/title:pointer-events-auto group-hover/title:pointer-events-auto transition-all z-20 translate-y-2 group-hover/title:translate-y-0 group-focus-within/title:translate-y-0">
                                 <div class="relative">
-                                    <button id="toolbarTitleSizeBtn" onmousedown="event.preventDefault();" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors flex items-center gap-1 text-[11px] font-bold min-w-[40px] justify-center" title="Font Size">
+                                    <button onmousedown="event.preventDefault(); window.toggleDropdownMenu(this);" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors flex items-center gap-1 text-[11px] font-bold min-w-[40px] justify-center" title="Font Size">
                                         <span id="toolbarTitleSizeLabel">32</span>
                                         <i data-lucide="chevron-down" class="w-3 h-3"></i>
                                     </button>
-                                    <div id="toolbarTitleSizeDropdownMenu" onmousedown="event.preventDefault();" class="hidden absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[60] overflow-hidden w-16 max-h-48 overflow-y-auto custom-scrollbar"></div>
+                                    <div id="toolbarTitleSizeDropdownMenu" class="hidden absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[60] overflow-hidden w-16 max-h-48 overflow-y-auto custom-scrollbar size-dropdown"></div>
                                 </div>
                                 <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                <button onmousedown="event.preventDefault(); execFormat('justifyLeft')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-left" title="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
-                                <button onmousedown="event.preventDefault(); execFormat('justifyCenter')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-center" title="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
-                                <button onmousedown="event.preventDefault(); execFormat('justifyRight')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-right" title="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+                                <button onmousedown="event.preventDefault(); window.execFormat('justifyLeft')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-left" title="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
+                                <button onmousedown="event.preventDefault(); window.execFormat('justifyCenter')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-center" title="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+                                <button onmousedown="event.preventDefault(); window.execFormat('justifyRight')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-right" title="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
                             </div>
 
                             <h2 id="cardWord" contenteditable="true" data-placeholder="Enter Term / Title..." class="font-bold tracking-tight leading-tight outline-none flex-1 min-w-[50%]" style="text-decoration: none;"></h2>
                             <span id="cardType" contenteditable="true" data-placeholder="Category..." class="text-sm md:text-xl font-bold px-3 py-1 md:px-4 md:py-1 rounded-none outline-none min-w-[80px] empty:min-w-[100px]"></span>
                             
-                            <button id="addCategoryBtn" onclick="showCategoryDropdown(event)" class="hidden text-[9px] md:text-[10px] font-bold uppercase tracking-widest px-2 py-1 md:px-3 md:py-1 rounded-lg border-2 border-dashed border-gray-300 dark:border-[#333] text-gray-400 hover:border-[#51b8cb] hover:text-[#51b8cb] transition-all flex items-center gap-1 opacity-100 lg:opacity-0 group-hover/title:opacity-100 outline-none" title="Add Category">
+                            <button id="addCategoryBtn" onclick="window.showCategoryDropdown(event)" class="hidden text-[9px] md:text-[10px] font-bold uppercase tracking-widest px-2 py-1 md:px-3 md:py-1 rounded-lg border-2 border-dashed border-gray-300 dark:border-[#333] text-gray-400 hover:border-[#51b8cb] hover:text-[#51b8cb] transition-all flex items-center gap-1 opacity-100 lg:opacity-0 group-hover/title:opacity-100 outline-none" title="Add Category">
                                 <i data-lucide="plus" class="w-3 h-3"></i> Add Category
                             </button>
 
-                            <button onclick="clearTitle()" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 group-hover/title:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" title="Remove Title Section">
+                            <button onclick="window.clearTitle()" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 group-hover/title:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" title="Remove Title Section">
                                 <i data-lucide="x" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
                             </button>
                         </div>
                         
                         <div id="cardContent" class="space-y-0 mt-1 flex-1">
                             <!-- Notes Restore Button -->
-                            <div id="cardDefRestore" onclick="restoreDef()" class="hidden cursor-pointer py-2 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl border-2 border-dashed border-transparent hover:border-[#d0ebf0] dark:hover:border-[#333] text-center text-gray-400 hover:text-[#51b8cb] opacity-100 lg:opacity-0 group-hover/card:opacity-100 transition-all flex items-center justify-center gap-2">
+                            <div id="cardDefRestore" onclick="window.restoreDef()" class="hidden cursor-pointer py-2 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl border-2 border-dashed border-transparent hover:border-[#d0ebf0] dark:hover:border-[#333] text-center text-gray-400 hover:text-[#51b8cb] opacity-100 lg:opacity-0 group-hover/card:opacity-100 transition-all flex items-center justify-center gap-2">
                                 <i data-lucide="plus" class="w-4 h-4"></i> <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Add Notes</span>
                             </div>
 
                             <!-- Editable Notes Section -->
                             <div id="cardNotesSection" class="group/def relative py-1 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                                 <div class="format-toolbar absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-lg border border-[#d0ebf0] dark:border-[#333] rounded-xl flex items-center p-1 gap-1 opacity-0 pointer-events-none group-focus-within/def:opacity-100 group-hover/def:opacity-100 group-focus-within/def:pointer-events-auto group-hover/def:pointer-events-auto transition-all z-20 translate-y-2 group-hover/def:translate-y-0 group-focus-within/def:translate-y-0">
-                                    <button onmousedown="event.preventDefault(); execFormat('undo')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors" title="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
-                                    <button onmousedown="event.preventDefault(); execFormat('redo')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors" title="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); window.execFormat('undo')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors" title="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); window.execFormat('redo')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors" title="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
                                     <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                    <button onmousedown="event.preventDefault(); execFormat('bold')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-bold" title="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
-                                    <button onmousedown="event.preventDefault(); execFormat('highlight')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-highlight" title="Highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
-                                    <button onmousedown="event.preventDefault(); execFormat('textColor')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-color" title="Text Color"><i data-lucide="palette" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); window.execFormat('bold')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-bold" title="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); window.execFormat('underline')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-underline" title="Underline"><i data-lucide="underline" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); window.execFormat('highlight')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-highlight" title="Highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
+                                    
+                                    <div class="relative">
+                                        <button onmousedown="event.preventDefault(); window.toggleTextColorMenu(this);" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-color" title="Text Color"><i data-lucide="palette" class="w-4 h-4"></i></button>
+                                        <div class="hidden absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[60] w-[140px] p-2 cursor-default text-color-dropdown">
+                                            <div class="flex flex-wrap gap-1.5 justify-center">
+                                                <button onmousedown="event.preventDefault(); window.execFormat('textColor'); window.closeAllDropdowns();" class="dynamic-theme-color-swatch w-5 h-5 rounded-full shadow-sm hover:scale-110 transition-transform" style="background-color: #51b8cb;"></button>
+                                                <button onmousedown="event.preventDefault(); window.execFormat('textColor', '#ef4444'); window.closeAllDropdowns();" class="w-5 h-5 rounded-full bg-red-500 shadow-sm hover:scale-110 transition-transform"></button>
+                                                <button onmousedown="event.preventDefault(); window.execFormat('textColor', '#f97316'); window.closeAllDropdowns();" class="w-5 h-5 rounded-full bg-orange-500 shadow-sm hover:scale-110 transition-transform"></button>
+                                                <button onmousedown="event.preventDefault(); window.execFormat('textColor', '#eab308'); window.closeAllDropdowns();" class="w-5 h-5 rounded-full bg-yellow-500 shadow-sm hover:scale-110 transition-transform"></button>
+                                                <button onmousedown="event.preventDefault(); window.execFormat('textColor', '#22c55e'); window.closeAllDropdowns();" class="w-5 h-5 rounded-full bg-green-500 shadow-sm hover:scale-110 transition-transform"></button>
+                                                <button onmousedown="event.preventDefault(); window.execFormat('textColor', '#3b82f6'); window.closeAllDropdowns();" class="w-5 h-5 rounded-full bg-blue-500 shadow-sm hover:scale-110 transition-transform"></button>
+                                                <button onmousedown="event.preventDefault(); window.execFormat('textColor', '#a855f7'); window.closeAllDropdowns();" class="w-5 h-5 rounded-full bg-purple-500 shadow-sm hover:scale-110 transition-transform"></button>
+                                                <button onmousedown="event.preventDefault(); window.execFormat('textColor', '#000000'); window.closeAllDropdowns();" class="w-5 h-5 rounded-full bg-black border border-gray-300 dark:border-gray-600 shadow-sm hover:scale-110 transition-transform"></button>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                    <button onmousedown="event.preventDefault(); execFormat('justifyLeft')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-left" title="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
-                                    <button onmousedown="event.preventDefault(); execFormat('justifyCenter')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-center" title="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
-                                    <button onmousedown="event.preventDefault(); execFormat('justifyRight')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-right" title="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); window.execFormat('justifyLeft')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-left" title="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); window.execFormat('justifyCenter')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-center" title="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); window.execFormat('justifyRight')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-right" title="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
                                     <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
                                     <div class="relative">
-                                        <button id="toolbarDefSizeBtn" onmousedown="event.preventDefault();" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors flex items-center gap-1 text-[11px] font-bold min-w-[40px] justify-center" title="Font Size">
+                                        <button onmousedown="event.preventDefault(); window.toggleDropdownMenu(this);" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors flex items-center gap-1 text-[11px] font-bold min-w-[40px] justify-center" title="Font Size">
                                             <span id="toolbarDefSizeLabel">24</span>
                                             <i data-lucide="chevron-down" class="w-3 h-3"></i>
                                         </button>
-                                        <div id="toolbarDefSizeDropdownMenu" onmousedown="event.preventDefault();" class="hidden absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[60] overflow-hidden w-16 max-h-48 overflow-y-auto custom-scrollbar"></div>
+                                        <div id="toolbarDefSizeDropdownMenu" onmousedown="event.preventDefault();" class="hidden absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[60] overflow-hidden w-16 max-h-48 overflow-y-auto custom-scrollbar size-dropdown"></div>
                                     </div>
                                 </div>
                                 <div id="cardDef" contenteditable="true" data-placeholder="Enter definition or notes..." class="font-medium leading-relaxed whitespace-pre-wrap outline-none" style="text-decoration: none; min-height: 1.5em;"></div>
-                                <button onclick="clearDef()" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 group-hover/def:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" title="Remove Notes Section">
+                                <button onclick="window.clearDef()" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 group-hover/def:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" title="Remove Notes Section">
                                     <i data-lucide="x" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
                                 </button>
                             </div>
@@ -293,7 +310,7 @@
                             
                             <!-- Add Buttons Row -->
                             <div class="flex flex-col sm:flex-row gap-2 mt-3 w-full hidden-in-export opacity-100 lg:opacity-0 group-hover/card:opacity-100 transition-all">
-                                <div onclick="addExtraNote()" class="flex-1 cursor-pointer py-2 px-2 md:px-4 rounded-xl md:rounded-2xl border-2 border-dashed border-transparent hover:border-[#d0ebf0] dark:hover:border-[#333] text-center text-gray-400 hover:text-[#51b8cb] transition-all flex items-center justify-center gap-2">
+                                <div onclick="window.addExtraNote()" class="flex-1 cursor-pointer py-2 px-2 md:px-4 rounded-xl md:rounded-2xl border-2 border-dashed border-transparent hover:border-[#d0ebf0] dark:hover:border-[#333] text-center text-gray-400 hover:text-[#51b8cb] transition-all flex items-center justify-center gap-2">
                                     <i data-lucide="plus" class="w-4 h-4"></i> <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Add Extra Note</span>
                                 </div>
                             </div>
@@ -302,7 +319,7 @@
                     </div>
                 </div>
 
-                <!-- Notepad Section (Swaps with Main Preview Card) -->
+                <!-- Notepad Section -->
                 <div id="notepadContainer" class="hidden rounded-[2rem] md:rounded-[3rem] card-shadow overflow-hidden border-[4px] md:border-[6px] border-[#51b8cb] relative transition-all duration-500 min-h-[400px] md:min-h-[600px] w-full max-w-[1050px] flex-col bg-white dark:bg-[#1a1a1a] p-6 md:p-12">
                     
                     <div class="flex-1 flex flex-col h-full relative z-20">
@@ -330,7 +347,25 @@
                                 <button id="np-redo-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
                                 <div class="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-1"></div>
                                 <button id="np-bold-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
+                                <button id="np-underline-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Underline"><i data-lucide="underline" class="w-4 h-4"></i></button>
                                 <button id="np-highlight-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
+                                
+                                <div class="relative">
+                                    <button id="np-color-btn" onmousedown="event.preventDefault(); window.toggleTextColorMenu(this);" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Text Color"><i data-lucide="palette" class="w-4 h-4"></i></button>
+                                    <div class="hidden absolute top-full right-0 mt-2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[60] w-[140px] p-2 cursor-default text-color-dropdown">
+                                        <div class="flex flex-wrap gap-1.5 justify-center">
+                                            <button onmousedown="event.preventDefault(); document.execCommand('foreColor', false, activeColor); window.closeAllDropdowns();" class="dynamic-theme-color-swatch w-5 h-5 rounded-full shadow-sm hover:scale-110 transition-transform" style="background-color: #51b8cb;"></button>
+                                            <button onmousedown="event.preventDefault(); document.execCommand('foreColor', false, '#ef4444'); window.closeAllDropdowns();" class="w-5 h-5 rounded-full bg-red-500 shadow-sm hover:scale-110 transition-transform"></button>
+                                            <button onmousedown="event.preventDefault(); document.execCommand('foreColor', false, '#f97316'); window.closeAllDropdowns();" class="w-5 h-5 rounded-full bg-orange-500 shadow-sm hover:scale-110 transition-transform"></button>
+                                            <button onmousedown="event.preventDefault(); document.execCommand('foreColor', false, '#eab308'); window.closeAllDropdowns();" class="w-5 h-5 rounded-full bg-yellow-500 shadow-sm hover:scale-110 transition-transform"></button>
+                                            <button onmousedown="event.preventDefault(); document.execCommand('foreColor', false, '#22c55e'); window.closeAllDropdowns();" class="w-5 h-5 rounded-full bg-green-500 shadow-sm hover:scale-110 transition-transform"></button>
+                                            <button onmousedown="event.preventDefault(); document.execCommand('foreColor', false, '#3b82f6'); window.closeAllDropdowns();" class="w-5 h-5 rounded-full bg-blue-500 shadow-sm hover:scale-110 transition-transform"></button>
+                                            <button onmousedown="event.preventDefault(); document.execCommand('foreColor', false, '#a855f7'); window.closeAllDropdowns();" class="w-5 h-5 rounded-full bg-purple-500 shadow-sm hover:scale-110 transition-transform"></button>
+                                            <button onmousedown="event.preventDefault(); document.execCommand('foreColor', false, '#000000'); window.closeAllDropdowns();" class="w-5 h-5 rounded-full bg-black border border-gray-300 dark:border-gray-600 shadow-sm hover:scale-110 transition-transform"></button>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-1"></div>
                                 <button id="np-copy-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Copy"><i data-lucide="copy" class="w-4 h-4"></i></button>
                                 <button id="np-download-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" title="Download TXT"><i data-lucide="download" class="w-4 h-4"></i></button>
@@ -360,9 +395,9 @@
     <div id="floatingImageBorderMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-40 py-1">
         <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Image Align</div>
         <div class="flex justify-between px-4 py-2">
-            <button onclick="cardImgAlign('left')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" title="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
-            <button onclick="cardImgAlign('center')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" title="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
-            <button onclick="cardImgAlign('right')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" title="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+            <button onclick="window.cardImgAlign('left')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" title="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
+            <button onclick="window.cardImgAlign('center')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" title="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+            <button onclick="window.cardImgAlign('right')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" title="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
         </div>
         <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
         <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Image Border</div>
@@ -455,26 +490,26 @@
         <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Image Options</div>
         <div class="py-1">
             <div class="flex justify-between px-4 py-2">
-                <button onclick="npImgAction('align-left')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" title="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
-                <button onclick="npImgAction('align-center')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" title="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
-                <button onclick="npImgAction('align-right')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" title="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+                <button onclick="window.npImgAction('align-left')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" title="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
+                <button onclick="window.npImgAction('align-center')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" title="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+                <button onclick="window.npImgAction('align-right')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" title="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
             </div>
             <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
-            <div onclick="npImgAction('grow')" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300">
+            <div onclick="window.npImgAction('grow')" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300">
                 <i data-lucide="zoom-in" class="w-4 h-4"></i> Increase Size
             </div>
-            <div onclick="npImgAction('shrink')" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300">
+            <div onclick="window.npImgAction('shrink')" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300">
                 <i data-lucide="zoom-out" class="w-4 h-4"></i> Decrease Size
             </div>
             <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
-            <div onclick="npImgAction('up')" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300">
+            <div onclick="window.npImgAction('up')" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300">
                 <i data-lucide="arrow-up" class="w-4 h-4"></i> Move Up
             </div>
-            <div onclick="npImgAction('down')" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300">
+            <div onclick="window.npImgAction('down')" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300">
                 <i data-lucide="arrow-down" class="w-4 h-4"></i> Move Down
             </div>
             <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
-            <div onclick="npImgAction('delete')" class="dropdown-item flex items-center gap-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10">
+            <div onclick="window.npImgAction('delete')" class="dropdown-item flex items-center gap-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10">
                 <i data-lucide="trash-2" class="w-4 h-4"></i> Delete Image
             </div>
         </div>
@@ -491,7 +526,7 @@
         let activeColor = "#51b8cb", hue = 189, saturation = 60, brightness = 80, uploadedImages = [];
         let activeBlocks = []; 
         let cards = [], activeCardId = null, isSwitching = false;
-        let currentSelectedCategory = "-", currentSelectedSize = 32, currentSelectedDefSize = 24, currentSelectedExtraDefSize = 24, currentImageBorder = 2, currentImageCols = 0, currentBlendPercentage = 10, deferredPrompt = null;
+        let currentSelectedCategory = "-", currentSelectedSize = 32, currentSelectedDefSize = 24, currentImageBorder = 2, currentImageCols = 0, currentBlendPercentage = 10, deferredPrompt = null;
         let showTitlePlaceholder = true, showDefPlaceholder = true, activeImageIdx = -1, activeBlockIdx = -1, activeImageIsGroup = false;
         
         // Dragging & Resizing States
@@ -692,6 +727,39 @@
             }
         };
 
+        window.showCategoryDropdown = function(e) {
+            e.stopPropagation();
+            const rect = e.currentTarget.getBoundingClientRect();
+            window.showFloatingCategoryMenu(rect.left, rect.bottom + 5);
+        };
+
+        window.showFloatingCategoryMenu = function(x, y) {
+            const menu = document.getElementById('floatingCategoryMenu');
+            document.getElementById('floatingImageBorderMenu').classList.add('hidden');
+            menu.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                const rect = menu.getBoundingClientRect();
+                if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
+                if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
+                menu.style.left = x + 'px'; 
+                menu.style.top = y + 'px';
+            });
+        };
+
+        window.showFloatingImageBorderMenu = function(x, y) {
+            const menu = document.getElementById('floatingImageBorderMenu');
+            document.getElementById('floatingCategoryMenu').classList.add('hidden');
+            document.getElementById('floatingPreviewMenu').classList.add('hidden');
+            menu.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                const rect = menu.getBoundingClientRect();
+                if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
+                if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
+                menu.style.left = x + 'px'; 
+                menu.style.top = y + 'px';
+            });
+        };
+
         initColorPicker(); 
         initBlendDropdown(); 
         initFloatingMenu(); 
@@ -765,17 +833,38 @@
             btn.onclick = (e) => { 
                 e.stopPropagation(); 
                 const isHidden = menu.classList.contains('hidden');
-                closeAllDropdowns(); 
+                window.closeAllDropdowns(); 
                 if (isHidden) menu.classList.remove('hidden'); 
             };
         }
 
-        function closeAllDropdowns() { 
-            document.querySelectorAll('[id$="DropdownMenu"]').forEach(el => el.classList.add('hidden')); 
-        }
-        window.addEventListener('click', closeAllDropdowns);
+        window.closeAllDropdowns = function(e) { 
+            // If clicking inside a size/color menu or on a toggle button, don't auto-close
+            if (e && e.target && e.target.closest) {
+                if (e.target.closest('.size-dropdown, .text-color-dropdown, button[onmousedown*="toggle"]')) {
+                    return;
+                }
+            }
+            document.querySelectorAll('.size-dropdown, .text-color-dropdown').forEach(el => el.classList.add('hidden')); 
+        };
+        window.addEventListener('click', window.closeAllDropdowns);
+        window.addEventListener('mousedown', window.closeAllDropdowns);
 
-        function showFloatingCategoryMenu(x, y) {
+        window.toggleDropdownMenu = function(btn) {
+            const menu = btn.nextElementSibling;
+            const isHidden = menu ? menu.classList.contains('hidden') : false;
+            window.closeAllDropdowns();
+            if (menu && isHidden) menu.classList.remove('hidden');
+        };
+
+        window.toggleTextColorMenu = function(btn) {
+            const menu = btn.nextElementSibling;
+            const isHidden = menu ? menu.classList.contains('hidden') : false;
+            window.closeAllDropdowns();
+            if (menu && isHidden) menu.classList.remove('hidden');
+        };
+
+        window.showFloatingCategoryMenu = function(x, y) {
             const menu = document.getElementById('floatingCategoryMenu');
             document.getElementById('floatingImageBorderMenu').classList.add('hidden');
             menu.classList.remove('hidden');
@@ -786,61 +875,33 @@
                 menu.style.left = x + 'px'; 
                 menu.style.top = y + 'px';
             });
-        }
-
-        window.showFloatingImageBorderMenu = function(x, y) {
-            const menu = document.getElementById('floatingImageBorderMenu');
-            document.getElementById('floatingCategoryMenu').classList.add('hidden');
-            document.getElementById('floatingPreviewMenu').classList.add('hidden');
-            menu.classList.remove('hidden');
-            requestAnimationFrame(() => {
-                const rect = menu.getBoundingClientRect();
-                if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
-                if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
-                menu.style.left = x + 'px'; 
-                menu.style.top = y + 'px';
-            });
-        };
-
-        window.showCategoryDropdown = function(e) {
-            e.stopPropagation();
-            const rect = e.currentTarget.getBoundingClientRect();
-            showFloatingCategoryMenu(rect.left, rect.bottom + 5);
         };
 
         function initFloatingMenu() {
-            const defSizes = [24, 28, 32, 36, 40, 48, 64, 80];
+            const defSizes = [12, 14, 16, 18, 20, 24, 28, 32, 40, 48, 64, 80];
             const titleSizes = [32, 36, 40, 48, 56, 64, 72, 80, 96, 120];
 
-            const defMenu = document.getElementById('toolbarDefSizeDropdownMenu'), defBtn = document.getElementById('toolbarDefSizeBtn');
-            if (defBtn) defBtn.onclick = (e) => { e.stopPropagation(); closeAllDropdowns(); defMenu.classList.toggle('hidden'); };
-            defSizes.forEach(size => {
-                const item = document.createElement('div');
-                item.className = 'dropdown-item text-gray-700 dark:text-gray-300 text-center py-1.5';
-                item.innerText = size;
-                item.onmousedown = (e) => { e.preventDefault(); selectDefSize(size); defMenu.classList.add('hidden'); };
-                if (defMenu) defMenu.appendChild(item);
-            });
+            const defMenu = document.getElementById('toolbarDefSizeDropdownMenu');
+            if (defMenu) {
+                defSizes.forEach(size => {
+                    const item = document.createElement('div');
+                    item.className = 'dropdown-item text-gray-700 dark:text-gray-300 text-center py-1.5';
+                    item.innerText = size;
+                    item.onmousedown = (e) => { e.preventDefault(); selectDefSize(size); window.closeAllDropdowns(); };
+                    defMenu.appendChild(item);
+                });
+            }
 
-            const extraDefMenu = document.getElementById('toolbarExtraDefSizeDropdownMenu'), extraDefBtn = document.getElementById('toolbarExtraDefSizeBtn');
-            if (extraDefBtn) extraDefBtn.onclick = (e) => { e.stopPropagation(); closeAllDropdowns(); extraDefMenu.classList.toggle('hidden'); };
-            defSizes.forEach(size => {
-                const item = document.createElement('div');
-                item.className = 'dropdown-item text-gray-700 dark:text-gray-300 text-center py-1.5';
-                item.innerText = size;
-                item.onmousedown = (e) => { e.preventDefault(); selectExtraDefSize(size); extraDefMenu.classList.add('hidden'); };
-                if (extraDefMenu) extraDefMenu.appendChild(item);
-            });
-
-            const titleMenu = document.getElementById('toolbarTitleSizeDropdownMenu'), titleBtn = document.getElementById('toolbarTitleSizeBtn');
-            if (titleBtn) titleBtn.onclick = (e) => { e.stopPropagation(); closeAllDropdowns(); titleMenu.classList.toggle('hidden'); };
-            titleSizes.forEach(size => {
-                const item = document.createElement('div');
-                item.className = 'dropdown-item text-gray-700 dark:text-gray-300 text-center py-1.5';
-                item.innerText = size;
-                item.onmousedown = (e) => { e.preventDefault(); selectTextSize(size); titleMenu.classList.add('hidden'); };
-                if (titleMenu) titleMenu.appendChild(item);
-            });
+            const titleMenu = document.getElementById('toolbarTitleSizeDropdownMenu');
+            if (titleMenu) {
+                titleSizes.forEach(size => {
+                    const item = document.createElement('div');
+                    item.className = 'dropdown-item text-gray-700 dark:text-gray-300 text-center py-1.5';
+                    item.innerText = size;
+                    item.onmousedown = (e) => { e.preventDefault(); selectTextSize(size); window.closeAllDropdowns(); };
+                    titleMenu.appendChild(item);
+                });
+            }
 
             const catMenu = document.getElementById('floatingCategoryMenu'), catContainer = document.getElementById('floatingCategoryOptions');
             if (catContainer) {
@@ -848,7 +909,7 @@
                 const manualItem = document.createElement('div');
                 manualItem.className = 'dropdown-item text-[#51b8cb] flex items-center gap-2 italic';
                 manualItem.innerHTML = `<i data-lucide="edit-3" class="w-3 h-3"></i> Custom Entry...`;
-                manualItem.onclick = (e) => { e.stopPropagation(); restoreCategory(); catMenu.classList.add('hidden'); };
+                manualItem.onclick = (e) => { e.stopPropagation(); window.restoreCategory(); catMenu.classList.add('hidden'); };
                 catContainer.appendChild(manualItem);
 
                 ["-", ...Object.keys(categoryColors)].forEach(cat => {
@@ -1025,12 +1086,15 @@
             currentSelectedDefSize = size; 
             const label = document.getElementById('toolbarDefSizeLabel'); 
             if(label) label.innerText = size; 
+            
+            // Sync all extra note labels to match
+            const extraLabels = document.querySelectorAll('.toolbarExtraDefSizeLabel');
+            extraLabels.forEach(el => el.innerText = size);
+            
             updatePreview(); 
         }
-        function selectExtraDefSize(size) { 
-            currentSelectedExtraDefSize = size; 
-            const label = document.getElementById('toolbarExtraDefSizeLabel'); 
-            if(label) label.innerText = size; 
+        window.selectExtraDefSize = function(size, blockIdx) { 
+            // Allows individual block sizing if desired, though usually synced
             updatePreview(); 
         }
         function selectImageBorder(border) { currentImageBorder = border; updatePreview(); }
@@ -1110,7 +1174,9 @@
                 }
             } else if (cmd === 'textColor') {
                 let fStyle = getSelectionStyle('color'), activeRgbString = `rgb(${hexToRgb(activeColor).r},${hexToRgb(activeColor).g},${hexToRgb(activeColor).b})`;
-                if (fStyle && fStyle.replace(/\s/g, '').toLowerCase() === activeRgbString) {
+                if (val) {
+                    document.execCommand('foreColor', false, val);
+                } else if (fStyle && fStyle.replace(/\s/g, '').toLowerCase() === activeRgbString) {
                     document.execCommand('foreColor', false, '#000000'); 
                     removeStyleFromSelection('color');
                 } else {
@@ -1144,6 +1210,7 @@
             if (activeEl.id !== 'cardDef' && activeEl.id !== 'cardWord' && !activeEl.classList.contains('card-extra-def-input')) return;
 
             const isBold = document.queryCommandState('bold');
+            const isUnderline = document.queryCommandState('underline');
             const isLeft = document.queryCommandState('justifyLeft');
             const isCenter = document.queryCommandState('justifyCenter');
             const isRight = document.queryCommandState('justifyRight');
@@ -1164,11 +1231,13 @@
             };
 
             toggleBtns('.btn-format-bold', isBold);
+            toggleBtns('.btn-format-underline', isUnderline);
             toggleBtns('.btn-format-left', isLeft);
             toggleBtns('.btn-format-center', isCenter);
             toggleBtns('.btn-format-right', isRight);
             toggleBtns('.btn-format-highlight', isHighlighted);
-            toggleBtns('.btn-format-color', isColored);
+            
+            // Do not toggle active visual state for specific color tool since it picks various colors.
         }
 
         function setupEventListeners() {
@@ -1623,20 +1692,6 @@
             imageUndoStack = [];
             imageRedoStack = [];
             
-            // Backwards compatibility for older definition setups
-            if (card.extraNotes || card.bottomImages) {
-                card.blocks = [];
-                if (card.extraNotes && card.extraNotes.length > 0) {
-                    card.extraNotes.forEach(note => {
-                        card.blocks.push({ type: 'text', content: note });
-                    });
-                }
-                if (card.bottomImages && card.bottomImages.length > 0) {
-                    card.blocks.push({ type: 'imageGroup', images: [...card.bottomImages] });
-                }
-                delete card.extraNotes;
-                delete card.bottomImages;
-            }
             if (!card.blocks) card.blocks = [];
 
             document.getElementById('inputTitle').value = card.title; 
@@ -1682,7 +1737,6 @@
             card.color = { hex: activeColor, hue: hue, sat: saturation, bri: brightness }; 
             card.textSize = currentSelectedSize; 
             card.defSize = currentSelectedDefSize; 
-            card.extraDefSize = currentSelectedExtraDefSize; 
             card.imageBorder = currentImageBorder; 
             card.imageCols = currentImageCols; 
             card.blend = currentBlendPercentage; 
@@ -1758,7 +1812,7 @@
                     const img = document.createElement('img'); img.src = imgObj.src; img.className = "resizable-img h-auto object-cover rounded-[1.5rem] shadow-sm block w-full";
                     img.style.border = `${imgObj.border !== null ? imgObj.border : imgBorder}px solid ${finalColor}`; img.draggable = false;
                     img.onmousedown = (e) => handleImageResizeStart(e, idx, false); img.ontouchstart = (e) => handleImageResizeStart(e, idx, false);
-                    img.oncontextmenu = (e) => { e.preventDefault(); activeImageIdx = idx; activeImageIsGroup = false; activeBlockIdx = -1; showFloatingImageBorderMenu(e.clientX, e.clientY); };
+                    img.oncontextmenu = (e) => { e.preventDefault(); activeImageIdx = idx; activeImageIsGroup = false; activeBlockIdx = -1; window.showFloatingImageBorderMenu(e.clientX, e.clientY); };
                     const moveControls = document.createElement('div'); moveControls.className = "absolute -top-3 -left-3 flex gap-1.5 z-10 hidden-in-export opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all";
                     if (idx > 0) { 
                         const lB = document.createElement('button'); lB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] md:w-[32px] md:h-[32px] outline-none p-0"; lB.style.color = finalColor; lB.style.border = `2px solid ${finalColor}`; lB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 md:w-5 md:h-5"><path d="M15 18l-6-6 6-6"/></svg>`; 
@@ -1799,19 +1853,37 @@
                             return `
                                 <div class="group/extradef relative py-1 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors mt-1" id="block-wrapper-${idx}" data-block-type="text">
                                     <div class="format-toolbar absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-lg border border-[#d0ebf0] dark:border-[#333] rounded-xl flex items-center p-1 gap-1 opacity-0 pointer-events-none group-focus-within/extradef:opacity-100 group-hover/extradef:opacity-100 group-focus-within/extradef:pointer-events-auto group-hover/extradef:pointer-events-auto transition-all z-20 translate-y-2 group-hover/extradef:translate-y-0 group-focus-within/extradef:translate-y-0">
-                                        <button onmousedown="event.preventDefault(); execFormat('undo')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors"><i data-lucide="undo" class="w-4 h-4"></i></button>
-                                        <button onmousedown="event.preventDefault(); execFormat('redo')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors"><i data-lucide="redo" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); window.execFormat('undo')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors"><i data-lucide="undo" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); window.execFormat('redo')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors"><i data-lucide="redo" class="w-4 h-4"></i></button>
                                         <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                        <button onmousedown="event.preventDefault(); execFormat('bold')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
-                                        <button onmousedown="event.preventDefault(); execFormat('highlight')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
-                                        <button onmousedown="event.preventDefault(); execFormat('textColor')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-color"><i data-lucide="palette" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); window.execFormat('bold')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); window.execFormat('underline')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-underline"><i data-lucide="underline" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); window.execFormat('highlight')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
+                                        
+                                        <div class="relative">
+                                            <button onmousedown="event.preventDefault(); window.toggleTextColorMenu(this);" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-color"><i data-lucide="palette" class="w-4 h-4"></i></button>
+                                            <div class="hidden absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[60] w-[140px] p-2 cursor-default text-color-dropdown">
+                                                <div class="flex flex-wrap gap-1.5 justify-center">
+                                                    <button onmousedown="event.preventDefault(); window.execFormat('textColor'); window.closeAllDropdowns();" class="dynamic-theme-color-swatch w-5 h-5 rounded-full shadow-sm hover:scale-110 transition-transform" style="background-color: ${finalColor};"></button>
+                                                    <button onmousedown="event.preventDefault(); window.execFormat('textColor', '#ef4444'); window.closeAllDropdowns();" class="w-5 h-5 rounded-full bg-red-500 shadow-sm hover:scale-110 transition-transform"></button>
+                                                    <button onmousedown="event.preventDefault(); window.execFormat('textColor', '#f97316'); window.closeAllDropdowns();" class="w-5 h-5 rounded-full bg-orange-500 shadow-sm hover:scale-110 transition-transform"></button>
+                                                    <button onmousedown="event.preventDefault(); window.execFormat('textColor', '#eab308'); window.closeAllDropdowns();" class="w-5 h-5 rounded-full bg-yellow-500 shadow-sm hover:scale-110 transition-transform"></button>
+                                                    <button onmousedown="event.preventDefault(); window.execFormat('textColor', '#22c55e'); window.closeAllDropdowns();" class="w-5 h-5 rounded-full bg-green-500 shadow-sm hover:scale-110 transition-transform"></button>
+                                                    <button onmousedown="event.preventDefault(); window.execFormat('textColor', '#3b82f6'); window.closeAllDropdowns();" class="w-5 h-5 rounded-full bg-blue-500 shadow-sm hover:scale-110 transition-transform"></button>
+                                                    <button onmousedown="event.preventDefault(); window.execFormat('textColor', '#a855f7'); window.closeAllDropdowns();" class="w-5 h-5 rounded-full bg-purple-500 shadow-sm hover:scale-110 transition-transform"></button>
+                                                    <button onmousedown="event.preventDefault(); window.execFormat('textColor', '#000000'); window.closeAllDropdowns();" class="w-5 h-5 rounded-full bg-black border border-gray-300 dark:border-gray-600 shadow-sm hover:scale-110 transition-transform"></button>
+                                                    <button onmousedown="event.preventDefault(); window.execFormat('textColor', '#ffffff'); window.closeAllDropdowns();" class="w-5 h-5 rounded-full bg-white border border-gray-300 dark:border-gray-600 shadow-sm hover:scale-110 transition-transform"></button>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                        <button onmousedown="event.preventDefault(); execFormat('justifyLeft')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-left" title="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
-                                        <button onmousedown="event.preventDefault(); execFormat('justifyCenter')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-center" title="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
-                                        <button onmousedown="event.preventDefault(); execFormat('justifyRight')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-right" title="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); window.execFormat('justifyLeft')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-left" title="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); window.execFormat('justifyCenter')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-center" title="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); window.execFormat('justifyRight')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-right" title="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
                                     </div>
                                     <div class="card-extra-def-input font-medium leading-relaxed whitespace-pre-wrap outline-none" contenteditable="true" data-placeholder="Enter note here..." style="text-decoration: none; min-height: 1.5em; font-family: 'Caveat', cursive;" data-block-idx="${idx}">${block.content}</div>
-                                    <button onclick="removeBlock(${idx})" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 group-hover/extradef:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" title="Remove Note">
+                                    <button onclick="window.removeBlock(${idx})" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 group-hover/extradef:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" title="Remove Note">
                                         <i data-lucide="x" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
                                     </button>
                                 </div>
@@ -1861,22 +1933,22 @@
                                 const img = document.createElement('img'); img.src = imgObj.src; img.className = "resizable-img h-auto object-cover rounded-[1.5rem] shadow-sm block w-full";
                                 img.style.border = `${imgObj.border !== null ? imgObj.border : imgBorder}px solid ${finalColor}`; img.draggable = false;
                                 img.onmousedown = (e) => handleImageResizeStart(e, imgIdx, true, idx); img.ontouchstart = (e) => handleImageResizeStart(e, imgIdx, true, idx);
-                                img.oncontextmenu = (e) => { e.preventDefault(); activeImageIdx = imgIdx; activeImageIsGroup = true; activeBlockIdx = idx; showFloatingImageBorderMenu(e.clientX, e.clientY); };
+                                img.oncontextmenu = (e) => { e.preventDefault(); activeImageIdx = imgIdx; activeImageIsGroup = true; activeBlockIdx = idx; window.showFloatingImageBorderMenu(e.clientX, e.clientY); };
                                 
                                 const moveControls = document.createElement('div'); moveControls.className = "absolute -top-3 -left-3 flex gap-1.5 z-10 hidden-in-export opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all";
                                 if (imgIdx > 0) { 
                                     const lB = document.createElement('button'); lB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] outline-none p-0"; lB.style.color = finalColor; lB.style.border = `2px solid ${finalColor}`; lB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M15 18l-6-6 6-6"/></svg>`; 
-                                    lB.onclick = (e) => { e.stopPropagation(); moveImageLeftGroup(idx, imgIdx); }; 
+                                    lB.onclick = (e) => { e.stopPropagation(); window.moveImageLeftGroup(idx, imgIdx); }; 
                                     moveControls.appendChild(lB); 
                                 }
                                 if (imgIdx < block.images.length - 1) { 
                                     const rB = document.createElement('button'); rB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] outline-none p-0"; rB.style.color = finalColor; rB.style.border = `2px solid ${finalColor}`; rB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M9 18l6-6-6-6"/></svg>`; 
-                                    rB.onclick = (e) => { e.stopPropagation(); moveImageRightGroup(idx, imgIdx); }; 
+                                    rB.onclick = (e) => { e.stopPropagation(); window.moveImageRightGroup(idx, imgIdx); }; 
                                     moveControls.appendChild(rB); 
                                 }
                                 
                                 const delBtn = document.createElement('button'); delBtn.className = "absolute -top-3 -right-3 opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all z-10 hidden-in-export flex items-center justify-center hover:scale-110 outline-none p-0 bg-transparent border-none w-[28px] h-[28px]"; delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-full h-full drop-shadow-md"><defs><linearGradient id="delGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ff3333" /><stop offset="100%" stop-color="#cc0000" /></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#delGrad)" stroke="#990000" stroke-width="0.5" /><path d="M8 8 L16 16 M16 8 L8 16" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" /></svg>`; 
-                                delBtn.onclick = (e) => { e.stopPropagation(); removeImageFromGroup(idx, imgIdx); };
+                                delBtn.onclick = (e) => { e.stopPropagation(); window.removeImageFromGroup(idx, imgIdx); };
                                 
                                 wrapper.appendChild(img); 
                                 if (moveControls.children.length > 0) wrapper.appendChild(moveControls); 
@@ -1886,9 +1958,10 @@
                     }
                 });
             }
-            
+
             updateFavicon(); updateBrandLogo();
             document.getElementById('dynamic-card-styles').innerHTML = `input[type=range]::-webkit-slider-thumb { background: white !important; border: 3px solid ${finalColor} !important; box-shadow: 0 0 10px ${finalColor}66 !important; } #cardWord, #cardDef, #cardType { text-decoration: none !important; }`;
+            document.querySelectorAll('.dynamic-theme-color-swatch').forEach(el => el.style.backgroundColor = finalColor);
             syncCardState();
         }
 
@@ -2025,7 +2098,10 @@
                     isUndoingRedoing = false; 
                 } 
             };
+            
             document.getElementById('np-bold-btn').onclick = () => { document.execCommand('bold'); update(); };
+            document.getElementById('np-underline-btn').onclick = () => { document.execCommand('underline'); update(); };
+            
             document.getElementById('np-highlight-btn').onclick = () => { 
                 document.execCommand('styleWithCSS', false, true);
                 let bgStyle = getSelectionStyle('backgroundColor');
@@ -2118,8 +2194,7 @@
             select(npCurrentId);
         }
 
-        let isDownloading = false;
-        async function downloadPNG() {
+        window.downloadPNG = async function() {
             if (isDownloading) return; 
             isDownloading = true; 
             
@@ -2170,7 +2245,7 @@
             } finally { 
                 isDownloading = false; 
             }
-        }
+        };
     </script>
 </body>
 </html>
