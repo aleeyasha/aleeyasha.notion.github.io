@@ -2283,11 +2283,23 @@
                         backgroundColor: '#ffffff', // Ensures transparent areas don't turn black
                         useCORS: true, 
                         onclone: (doc) => { 
+                            // Override CSS variables globally in the cloned document to ensure no rogue colors
+                            doc.documentElement.style.setProperty('--theme-blend', '#ffffff', 'important');
+                            doc.documentElement.style.setProperty('--theme-color', 'transparent', 'important');
+
                             const c = doc.getElementById('cardContainer'); 
                             c.style.boxShadow = 'none'; 
-                            // Make the exported card rectangular so it fills the PDF page flawlessly
+                            
+                            // Make the exported card rectangular and aggressively remove bg/border classes for a clean PDF
                             c.style.borderRadius = '0px'; 
                             c.style.margin = '0';
+                            c.classList.remove('border-[4px]', 'md:border-[6px]', 'border-[var(--theme-color)]', 'theme-blend-bg-card', 'rounded-[2rem]', 'md:rounded-[3rem]');
+                            
+                            // Force standard CSS overrides as a fallback
+                            c.style.setProperty('background-color', '#ffffff', 'important');
+                            c.style.setProperty('background', '#ffffff', 'important');
+                            c.style.setProperty('border', 'none', 'important');
+                            c.style.setProperty('border-width', '0px', 'important');
                             
                             doc.querySelectorAll('#cardTitleRestore, #cardDefRestore, #cardExtraDefRestore, #addCategoryBtn, .format-toolbar, .clear-btn, .hidden-in-export').forEach(el => el.style.display = 'none');
                             doc.querySelectorAll('[contenteditable]').forEach(el => { if (!el.innerText.trim()) el.removeAttribute('data-placeholder'); });
