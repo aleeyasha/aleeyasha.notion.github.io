@@ -194,7 +194,7 @@
         
         <header class="w-full flex justify-center items-center mb-6 md:mb-8 pointer-events-none select-none z-20">
             <div class="relative flex items-center pointer-events-auto group/logo" onmouseenter="populateHeaderCardsList()">
-                <div class="transition-all hover:scale-105">
+                <div onclick="toggleNotepadView()" class="cursor-pointer transition-all hover:scale-105" aria-label="Toggle Notepad">
                     <img src="image_c2e349.png" alt="aliyasa logo" class="h-10 md:h-14 object-contain drop-shadow-md" onerror="this.onerror=null; this.outerHTML='<h1 class=\'handdrawn-title text-4xl md:text-5xl font-bold tracking-wider\'><span class=\'text-gray-400\'>ali</span><span class=\'text-[#51b8cb]\'>yasa</span></h1>';">
                 </div>
                 
@@ -219,9 +219,16 @@
             
             <div id="cardContainer" class="rounded-[2rem] md:rounded-[3rem] card-shadow overflow-hidden border-[4px] md:border-[6px] border-[var(--theme-color)] relative transition-all duration-500 min-h-[400px] md:min-h-[600px] w-full max-w-[1050px] group/maincard theme-blend-bg-card">
 
-                    <button id="cardDownloadBtn" onclick="downloadPNG()" class="absolute top-4 right-4 md:top-6 md:right-6 bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md opacity-100 lg:opacity-0 group-hover/maincard:opacity-100 transition-all z-[30] hidden-in-export flex items-center justify-center hover:scale-110 w-[36px] h-[36px] md:w-[44px] md:h-[44px] outline-none text-[var(--theme-color)] border-2 border-[var(--theme-color)]" aria-label="Download Card">
-                        <i data-lucide="download" class="w-4 h-4 md:w-5 md:h-5"></i>
-                    </button>
+                    <div class="absolute top-4 right-4 md:top-6 md:right-6 z-[30] hidden-in-export opacity-100 lg:opacity-0 group-hover/maincard:opacity-100 transition-all group/dl flex flex-col items-center">
+                        <button id="cardDownloadBtn" onclick="downloadPNG()" class="bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[36px] h-[36px] md:w-[44px] md:h-[44px] outline-none text-[var(--theme-color)] border-2 border-[var(--theme-color)] relative z-10" aria-label="Download Card PNG">
+                            <i data-lucide="download" class="w-4 h-4 md:w-5 md:h-5"></i>
+                        </button>
+                        <div class="absolute top-full pt-2 opacity-0 pointer-events-none group-hover/dl:opacity-100 group-hover/dl:pointer-events-auto transition-all duration-300 z-0 -translate-y-2 group-hover/dl:translate-y-0">
+                            <button id="cardDownloadPdfBtn" onclick="downloadPDF()" class="bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[36px] h-[36px] md:w-[44px] md:h-[44px] outline-none text-[var(--theme-color)] border-2 border-[var(--theme-color)]" aria-label="Download Card PDF">
+                                <i data-lucide="file-down" class="w-4 h-4 md:w-5 md:h-5"></i>
+                            </button>
+                        </div>
+                    </div>
 
                     <div class="pt-6 md:pt-10 px-6 md:px-20 pb-8 md:pb-20 group/card flex flex-col h-full">
                         
@@ -403,32 +410,19 @@
                 <button id="imageLayoutToggleBtn" class="text-gray-400 hover:text-[#51b8cb] transition-colors outline-none cursor-pointer p-1" aria-label="Image Layout">
                     <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
                 </button>
+                <button onclick="document.getElementById('imageInput').click()" class="text-gray-400 hover:text-[var(--theme-color)] transition-colors outline-none cursor-pointer p-1" aria-label="Upload Image">
+                    <i data-lucide="image-plus" class="w-3.5 h-3.5"></i>
+                </button>
+                <button id="contextUndoImageBtn" onclick="event.stopPropagation(); undoImageAction(); document.getElementById('floatingPreviewMenu').classList.add('hidden');" class="text-gray-400 hover:text-[var(--theme-color)] transition-colors outline-none cursor-pointer p-1" aria-label="Undo Image Action">
+                    <i data-lucide="undo" class="w-3.5 h-3.5"></i>
+                </button>
+                <button id="contextRedoImageBtn" onclick="event.stopPropagation(); redoImageAction(); document.getElementById('floatingPreviewMenu').classList.add('hidden');" class="text-gray-400 hover:text-[var(--theme-color)] transition-colors outline-none cursor-pointer p-1" aria-label="Redo Image Action">
+                    <i data-lucide="redo" class="w-3.5 h-3.5"></i>
+                </button>
             </div>
         </div>
         <div id="floatingLayoutOptions" class="hidden py-1 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mt-1 mb-1"></div>
         <div class="py-1">
-            <div class="flex items-center justify-between px-1">
-                <div onclick="document.getElementById('imageInput').click()" class="dropdown-item flex-1 flex items-center gap-2 text-gray-700 dark:text-gray-300 m-0">
-                    <i data-lucide="image-plus" class="w-4 h-4"></i> Upload Image
-                </div>
-                <div class="flex items-center gap-1 pr-2 shrink-0">
-                    <button id="contextUndoImageBtn" onclick="event.stopPropagation(); undoImageAction(); document.getElementById('floatingPreviewMenu').classList.add('hidden');" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors outline-none" aria-label="Undo Image Action">
-                        <i data-lucide="undo" class="w-4 h-4"></i>
-                    </button>
-                    <button id="contextRedoImageBtn" onclick="event.stopPropagation(); redoImageAction(); document.getElementById('floatingPreviewMenu').classList.add('hidden');" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors outline-none" aria-label="Redo Image Action">
-                        <i data-lucide="redo" class="w-4 h-4"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
-            
-            <div id="contextAddNoteBtn" class="dropdown-item flex items-center gap-2 text-[#e7f135]">
-                <i data-lucide="file-text" class="w-4 h-4"></i> Switch Notepad
-            </div>
-            
-            <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
-
             <div id="themeColorToggleBtn" class="dropdown-item flex items-center justify-between gap-2 transition-colors">
                 <div class="flex items-center gap-2"><i data-lucide="palette" class="w-4 h-4"></i> Theme Color</div>
                 <i data-lucide="chevron-down" class="w-3 h-3 transition-transform" id="themeColorChevron"></i>
@@ -1011,14 +1005,6 @@
                             switchCard(cards[Math.max(0, index - 1)].id);
                         }
                     }
-                };
-            }
-
-            const addNoteBtn = document.getElementById('contextAddNoteBtn');
-            if (addNoteBtn) {
-                addNoteBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    switchToNotepad();
                 };
             }
 
@@ -1642,15 +1628,21 @@
             createCard(); 
         }
         
-        window.switchToNotepad = function() {
+        window.toggleNotepadView = function() {
             const menu = document.getElementById('floatingPreviewMenu');
             if (menu) menu.classList.add('hidden');
             const c = document.getElementById('cardContainer');
             const n = document.getElementById('notepadContainer');
             if (c && n) {
-                c.classList.add('hidden');
-                n.classList.remove('hidden');
-                n.classList.add('flex');
+                if (c.classList.contains('hidden')) {
+                    n.classList.add('hidden');
+                    n.classList.remove('flex');
+                    c.classList.remove('hidden');
+                } else {
+                    c.classList.add('hidden');
+                    n.classList.remove('hidden');
+                    n.classList.add('flex');
+                }
             }
         };
 
@@ -1772,6 +1764,12 @@
             
             const themeColorBtn = document.getElementById('themeColorToggleBtn');
             if (themeColorBtn) { themeColorBtn.style.color = finalColor; }
+
+            const dlBtn = document.getElementById('cardDownloadBtn'); 
+            if (dlBtn) { dlBtn.style.color = finalColor; dlBtn.style.border = `2px solid ${finalColor}`; }
+            
+            const dlPdfBtn = document.getElementById('cardDownloadPdfBtn'); 
+            if (dlPdfBtn) { dlPdfBtn.style.color = finalColor; dlPdfBtn.style.border = `2px solid ${finalColor}`; }
 
             document.querySelectorAll('.dynamic-theme-color-swatch').forEach(swatch => {
                 swatch.style.backgroundColor = finalColor;
@@ -2253,6 +2251,64 @@
                 card.classList.add('card-shadow'); 
             } finally { 
                 isDownloading = false; 
+            }
+        }
+
+        let isDownloadingPDF = false;
+        async function downloadPDF() {
+            if (isDownloadingPDF) return; 
+            isDownloadingPDF = true; 
+            
+            const cardWordEl = document.getElementById('cardWord');
+            const tempDiv = document.createElement('div');
+            if(cardWordEl) tempDiv.innerHTML = cardWordEl.innerHTML;
+            const f = (tempDiv.innerText.trim()) ? tempDiv.innerText.trim() : "Card";
+            
+            const card = document.getElementById('cardContainer');
+            try {
+                const rect = card.getBoundingClientRect();
+                card.classList.remove('card-shadow'); 
+                const imgs = card.querySelectorAll('img'); 
+                await Promise.all(Array.from(imgs).map(img => img.complete ? Promise.resolve() : new Promise(r => { img.onload = r; img.onerror = r; })));
+                
+                const opt = {
+                    margin:       0,
+                    filename:     `${f}.pdf`,
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { 
+                        scale: 2, 
+                        backgroundColor: null, 
+                        useCORS: true, 
+                        onclone: (doc) => { 
+                            const c = doc.getElementById('cardContainer'); c.style.boxShadow = 'none'; c.style.borderRadius = '48px'; 
+                            doc.querySelectorAll('#cardTitleRestore, #cardDefRestore, #cardExtraDefRestore, #addCategoryBtn, .format-toolbar, .clear-btn, .hidden-in-export').forEach(el => el.style.display = 'none');
+                            doc.querySelectorAll('[contenteditable]').forEach(el => { if (!el.innerText.trim()) el.removeAttribute('data-placeholder'); });
+                            if (!doc.getElementById('cardDef').innerText.trim()) doc.getElementById('cardNotesSection').style.display = 'none';
+                            
+                            if (doc.getElementById('cardBlocksContainer')) {
+                                doc.querySelectorAll('.card-extra-def-input').forEach(el => {
+                                    if (!el.innerText.trim()) el.parentElement.style.display = 'none';
+                                });
+                            }
+
+                            if (!doc.getElementById('cardType').innerText.trim()) doc.getElementById('cardType').style.display = 'none';
+                            if (!doc.getElementById('cardWord').innerText.trim() && !doc.getElementById('cardType').innerText.trim()) doc.getElementById('cardTitleSection').style.display = 'none';
+                            if (doc.getElementById('cardImagesContainer') && doc.getElementById('cardImagesContainer').children.length > 0) {
+                                doc.getElementById('cardImagesContainer').style.paddingTop = '1rem';
+                            }
+                            
+                            doc.querySelectorAll('#cardWord, #cardDef, .card-extra-def-input, #cardType').forEach(el => el.style.textDecoration = 'none');
+                        }
+                    },
+                    jsPDF:        { unit: 'px', format: [rect.width, rect.height], orientation: rect.width > rect.height ? 'landscape' : 'portrait' }
+                };
+                
+                await html2pdf().set(opt).from(card).save();
+            } catch (e) { 
+                console.error("Export failed", e); 
+            } finally { 
+                card.classList.add('card-shadow'); 
+                isDownloadingPDF = false; 
             }
         }
     </script>
