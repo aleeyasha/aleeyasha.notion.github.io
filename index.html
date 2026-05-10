@@ -2266,9 +2266,9 @@
             
             const card = document.getElementById('cardContainer');
             try {
-                // Use exact integer dimensions to prevent fractional rendering bugs
-                const w = card.offsetWidth;
-                const h = card.offsetHeight;
+                // Use clientWidth/Height to strictly measure the inside of the card (ignoring border thickness)
+                const w = card.clientWidth;
+                const h = card.clientHeight;
                 
                 card.classList.remove('card-shadow'); 
                 const imgs = card.querySelectorAll('img'); 
@@ -2280,27 +2280,54 @@
                     image:        { type: 'jpeg', quality: 1.0 },
                     html2canvas:  { 
                         scale: 2, 
-                        backgroundColor: '#ffffff', // Ensures transparent areas don't turn black
+                        backgroundColor: '#ffffff', // Ensures transparent areas are pure white
                         useCORS: true, 
+                        width: w,  // Force html2canvas to capture EXACTLY the border-less width (eliminates margins)
+                        height: h, // Force html2canvas to capture EXACTLY the border-less height
                         onclone: (doc) => { 
-                            // Override CSS variables globally in the cloned document to ensure no rogue colors
-                            doc.documentElement.style.setProperty('--theme-blend', '#ffffff', 'important');
-                            doc.documentElement.style.setProperty('--theme-color', 'transparent', 'important');
+                            // 1. Inject a bulletproof style tag to force a pure white background and invisible border
+                            const style = doc.createElement('style');
+                            style.innerHTML = `
+                                #cardContainer {
+                                    background-color: #ffffff !important;
+                                    background: #ffffff !important;
+                                    border: none !important;
+                                    border-width: 0 !important;
+                                    border-radius: 0px !important;
+                                    box-shadow: none !important;
+                                    margin: 0 !important;
+                                    max-width: none !important;
+                                    width: ${w}px !important;
+                                    height: ${h}px !important;
+                                }
+                                body, html {
+                                    background-color: #ffffff !important;
+                                    background: #ffffff !important;
+                                }
+                            `;
+                            doc.head.appendChild(style);
 
                             const c = doc.getElementById('cardContainer'); 
-                            c.style.boxShadow = 'none'; 
                             
-                            // Make the exported card rectangular and aggressively remove bg/border classes for a clean PDF
-                            c.style.borderRadius = '0px'; 
-                            c.style.margin = '0';
-                            c.classList.remove('border-[4px]', 'md:border-[6px]', 'border-[var(--theme-color)]', 'theme-blend-bg-card', 'rounded-[2rem]', 'md:rounded-[3rem]');
+                            // 2. Aggressively strip ALL border, background, shadow, and rounded classes
+                            c.className = c.className.split(' ').filter(cls => 
+                                !cls.includes('border') && 
+                                !cls.includes('rounded') && 
+                                !cls.includes('theme-blend') && 
+                                !cls.includes('shadow')
+                            ).join(' ');
                             
-                            // Force standard CSS overrides as a fallback
+                            // 3. Set inline styles just to be triple sure the overrides stick
                             c.style.setProperty('background-color', '#ffffff', 'important');
                             c.style.setProperty('background', '#ffffff', 'important');
                             c.style.setProperty('border', 'none', 'important');
-                            c.style.setProperty('border-width', '0px', 'important');
+                            c.style.setProperty('border-radius', '0px', 'important');
+                            c.style.setProperty('box-shadow', 'none', 'important');
+                            c.style.setProperty('margin', '0', 'important');
+                            c.style.setProperty('width', w + 'px', 'important');
+                            c.style.setProperty('height', h + 'px', 'important');
                             
+                            // 4. Cleanup UI elements
                             doc.querySelectorAll('#cardTitleRestore, #cardDefRestore, #cardExtraDefRestore, #addCategoryBtn, .format-toolbar, .clear-btn, .hidden-in-export').forEach(el => el.style.display = 'none');
                             doc.querySelectorAll('[contenteditable]').forEach(el => { if (!el.innerText.trim()) el.removeAttribute('data-placeholder'); });
                             if (!doc.getElementById('cardDef').innerText.trim()) doc.getElementById('cardNotesSection').style.display = 'none';
@@ -2320,7 +2347,7 @@
                             doc.querySelectorAll('#cardWord, #cardDef, .card-extra-def-input, #cardType').forEach(el => el.style.textDecoration = 'none');
                         }
                     },
-                    // Add 1px to height to firmly prevent html2pdf's tiny fraction overflow bug from making a 2nd page
+                    // Add 1px to height to firmly prevent html2pdf fraction overflow
                     jsPDF:        { unit: 'px', format: [w, h + 1], orientation: w > h ? 'landscape' : 'portrait' }
                 };
                 
