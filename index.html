@@ -2266,7 +2266,10 @@
             
             const card = document.getElementById('cardContainer');
             try {
-                const rect = card.getBoundingClientRect();
+                // Use exact integer dimensions to prevent fractional rendering bugs
+                const w = card.offsetWidth;
+                const h = card.offsetHeight;
+                
                 card.classList.remove('card-shadow'); 
                 const imgs = card.querySelectorAll('img'); 
                 await Promise.all(Array.from(imgs).map(img => img.complete ? Promise.resolve() : new Promise(r => { img.onload = r; img.onerror = r; })));
@@ -2274,13 +2277,18 @@
                 const opt = {
                     margin:       0,
                     filename:     `${f}.pdf`,
-                    image:        { type: 'jpeg', quality: 0.98 },
+                    image:        { type: 'jpeg', quality: 1.0 },
                     html2canvas:  { 
                         scale: 2, 
-                        backgroundColor: null, 
+                        backgroundColor: '#ffffff', // Ensures transparent areas don't turn black
                         useCORS: true, 
                         onclone: (doc) => { 
-                            const c = doc.getElementById('cardContainer'); c.style.boxShadow = 'none'; c.style.borderRadius = '48px'; 
+                            const c = doc.getElementById('cardContainer'); 
+                            c.style.boxShadow = 'none'; 
+                            // Make the exported card rectangular so it fills the PDF page flawlessly
+                            c.style.borderRadius = '0px'; 
+                            c.style.margin = '0';
+                            
                             doc.querySelectorAll('#cardTitleRestore, #cardDefRestore, #cardExtraDefRestore, #addCategoryBtn, .format-toolbar, .clear-btn, .hidden-in-export').forEach(el => el.style.display = 'none');
                             doc.querySelectorAll('[contenteditable]').forEach(el => { if (!el.innerText.trim()) el.removeAttribute('data-placeholder'); });
                             if (!doc.getElementById('cardDef').innerText.trim()) doc.getElementById('cardNotesSection').style.display = 'none';
@@ -2300,7 +2308,8 @@
                             doc.querySelectorAll('#cardWord, #cardDef, .card-extra-def-input, #cardType').forEach(el => el.style.textDecoration = 'none');
                         }
                     },
-                    jsPDF:        { unit: 'px', format: [rect.width, rect.height], orientation: rect.width > rect.height ? 'landscape' : 'portrait' }
+                    // Add 1px to height to firmly prevent html2pdf's tiny fraction overflow bug from making a 2nd page
+                    jsPDF:        { unit: 'px', format: [w, h + 1], orientation: w > h ? 'landscape' : 'portrait' }
                 };
                 
                 await html2pdf().set(opt).from(card).save();
