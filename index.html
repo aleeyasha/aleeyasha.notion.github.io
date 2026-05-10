@@ -998,6 +998,22 @@
                 };
             }
 
+            const deleteCardBtn = document.getElementById('contextDeleteCardBtn');
+            if (deleteCardBtn) {
+                deleteCardBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    document.getElementById('floatingPreviewMenu').classList.add('hidden');
+                    if (cards.length > 1) {
+                        const index = cards.findIndex(c => c.id === activeCardId);
+                        if (index > -1) {
+                            cards.splice(index, 1);
+                            saveCardsToStorage();
+                            switchCard(cards[Math.max(0, index - 1)].id);
+                        }
+                    }
+                };
+            }
+
             const addNoteBtn = document.getElementById('contextAddNoteBtn');
             if (addNoteBtn) {
                 addNoteBtn.onclick = (e) => {
