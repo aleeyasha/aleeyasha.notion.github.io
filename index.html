@@ -24,6 +24,11 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
+        :root {
+            --theme-color: #51b8cb;
+            --theme-blend: #ffffff;
+        }
+
         body { 
             font-family: 'Poppins', sans-serif; 
             background-color: #e8f6f8; 
@@ -36,6 +41,10 @@
             color: #f1f1f1; 
         }
         
+        .theme-blend-bg-card { background-color: var(--theme-blend, #ffffff) !important; }
+        .theme-blend-bg { background-color: var(--theme-blend, #ffffff) !important; }
+        .dark .theme-blend-bg { background-color: #1a1a1a !important; }
+
         .card-shadow { 
             box-shadow: 0 20px 40px -10px rgba(81, 184, 203, 0.15), 0 0 15px rgba(0, 0, 0, 0.02); 
         }
@@ -61,14 +70,14 @@
             color: #eee !important; 
         }
         input:focus, textarea:focus, select:focus { 
-            border-color: #51b8cb !important; 
-            box-shadow: 0 0 0 2px rgba(81, 184, 203, 0.15) !important; 
+            border-color: var(--theme-color) !important; 
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05) !important; 
         }
         
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #51b8cb; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #3a98aa; }
+        ::-webkit-scrollbar-thumb { background: var(--theme-color); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { opacity: 0.8; }
 
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]:focus { outline: none; }
@@ -88,7 +97,7 @@
         #inputHue::-webkit-slider-runnable-track { background: transparent; height: 12px; }
         #inputHue::-webkit-slider-thumb { 
             height: 20px; width: 20px; border-radius: 50%; background: white; 
-            border: 3px solid #51b8cb; box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            border: 3px solid var(--theme-color, #51b8cb); box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
             cursor: pointer; -webkit-appearance: none; margin-top: -4px; 
         }
 
@@ -121,7 +130,7 @@
             font-family: 'Caveat', cursive !important; 
             background-color: transparent !important; 
             border: none !important; 
-            border-bottom: 2px dashed #d0ebf0 !important; 
+            border-bottom: 2px dashed rgba(0,0,0,0.1) !important; 
             font-weight: 700; 
             font-size: 24px; 
             letter-spacing: 0.02em; 
@@ -137,12 +146,12 @@
             border-bottom-color: #333 !important;
             color: #eee !important; 
         }
-        .np-title-input:hover { background-color: rgba(81, 184, 203, 0.02) !important; }
+        .np-title-input:hover { background-color: rgba(0,0,0,0.02) !important; }
         .dark .np-title-input:hover { background-color: rgba(255, 255, 255, 0.02) !important; }
         .np-title-input:focus { 
             outline: none !important; box-shadow: none !important; 
-            border-bottom: 2px solid #51b8cb !important;
-            background-color: rgba(81, 184, 203, 0.05) !important;
+            border-bottom: 2px solid var(--theme-color) !important;
+            background-color: rgba(0,0,0,0.03) !important;
         }
         .dark .np-title-input:focus { background-color: rgba(255, 255, 255, 0.05) !important; }
         
@@ -184,23 +193,23 @@
     <div id="mainLayout" class="relative z-10 w-full flex flex-col items-center pt-8 md:pt-12 pb-10">
         
         <header class="w-full flex justify-center items-center mb-6 md:mb-8 pointer-events-none select-none z-20">
-            <div class="flex items-center gap-3 md:gap-4 pointer-events-auto group/logo">
-                <div onclick="openCardContextMenu(event)" class="cursor-pointer transition-all hover:scale-105" aria-label="Open Menu">
+            <div class="relative flex items-center pointer-events-auto group/logo" onmouseenter="populateHeaderCardsList()">
+                <div class="transition-all hover:scale-105">
                     <img src="image_c2e349.png" alt="aliyasa logo" class="h-10 md:h-14 object-contain drop-shadow-md" onerror="this.onerror=null; this.outerHTML='<h1 class=\'handdrawn-title text-4xl md:text-5xl font-bold tracking-wider\'><span class=\'text-gray-400\'>ali</span><span class=\'text-[#51b8cb]\'>yasa</span></h1>';">
                 </div>
                 
-                <div class="relative group/plusmenu translate-y-1.5 md:translate-y-2 opacity-0 pointer-events-none group-hover/logo:opacity-100 group-hover/logo:pointer-events-auto transition-all duration-300" onmouseenter="populateHeaderCardsList()">
-                    <button onclick="createCard()" oncontextmenu="event.preventDefault(); createCard(true);" class="cursor-pointer transition-all hover:scale-110 hover:rotate-90 duration-300 outline-none flex items-center justify-center text-[#e7f135] hover:text-[#51b8cb] drop-shadow-sm" aria-label="New Card">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 md:w-7 md:h-7">
-                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                    </button>
-                    <div class="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-[100] hidden group-hover/plusmenu:block">
-                        <div class="bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl w-48 overflow-hidden">
-                            <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Your Cards</div>
-                            <div id="headerCardsList" class="max-h-60 overflow-y-auto custom-scrollbar pb-1"></div>
+                <div class="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-[100] opacity-0 invisible group-hover/logo:opacity-100 group-hover/logo:visible transition-all duration-300">
+                    <div class="bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl w-56 overflow-hidden">
+                        <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Your Cards</span>
+                            <button onclick="createCard()" oncontextmenu="event.preventDefault(); createCard(true);" class="cursor-pointer transition-all hover:scale-110 hover:rotate-90 duration-300 outline-none flex items-center justify-center text-[#e7f135] hover:text-[#51b8cb] drop-shadow-sm" aria-label="New Card">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 md:w-5 md:h-5">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                            </button>
                         </div>
+                        <div id="headerCardsList" class="max-h-60 overflow-y-auto custom-scrollbar pb-1"></div>
                     </div>
                 </div>
             </div>
@@ -208,15 +217,15 @@
 
         <main class="w-full px-3 md:px-4 flex justify-center">
             
-            <div id="cardContainer" class="rounded-[2rem] md:rounded-[3rem] card-shadow overflow-hidden border-[4px] md:border-[6px] border-[#51b8cb] relative transition-all duration-500 min-h-[400px] md:min-h-[600px] w-full max-w-[1050px] group/maincard" style="background-color: #ffffff;">
+            <div id="cardContainer" class="rounded-[2rem] md:rounded-[3rem] card-shadow overflow-hidden border-[4px] md:border-[6px] border-[var(--theme-color)] relative transition-all duration-500 min-h-[400px] md:min-h-[600px] w-full max-w-[1050px] group/maincard theme-blend-bg-card">
 
-                    <button id="cardDownloadBtn" onclick="downloadPNG()" class="absolute top-4 right-4 md:top-6 md:right-6 bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md opacity-100 lg:opacity-0 group-hover/maincard:opacity-100 transition-all z-[30] hidden-in-export flex items-center justify-center hover:scale-110 w-[36px] h-[36px] md:w-[44px] md:h-[44px] outline-none" aria-label="Download Card">
+                    <button id="cardDownloadBtn" onclick="downloadPNG()" class="absolute top-4 right-4 md:top-6 md:right-6 bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md opacity-100 lg:opacity-0 group-hover/maincard:opacity-100 transition-all z-[30] hidden-in-export flex items-center justify-center hover:scale-110 w-[36px] h-[36px] md:w-[44px] md:h-[44px] outline-none text-[var(--theme-color)] border-2 border-[var(--theme-color)]" aria-label="Download Card">
                         <i data-lucide="download" class="w-4 h-4 md:w-5 md:h-5"></i>
                     </button>
 
                     <div class="pt-6 md:pt-10 px-6 md:px-20 pb-8 md:pb-20 group/card flex flex-col h-full">
                         
-                        <div id="cardTitleRestore" onclick="restoreTitle()" class="hidden cursor-pointer py-2 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl border-2 border-dashed border-transparent hover:border-[#d0ebf0] dark:hover:border-[#333] text-center text-gray-400 hover:text-[#51b8cb] opacity-100 lg:opacity-0 group-hover/card:opacity-100 transition-all flex items-center justify-center gap-2">
+                        <div id="cardTitleRestore" onclick="restoreTitle()" class="hidden cursor-pointer py-2 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl border-2 border-dashed border-transparent hover:border-[var(--theme-color)] dark:hover:border-[#333] text-center text-gray-400 hover:text-[var(--theme-color)] opacity-100 lg:opacity-0 group-hover/card:opacity-100 transition-all flex items-center justify-center gap-2">
                             <i data-lucide="plus" class="w-4 h-4"></i> <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Add Title / Category</span>
                         </div>
 
@@ -224,22 +233,22 @@
                             
                             <div class="format-toolbar absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-lg border border-[#d0ebf0] dark:border-[#333] rounded-xl flex items-center p-1 gap-1 opacity-0 pointer-events-none group-focus-within/title:opacity-100 group-hover/title:opacity-100 group-focus-within/title:pointer-events-auto group-hover/title:pointer-events-auto transition-all z-20 translate-y-2 group-hover/title:translate-y-0 group-focus-within/title:translate-y-0">
                                 <div class="relative">
-                                    <button id="toolbarTitleSizeBtn" onmousedown="event.preventDefault();" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors flex items-center gap-1 text-[11px] font-bold min-w-[40px] justify-center" aria-label="Font Size">
+                                    <button id="toolbarTitleSizeBtn" onmousedown="event.preventDefault();" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors flex items-center gap-1 text-[11px] font-bold min-w-[40px] justify-center" aria-label="Font Size">
                                         <span id="toolbarTitleSizeLabel">32</span>
                                         <i data-lucide="chevron-down" class="w-3 h-3"></i>
                                     </button>
                                     <div id="toolbarTitleSizeDropdownMenu" onmousedown="event.preventDefault();" class="hidden absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[60] overflow-hidden w-16 max-h-48 overflow-y-auto custom-scrollbar"></div>
                                 </div>
                                 <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                <button onmousedown="event.preventDefault(); execFormat('justifyLeft')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-left" aria-label="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
-                                <button onmousedown="event.preventDefault(); execFormat('justifyCenter')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-center" aria-label="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
-                                <button onmousedown="event.preventDefault(); execFormat('justifyRight')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-right" aria-label="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+                                <button onmousedown="event.preventDefault(); execFormat('justifyLeft')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-left" aria-label="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
+                                <button onmousedown="event.preventDefault(); execFormat('justifyCenter')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-center" aria-label="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+                                <button onmousedown="event.preventDefault(); execFormat('justifyRight')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-right" aria-label="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
                             </div>
 
                             <h2 id="cardWord" contenteditable="true" data-placeholder="Enter Term / Title..." class="font-bold tracking-tight leading-tight outline-none flex-1 min-w-[50%]" style="text-decoration: none;"></h2>
                             <span id="cardType" contenteditable="true" data-placeholder="Category..." class="text-sm md:text-xl font-bold px-3 py-1 md:px-4 md:py-1 rounded-none outline-none min-w-[80px] empty:min-w-[100px]"></span>
                             
-                            <button id="addCategoryBtn" onclick="showCategoryDropdown(event)" class="hidden text-[9px] md:text-[10px] font-bold uppercase tracking-widest px-2 py-1 md:px-3 md:py-1 rounded-lg border-2 border-dashed border-gray-300 dark:border-[#333] text-gray-400 hover:border-[#51b8cb] hover:text-[#51b8cb] transition-all flex items-center gap-1 opacity-100 lg:opacity-0 group-hover/title:opacity-100 outline-none" aria-label="Add Category">
+                            <button id="addCategoryBtn" onclick="showCategoryDropdown(event)" class="hidden text-[9px] md:text-[10px] font-bold uppercase tracking-widest px-2 py-1 md:px-3 md:py-1 rounded-lg border-2 border-dashed border-gray-300 dark:border-[#333] text-gray-400 hover:border-[var(--theme-color)] hover:text-[var(--theme-color)] transition-all flex items-center gap-1 opacity-100 lg:opacity-0 group-hover/title:opacity-100 outline-none" aria-label="Add Category">
                                 <i data-lucide="plus" class="w-3 h-3"></i> Add Category
                             </button>
 
@@ -249,21 +258,21 @@
                         </div>
                         
                         <div id="cardContent" class="space-y-0 mt-1 flex-1">
-                            <div id="cardDefRestore" onclick="restoreDef()" class="hidden cursor-pointer py-2 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl border-2 border-dashed border-transparent hover:border-[#d0ebf0] dark:hover:border-[#333] text-center text-gray-400 hover:text-[#51b8cb] opacity-100 lg:opacity-0 group-hover/card:opacity-100 transition-all flex items-center justify-center gap-2">
+                            <div id="cardDefRestore" onclick="restoreDef()" class="hidden cursor-pointer py-2 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl border-2 border-dashed border-transparent hover:border-[var(--theme-color)] dark:hover:border-[#333] text-center text-gray-400 hover:text-[var(--theme-color)] opacity-100 lg:opacity-0 group-hover/card:opacity-100 transition-all flex items-center justify-center gap-2">
                                 <i data-lucide="plus" class="w-4 h-4"></i> <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Add Notes</span>
                             </div>
 
                             <div id="cardNotesSection" class="group/def relative py-1 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                                 <div class="format-toolbar absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-lg border border-[#d0ebf0] dark:border-[#333] rounded-xl flex items-center p-1 gap-1 opacity-0 pointer-events-none group-focus-within/def:opacity-100 group-hover/def:opacity-100 group-focus-within/def:pointer-events-auto group-hover/def:pointer-events-auto transition-all z-20 translate-y-2 group-hover/def:translate-y-0 group-focus-within/def:translate-y-0">
-                                    <button onmousedown="event.preventDefault(); execFormat('undo')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors" aria-label="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
-                                    <button onmousedown="event.preventDefault(); execFormat('redo')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors" aria-label="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); execFormat('undo')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); execFormat('redo')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
                                     <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                    <button onmousedown="event.preventDefault(); execFormat('bold')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-bold" aria-label="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
-                                    <button onmousedown="event.preventDefault(); execFormat('underline')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-underline" aria-label="Underline"><i data-lucide="underline" class="w-4 h-4"></i></button>
-                                    <button onmousedown="event.preventDefault(); execFormat('highlight')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-highlight" aria-label="Highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); execFormat('bold')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-bold" aria-label="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); execFormat('underline')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-underline" aria-label="Underline"><i data-lucide="underline" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); execFormat('highlight')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-highlight" aria-label="Highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
                                     
                                     <div class="relative group/colorpicker">
-                                        <button onmousedown="event.preventDefault(); toggleTextColorMenu(event)" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-color" aria-label="Text Color"><i data-lucide="palette" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); toggleTextColorMenu(event)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-color" aria-label="Text Color"><i data-lucide="palette" class="w-4 h-4"></i></button>
                                         <div class="text-color-menu hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] p-2 flex flex-wrap gap-1.5 rounded-xl shadow-xl z-[60] w-[165px]" onmousedown="event.preventDefault(); event.stopPropagation();" onclick="event.stopPropagation();">
                                             <div onmousedown="event.preventDefault(); applyTextColor(activeColor)" class="dynamic-theme-color-swatch w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform" style="background-color: #51b8cb; border: 1px solid rgba(0,0,0,0.1);" aria-label="Theme Color"></div>
                                             <div onmousedown="event.preventDefault(); applyTextColor('#ef4444')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-red-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Red"></div>
@@ -279,12 +288,12 @@
                                     </div>
 
                                     <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                    <button onmousedown="event.preventDefault(); execFormat('justifyLeft')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-left" aria-label="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
-                                    <button onmousedown="event.preventDefault(); execFormat('justifyCenter')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-center" aria-label="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
-                                    <button onmousedown="event.preventDefault(); execFormat('justifyRight')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-right" aria-label="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); execFormat('justifyLeft')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-left" aria-label="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); execFormat('justifyCenter')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-center" aria-label="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); execFormat('justifyRight')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-right" aria-label="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
                                     <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
                                     <div class="relative">
-                                        <button id="toolbarDefSizeBtn" onmousedown="event.preventDefault();" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors flex items-center gap-1 text-[11px] font-bold min-w-[40px] justify-center" aria-label="Font Size">
+                                        <button id="toolbarDefSizeBtn" onmousedown="event.preventDefault();" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors flex items-center gap-1 text-[11px] font-bold min-w-[40px] justify-center" aria-label="Font Size">
                                             <span id="toolbarDefSizeLabel">24</span>
                                             <i data-lucide="chevron-down" class="w-3 h-3"></i>
                                         </button>
@@ -301,7 +310,7 @@
                             <div id="cardBlocksContainer" class="w-full flex flex-col gap-2 mt-2"></div>
                             
                             <div class="flex flex-col sm:flex-row gap-2 mt-3 w-full hidden-in-export opacity-100 lg:opacity-0 group-hover/card:opacity-100 transition-all">
-                                <div onclick="addExtraNote()" class="flex-1 cursor-pointer py-2 px-2 md:px-4 rounded-xl md:rounded-2xl border-2 border-dashed border-transparent hover:border-[#d0ebf0] dark:hover:border-[#333] text-center text-gray-400 hover:text-[#51b8cb] transition-all flex items-center justify-center gap-2">
+                                <div onclick="addExtraNote()" class="flex-1 cursor-pointer py-2 px-2 md:px-4 rounded-xl md:rounded-2xl border-2 border-dashed border-transparent hover:border-[var(--theme-color)] dark:hover:border-[#333] text-center text-gray-400 hover:text-[var(--theme-color)] transition-all flex items-center justify-center gap-2">
                                     <i data-lucide="plus" class="w-4 h-4"></i> <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Add Extra Note</span>
                                 </div>
                             </div>
@@ -310,14 +319,14 @@
                     </div>
                 </div>
 
-                <div id="notepadContainer" class="hidden rounded-[2rem] md:rounded-[3rem] card-shadow overflow-hidden border-[4px] md:border-[6px] border-[#51b8cb] relative transition-all duration-500 min-h-[400px] md:min-h-[600px] w-full max-w-[1050px] flex-col bg-white dark:bg-[#1a1a1a] p-6 md:p-12">
+                <div id="notepadContainer" class="hidden rounded-[2rem] md:rounded-[3rem] card-shadow overflow-hidden border-[4px] md:border-[6px] border-[var(--theme-color)] relative transition-all duration-500 min-h-[400px] md:min-h-[600px] w-full max-w-[1050px] flex-col bg-[#1a1a1a] p-6 md:p-12">
                     <div class="flex-1 flex flex-col h-full relative z-20">
                         <div class="flex items-center gap-2 mb-4 w-full overflow-x-auto custom-scrollbar shrink-0 pb-2 border-b border-gray-100 dark:border-gray-800">
                             <div id="notes-list" class="flex gap-2 items-center flex-1"></div>
-                            <button id="new-note-btn" class="p-2 bg-[#e8f6f8] dark:bg-[#222] text-[#51b8cb] rounded-lg transition-all shadow-sm hover:scale-105 shrink-0" aria-label="New Note">
+                            <button id="new-note-btn" class="p-2 bg-black/5 dark:bg-[#222] text-[var(--theme-color)] rounded-lg transition-all shadow-sm hover:scale-105 shrink-0" aria-label="New Note">
                                 <i data-lucide="plus" class="w-4 h-4 md:w-5 md:h-5"></i>
                             </button>
-                            <button id="switchToPreviewBtn" class="p-2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] text-gray-500 hover:text-[#51b8cb] rounded-lg transition-all shadow-sm hover:scale-105 shrink-0 outline-none" aria-label="Back to Card">
+                            <button id="switchToPreviewBtn" class="p-2 bg-white dark:bg-[#1a1a1a] border border-[var(--theme-color)] text-[var(--theme-color)] rounded-lg transition-all shadow-sm hover:scale-105 shrink-0 outline-none" aria-label="Back to Card">
                                 <i data-lucide="arrow-left" class="w-4 h-4 md:w-5 md:h-5"></i>
                             </button>
                         </div>
@@ -326,15 +335,15 @@
                             <input type="text" id="note-title" class="np-title-input flex-1 placeholder:text-gray-300 dark:placeholder:text-gray-600 m-0 min-w-[50%]" placeholder="Note Title...">
                             
                             <div class="flex items-center gap-1.5 md:gap-2 shrink-0 relative">
-                                <button id="np-undo-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" aria-label="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
-                                <button id="np-redo-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" aria-label="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
+                                <button id="np-undo-btn" class="np-control-btn p-2 bg-black/5 dark:bg-[#222] border border-transparent rounded-lg shadow-sm text-gray-500 hover:text-[var(--theme-color)]" aria-label="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
+                                <button id="np-redo-btn" class="np-control-btn p-2 bg-black/5 dark:bg-[#222] border border-transparent rounded-lg shadow-sm text-gray-500 hover:text-[var(--theme-color)]" aria-label="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
                                 <div class="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                <button id="np-bold-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb] btn-format-bold" aria-label="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
-                                <button id="np-underline-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb] btn-format-underline" aria-label="Underline"><i data-lucide="underline" class="w-4 h-4"></i></button>
-                                <button id="np-highlight-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb] btn-format-highlight" aria-label="Highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
+                                <button id="np-bold-btn" class="np-control-btn p-2 bg-black/5 dark:bg-[#222] border border-transparent rounded-lg shadow-sm text-gray-500 hover:text-[var(--theme-color)] btn-format-bold" aria-label="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
+                                <button id="np-underline-btn" class="np-control-btn p-2 bg-black/5 dark:bg-[#222] border border-transparent rounded-lg shadow-sm text-gray-500 hover:text-[var(--theme-color)] btn-format-underline" aria-label="Underline"><i data-lucide="underline" class="w-4 h-4"></i></button>
+                                <button id="np-highlight-btn" class="np-control-btn p-2 bg-black/5 dark:bg-[#222] border border-transparent rounded-lg shadow-sm text-gray-500 hover:text-[var(--theme-color)] btn-format-highlight" aria-label="Highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
                                 
                                 <div class="relative group/colorpicker">
-                                    <button onmousedown="event.preventDefault(); toggleTextColorMenu(event)" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb] btn-format-color" aria-label="Text Color"><i data-lucide="palette" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); toggleTextColorMenu(event)" class="np-control-btn p-2 bg-black/5 dark:bg-[#222] border border-transparent rounded-lg shadow-sm text-gray-500 hover:text-[var(--theme-color)] btn-format-color" aria-label="Text Color"><i data-lucide="palette" class="w-4 h-4"></i></button>
                                     <div class="text-color-menu hidden absolute top-full right-0 mt-2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] p-2 flex flex-wrap gap-1.5 rounded-xl shadow-xl z-[60] w-[165px]" onmousedown="event.preventDefault(); event.stopPropagation();" onclick="event.stopPropagation();">
                                         <div onmousedown="event.preventDefault(); applyTextColor(activeColor)" class="dynamic-theme-color-swatch w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform" style="background-color: #51b8cb; border: 1px solid rgba(0,0,0,0.1);" aria-label="Theme Color"></div>
                                         <div onmousedown="event.preventDefault(); applyTextColor('#ef4444')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-red-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Red"></div>
@@ -350,9 +359,9 @@
                                 </div>
 
                                 <div class="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                <button id="np-copy-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" aria-label="Copy"><i data-lucide="copy" class="w-4 h-4"></i></button>
-                                <button id="np-download-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" aria-label="Download TXT"><i data-lucide="download" class="w-4 h-4"></i></button>
-                                <button id="np-pdf-btn" class="np-control-btn p-2 bg-[#e8f6f8] dark:bg-[#222] dark:border-[#333] border border-gray-100 rounded-lg shadow-sm text-gray-500 hover:text-[#51b8cb]" aria-label="Download PDF"><i data-lucide="file-down" class="w-4 h-4"></i></button>
+                                <button id="np-copy-btn" class="np-control-btn p-2 bg-black/5 dark:bg-[#222] border border-transparent rounded-lg shadow-sm text-gray-500 hover:text-[var(--theme-color)]" aria-label="Copy"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                                <button id="np-download-btn" class="np-control-btn p-2 bg-black/5 dark:bg-[#222] border border-transparent rounded-lg shadow-sm text-gray-500 hover:text-[var(--theme-color)]" aria-label="Download TXT"><i data-lucide="download" class="w-4 h-4"></i></button>
+                                <button id="np-pdf-btn" class="np-control-btn p-2 bg-black/5 dark:bg-[#222] border border-transparent rounded-lg shadow-sm text-gray-500 hover:text-[var(--theme-color)]" aria-label="Download PDF"><i data-lucide="file-down" class="w-4 h-4"></i></button>
                             </div>
                         </div>
 
@@ -360,7 +369,7 @@
                         
                         <footer class="mt-4 pt-4 border-t border-gray-50 dark:border-gray-800 flex justify-between items-center shrink-0">
                             <div id="word-count" class="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest">0 Words</div>
-                            <div id="save-status" class="text-[9px] md:text-[10px] font-bold text-[#51b8cb] uppercase tracking-widest opacity-60">Synced</div>
+                            <div id="save-status" class="text-[9px] md:text-[10px] font-bold text-[var(--theme-color)] uppercase tracking-widest opacity-60">Synced</div>
                         </footer>
                     </div>
                 </div>
@@ -375,9 +384,9 @@
     <div id="floatingImageBorderMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-40 py-1">
         <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Image Align</div>
         <div class="flex justify-between px-4 py-2">
-            <button onclick="cardImgAlign('left')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" aria-label="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
-            <button onclick="cardImgAlign('center')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" aria-label="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
-            <button onclick="cardImgAlign('right')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" aria-label="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+            <button onclick="cardImgAlign('left')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" aria-label="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
+            <button onclick="cardImgAlign('center')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" aria-label="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+            <button onclick="cardImgAlign('right')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" aria-label="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
         </div>
         <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
         <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Image Border</div>
@@ -385,23 +394,28 @@
     </div>
 
     <div id="floatingPreviewMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-64 py-1">
-        <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 mb-1 flex items-center justify-between">
+        <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
             <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Menu</span>
-            <button id="context-theme-toggle" class="text-gray-400 hover:text-[#51b8cb] transition-colors outline-none cursor-pointer p-1" aria-label="Toggle Light/Dark Mode">
-                <i data-lucide="moon" class="w-3.5 h-3.5 dark:hidden"></i>
-                <i data-lucide="sun" class="w-3.5 h-3.5 hidden dark:block"></i>
-            </button>
+            <div class="flex items-center gap-1">
+                <button id="contextDeleteCardBtn" class="text-gray-400 hover:text-rose-500 transition-colors outline-none cursor-pointer p-1" aria-label="Delete Card">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+                <button id="imageLayoutToggleBtn" class="text-gray-400 hover:text-[#51b8cb] transition-colors outline-none cursor-pointer p-1" aria-label="Image Layout">
+                    <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
         </div>
+        <div id="floatingLayoutOptions" class="hidden py-1 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mt-1 mb-1"></div>
         <div class="py-1">
             <div class="flex items-center justify-between px-1">
                 <div onclick="document.getElementById('imageInput').click()" class="dropdown-item flex-1 flex items-center gap-2 text-gray-700 dark:text-gray-300 m-0">
                     <i data-lucide="image-plus" class="w-4 h-4"></i> Upload Image
                 </div>
                 <div class="flex items-center gap-1 pr-2 shrink-0">
-                    <button id="contextUndoImageBtn" onclick="event.stopPropagation(); undoImageAction(); document.getElementById('floatingPreviewMenu').classList.add('hidden');" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors outline-none" aria-label="Undo Image Action">
+                    <button id="contextUndoImageBtn" onclick="event.stopPropagation(); undoImageAction(); document.getElementById('floatingPreviewMenu').classList.add('hidden');" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors outline-none" aria-label="Undo Image Action">
                         <i data-lucide="undo" class="w-4 h-4"></i>
                     </button>
-                    <button id="contextRedoImageBtn" onclick="event.stopPropagation(); redoImageAction(); document.getElementById('floatingPreviewMenu').classList.add('hidden');" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors outline-none" aria-label="Redo Image Action">
+                    <button id="contextRedoImageBtn" onclick="event.stopPropagation(); redoImageAction(); document.getElementById('floatingPreviewMenu').classList.add('hidden');" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors outline-none" aria-label="Redo Image Action">
                         <i data-lucide="redo" class="w-4 h-4"></i>
                     </button>
                 </div>
@@ -414,27 +428,19 @@
             </div>
             
             <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
-            
-            <div id="imageLayoutToggleBtn" class="dropdown-item flex items-center justify-between gap-2 text-gray-700 dark:text-gray-300">
-                <div class="flex items-center gap-2"><i data-lucide="layout-grid" class="w-4 h-4"></i> Image Layout</div>
-                <i data-lucide="chevron-down" class="w-3 h-3 transition-transform" id="imageLayoutChevron"></i>
-            </div>
-            <div id="floatingLayoutOptions" class="hidden py-1 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mt-1"></div>
 
-            <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
-
-            <div id="themeColorToggleBtn" class="dropdown-item flex items-center justify-between gap-2 text-gray-700 dark:text-gray-300">
+            <div id="themeColorToggleBtn" class="dropdown-item flex items-center justify-between gap-2 transition-colors">
                 <div class="flex items-center gap-2"><i data-lucide="palette" class="w-4 h-4"></i> Theme Color</div>
                 <i data-lucide="chevron-down" class="w-3 h-3 transition-transform" id="themeColorChevron"></i>
             </div>
             <div id="floatingThemeColorOptions" class="hidden py-2 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mt-1 px-3">
                 <div class="flex flex-wrap items-center justify-end gap-2 mb-3">
                     <div class="flex items-center gap-1">
-                        <button id="btnRandomColor" class="p-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-gray-400 hover:text-[#51b8cb] rounded-lg transition-all shadow-sm hover:border-gray-300 dark:hover:border-gray-600 outline-none" aria-label="Generate Random Palette">
+                        <button id="btnRandomColor" class="p-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-gray-400 hover:text-[var(--theme-color)] rounded-lg transition-all shadow-sm hover:border-gray-300 dark:hover:border-gray-600 outline-none" aria-label="Generate Random Palette">
                             <i data-lucide="shuffle" class="w-3 h-3"></i>
                         </button>
                         <div class="relative shrink-0 w-20">
-                            <button id="blendBtn" class="w-full px-2 py-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-[#51b8cb] text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group hover:border-gray-300 dark:hover:border-gray-600">
+                            <button id="blendBtn" class="w-full px-2 py-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-[var(--theme-color)] text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group hover:border-gray-300 dark:hover:border-gray-600">
                                 <span class="text-gray-400">Blend</span>
                                 <span id="blendValueLabel">10%</span>
                                 <i data-lucide="chevron-down" class="w-3 h-3 text-gray-400 transition-transform group-hover:translate-y-0.5 shrink-0"></i>
@@ -461,9 +467,9 @@
         <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Image Options</div>
         <div class="py-1">
             <div class="flex justify-between px-4 py-2">
-                <button onclick="npImgAction('align-left')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" aria-label="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
-                <button onclick="npImgAction('align-center')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" aria-label="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
-                <button onclick="npImgAction('align-right')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" aria-label="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+                <button onclick="npImgAction('align-left')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" aria-label="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
+                <button onclick="npImgAction('align-center')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" aria-label="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+                <button onclick="npImgAction('align-right')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" aria-label="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
             </div>
             <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
             <div onclick="npImgAction('grow')" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300">
@@ -627,11 +633,15 @@
                     
                     let itemClass = 'dropdown-item flex items-center justify-between group/carditem transition-all ';
                     if (isActive) {
-                        itemClass += 'bg-[#e8f6f8] dark:bg-[#222] text-[#51b8cb] shadow-sm';
+                        itemClass += 'bg-[#e8f6f8] dark:bg-[#222] shadow-sm';
                     } else {
-                        itemClass += 'text-gray-700 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5';
+                        itemClass += 'hover:bg-black/5 dark:hover:bg-white/5';
                     }
                     item.className = itemClass;
+                    
+                    // Set the text and icon color to match the card's theme color
+                    const cardColor = c.color && c.color.hex ? c.color.hex : '#51b8cb';
+                    item.style.color = cardColor;
                     
                     const leftPart = document.createElement('div');
                     leftPart.className = 'flex items-center gap-2 overflow-hidden flex-1';
@@ -661,7 +671,8 @@
                     item.onclick = (evt) => {
                         evt.stopPropagation();
                         if (!isActive) switchCard(c.id);
-                        document.querySelector('.group\\/plusmenu').dispatchEvent(new Event('mouseleave'));
+                        const logoGroup = document.querySelector('.group\\/logo');
+                        if (logoGroup) logoGroup.dispatchEvent(new Event('mouseleave'));
                     };
                     
                     item.appendChild(leftPart);
@@ -793,11 +804,6 @@
             updatePreview();
             isImageUndoingRedoing = false;
         };
-
-        document.getElementById('context-theme-toggle').addEventListener('click', (e) => {
-            e.stopPropagation();
-            document.documentElement.classList.toggle('dark');
-        });
 
         function initBlendDropdown() {
             const container = document.getElementById('blendOptions');
@@ -1171,10 +1177,15 @@
 
             const toggleBtns = (selector, isActive) => {
                 document.querySelectorAll(selector).forEach(btn => {
-                    btn.classList.toggle('text-[#51b8cb]', isActive); 
-                    btn.classList.toggle('text-gray-500', !isActive); 
-                    btn.classList.toggle('bg-[#e8f6f8]', isActive); 
-                    btn.classList.toggle('dark:bg-[#333]', isActive); 
+                    if (isActive) {
+                        btn.style.color = 'var(--theme-color)';
+                        btn.classList.add('bg-black/5', 'dark:bg-[#333]');
+                        btn.classList.remove('text-gray-500');
+                    } else {
+                        btn.style.color = '';
+                        btn.classList.remove('bg-black/5', 'dark:bg-[#333]');
+                        btn.classList.add('text-gray-500');
+                    }
                 });
             };
 
@@ -1737,17 +1748,14 @@
         function updatePreview() {
             const finalColor = activeColor, textColor = getDarkerShade(finalColor, 0.4), blend = currentBlendPercentage, textSize = currentSelectedSize, defSize = currentSelectedDefSize, imgBorder = currentImageBorder, imageCols = currentImageCols;
             
+            document.documentElement.style.setProperty('--theme-color', finalColor);
+            document.documentElement.style.setProperty('--theme-blend', getLightShade(finalColor, blend));
+            
             const bVL = document.getElementById('blendValueLabel'); if (bVL) bVL.style.color = finalColor;
             const card = document.getElementById('cardContainer'); 
-            card.style.borderColor = finalColor; card.style.backgroundColor = getLightShade(finalColor, blend);
             
-            const notepad = document.getElementById('notepadContainer'); if (notepad) notepad.style.borderColor = finalColor;
-            
-            const dlBtn = document.getElementById('cardDownloadBtn'); 
-            if (dlBtn) { dlBtn.style.color = finalColor; dlBtn.style.border = `2px solid ${finalColor}`; }
-            
-            const switchPrvBtn = document.getElementById('switchToPreviewBtn'); 
-            if (switchPrvBtn) { switchPrvBtn.style.color = finalColor; switchPrvBtn.style.borderColor = finalColor; }
+            const themeColorBtn = document.getElementById('themeColorToggleBtn');
+            if (themeColorBtn) { themeColorBtn.style.color = finalColor; }
 
             document.querySelectorAll('.dynamic-theme-color-swatch').forEach(swatch => {
                 swatch.style.backgroundColor = finalColor;
@@ -1843,16 +1851,16 @@
                             return `
                                 <div class="group/extradef relative py-1 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors mt-1" id="block-wrapper-${idx}" data-block-type="text">
                                     <div class="format-toolbar absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-lg border border-[#d0ebf0] dark:border-[#333] rounded-xl flex items-center p-1 gap-1 opacity-0 pointer-events-none group-focus-within/extradef:opacity-100 group-hover/extradef:opacity-100 group-focus-within/extradef:pointer-events-auto group-hover/extradef:pointer-events-auto transition-all z-20 translate-y-2 group-hover/extradef:translate-y-0 group-focus-within/extradef:translate-y-0">
-                                        <button onmousedown="event.preventDefault(); execFormat('undo')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors" aria-label="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
-                                        <button onmousedown="event.preventDefault(); execFormat('redo')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors" aria-label="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); execFormat('undo')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); execFormat('redo')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
                                         <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                        <button onmousedown="event.preventDefault(); execFormat('bold')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-bold" aria-label="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
-                                        <button onmousedown="event.preventDefault(); execFormat('underline')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-underline" aria-label="Underline"><i data-lucide="underline" class="w-4 h-4"></i></button>
-                                        <button onmousedown="event.preventDefault(); execFormat('highlight')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-highlight" aria-label="Highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); execFormat('bold')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-bold" aria-label="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); execFormat('underline')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-underline" aria-label="Underline"><i data-lucide="underline" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); execFormat('highlight')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-highlight" aria-label="Highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
                                         
                                         <div class="relative group/colorpicker">
-                                            <button onmousedown="event.preventDefault(); toggleTextColorMenu(event)" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-color" aria-label="Text Color"><i data-lucide="palette" class="w-4 h-4"></i></button>
-                                            <div class="text-color-menu hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] p-2 flex flex-wrap gap-1.5 rounded-xl shadow-xl z-[60] w-[150px]" onmousedown="event.preventDefault(); event.stopPropagation();" onclick="event.stopPropagation();">
+                                            <button onmousedown="event.preventDefault(); toggleTextColorMenu(event)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-color" aria-label="Text Color"><i data-lucide="palette" class="w-4 h-4"></i></button>
+                                            <div class="text-color-menu hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] p-2 flex flex-wrap gap-1.5 rounded-xl shadow-xl z-[60] w-[165px]" onmousedown="event.preventDefault(); event.stopPropagation();" onclick="event.stopPropagation();">
                                                 <div onmousedown="event.preventDefault(); applyTextColor(activeColor)" class="dynamic-theme-color-swatch w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform" style="background-color: #51b8cb; border: 1px solid rgba(0,0,0,0.1);" aria-label="Theme Color"></div>
                                                 <div onmousedown="event.preventDefault(); applyTextColor('#ef4444')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-red-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Red"></div>
                                                 <div onmousedown="event.preventDefault(); applyTextColor('#f97316')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-orange-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Orange"></div>
@@ -1861,16 +1869,15 @@
                                                 <div onmousedown="event.preventDefault(); applyTextColor('#10b981')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-emerald-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Green"></div>
                                                 <div onmousedown="event.preventDefault(); applyTextColor('#06b6d4')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-cyan-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Cyan"></div>
                                                 <div onmousedown="event.preventDefault(); applyTextColor('#3b82f6')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-blue-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Blue"></div>
-                                                <div onmousedown="event.preventDefault(); applyTextColor('#6366f1')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-indigo-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Indigo"></div>
                                                 <div onmousedown="event.preventDefault(); applyTextColor('#8b5cf6')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-violet-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Purple"></div>
-                                                <div onmousedown="event.preventDefault(); applyTextColor('#222222')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-gray-900" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Black"></div>
+                                                <div onmousedown="event.preventDefault(); applyTextColor('#222222')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-gray-900" style="border: 1px solid rgba(60,60,60,60.1);" aria-label="Black"></div>
                                             </div>
                                         </div>
 
                                         <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                        <button onmousedown="event.preventDefault(); execFormat('justifyLeft')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-left" aria-label="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
-                                        <button onmousedown="event.preventDefault(); execFormat('justifyCenter')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-center" aria-label="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
-                                        <button onmousedown="event.preventDefault(); execFormat('justifyRight')" class="p-1.5 hover:bg-[#e8f6f8] dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[#51b8cb] transition-colors btn-format-right" aria-label="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); execFormat('justifyLeft')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-left" aria-label="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); execFormat('justifyCenter')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-center" aria-label="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); execFormat('justifyRight')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-right" aria-label="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
                                     </div>
                                     <div class="card-extra-def-input font-medium leading-relaxed whitespace-pre-wrap outline-none" contenteditable="true" data-placeholder="Enter note here..." style="text-decoration: none; min-height: 1.5em; font-family: 'Caveat', cursive;" data-block-idx="${idx}">${block.content}</div>
                                     <button onclick="removeBlock(${idx})" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 group-hover/extradef:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" aria-label="Remove Note">
@@ -2005,7 +2012,8 @@
                 npNotes.forEach((n, idx) => { 
                     const isActive = n.id === npCurrentId;
                     const btn = document.createElement('button'); 
-                    btn.className = `px-4 py-2 text-xs font-bold rounded-xl whitespace-nowrap transition-all flex items-center gap-2 group ${isActive ? 'bg-[#51b8cb] text-white shadow-md' : 'bg-[#e8f6f8] text-gray-500 hover:bg-[#d0ebf0] dark:bg-[#222] dark:hover:bg-[#333]'}`; 
+                    btn.className = `px-4 py-2 text-xs font-bold rounded-xl whitespace-nowrap transition-all flex items-center gap-2 group ${isActive ? 'text-white shadow-md' : 'bg-black/5 text-gray-500 hover:bg-black/10 dark:bg-[#222] dark:hover:bg-[#333]'}`; 
+                    if (isActive) btn.style.backgroundColor = 'var(--theme-color)';
                     btn.onclick = () => select(n.id); 
                     btn.innerHTML = `<span>${n.title.trim() || `Note ${idx + 1}`}</span>`; 
                     if (npNotes.length > 1) {
@@ -2117,7 +2125,7 @@
                 document.execCommand('copy'); 
                 s.removeAllRanges(); 
                 const b = document.getElementById('np-copy-btn'), i = b.innerHTML; 
-                b.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-[#51b8cb]"></i>'; 
+                b.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-[var(--theme-color)]"></i>'; 
                 if (typeof lucide !== 'undefined') lucide.createIcons(); 
                 setTimeout(() => { b.innerHTML = i; if (typeof lucide !== 'undefined') lucide.createIcons(); }, 2000); 
             };
