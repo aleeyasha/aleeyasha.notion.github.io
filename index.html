@@ -114,7 +114,7 @@
             pointer-events: none; transform: translate(-50%, -50%); 
         }
 
-        #cardContainer, #notepadContainer { 
+        #cardContainer { 
             backface-visibility: hidden; -webkit-font-smoothing: antialiased; 
             margin: 0 auto; transition: all 0.3s ease; 
         }
@@ -125,36 +125,6 @@
         .dark #builderArea h2, .dark #builderArea label { color: #f1f1f1 !important; }
         .dark .bg-\[\#FAFAFA\] { background-color: #111 !important; border-color: #333 !important; }
         .dark .bg-white { background-color: #1a1a1a !important; border-color: #333 !important; }
-        
-        .np-title-input { 
-            font-family: 'Caveat', cursive !important; 
-            background-color: transparent !important; 
-            border: none !important; 
-            border-bottom: 2px dashed rgba(0,0,0,0.1) !important; 
-            font-weight: 700; 
-            font-size: 24px; 
-            letter-spacing: 0.02em; 
-            width: 100%; 
-            box-shadow: none !important; 
-            padding: 4px 8px !important; 
-            border-radius: 8px 8px 0 0 !important;
-            transition: all 0.3s ease !important;
-        }
-        @media (min-width: 768px) { .np-title-input { font-size: 28px; } }
-        
-        .dark .np-title-input { 
-            background-color: transparent !important; 
-            border-bottom-color: #333 !important;
-            color: #eee !important; 
-        }
-        .np-title-input:hover { background-color: rgba(0,0,0,0.02) !important; }
-        .dark .np-title-input:hover { background-color: rgba(255, 255, 255, 0.02) !important; }
-        .np-title-input:focus { 
-            outline: none !important; box-shadow: none !important; 
-            border-bottom: 2px solid var(--theme-color) !important;
-            background-color: rgba(0,0,0,0.03) !important;
-        }
-        .dark .np-title-input:focus { background-color: rgba(255, 255, 255, 0.05) !important; }
         
         .dropdown-item { 
             padding: 10px 16px; cursor: pointer; font-size: 11px; font-weight: 600; 
@@ -170,16 +140,25 @@
         }
         .resizable-img:active { cursor: ew-resize; box-shadow: 0 0 0 4px rgba(172, 135, 102, 0.3); }
         
-        .inline-notepad-img { transition: box-shadow 0.2s ease; }
-
         /* Hand-drawn typography */
         #cardWord, #cardDef, .card-extra-def-input, #cardType { font-family: 'Caveat', cursive !important; }
-        #cardDef, .card-extra-def-input, #note-area { tab-size: 4; -moz-tab-size: 4; }
+        #cardDef, .card-extra-def-input { tab-size: 4; -moz-tab-size: 4; }
         .handdrawn-title { font-family: 'Caveat', cursive !important; }
 
         /* ContentEditable Placeholder Styling */
         [contenteditable]:empty:before {
             content: attr(data-placeholder); color: inherit; opacity: 0.4; pointer-events: none; display: block;
+        }
+
+        /* Image Editor Toolbar Styles */
+        .ed-tool-btn.active {
+            color: var(--theme-color) !important;
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        .is-editing > div[class*="absolute"], .is-editing > button { 
+            /* Hide hover controls (move/delete) while actively editing */
+            display: none !important; 
         }
     </style>
     <style id="dynamic-card-styles"></style>
@@ -195,12 +174,12 @@
         
         <header class="w-full flex justify-center items-center mb-6 md:mb-8 pointer-events-none select-none z-20">
             <div class="relative flex items-center pointer-events-auto group/logo" onmouseenter="populateHeaderCardsList()">
-                <div onclick="toggleNotepadView()" class="cursor-pointer transition-all hover:scale-105" aria-label="Toggle Notepad">
+                <div class="cursor-pointer transition-all hover:scale-105">
                     <img src="image_c2e349.png" alt="aliyasa logo" class="h-10 md:h-14 object-contain drop-shadow-md" onerror="this.onerror=null; this.outerHTML='<h1 class=\'handdrawn-title text-4xl md:text-5xl font-bold tracking-wider\'><span class=\'text-gray-400\'>ali</span><span class=\'text-[#51b8cb]\'>yasa</span></h1>';">
                 </div>
                 
                 <div class="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-[100] opacity-0 invisible group-hover/logo:opacity-100 group-hover/logo:visible transition-all duration-300">
-                    <div class="bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl w-56 overflow-hidden">
+                    <div class="bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl w-80 overflow-hidden">
                         <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
                             <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Your Cards</span>
                             <button onclick="createCard()" oncontextmenu="event.preventDefault(); createCard(true);" class="cursor-pointer transition-all hover:scale-110 hover:rotate-90 duration-300 outline-none flex items-center justify-center text-[#e7f135] hover:text-[#51b8cb] drop-shadow-sm" aria-label="New Card">
@@ -300,6 +279,9 @@
                                     <button onmousedown="event.preventDefault(); execFormat('justifyCenter')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-center" aria-label="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
                                     <button onmousedown="event.preventDefault(); execFormat('justifyRight')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-right" aria-label="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
                                     <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                    <button onmousedown="event.preventDefault(); copyNoteText(event, 'cardDef')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Copy Text" title="Copy Text"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); downloadNoteText('cardDef')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Download .txt" title="Download .txt"><i data-lucide="file-text" class="w-4 h-4"></i></button>
+                                    <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
                                     <div class="relative">
                                         <button id="toolbarDefSizeBtn" onmousedown="event.preventDefault();" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors flex items-center gap-1 text-[11px] font-bold min-w-[40px] justify-center" aria-label="Font Size">
                                             <span id="toolbarDefSizeLabel">24</span>
@@ -326,61 +308,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div id="notepadContainer" class="hidden rounded-[2rem] md:rounded-[3rem] card-shadow overflow-hidden border-[4px] md:border-[6px] border-[var(--theme-color)] relative transition-all duration-500 min-h-[400px] md:min-h-[600px] w-full max-w-[1050px] flex-col bg-[#1a1a1a] p-6 md:p-12">
-                    <div class="flex-1 flex flex-col h-full relative z-20">
-                        <div class="flex items-center gap-2 mb-4 w-full overflow-x-auto custom-scrollbar shrink-0 pb-2 border-b border-gray-100 dark:border-gray-800">
-                            <div id="notes-list" class="flex gap-2 items-center flex-1"></div>
-                            <button id="new-note-btn" class="p-2 bg-black/5 dark:bg-[#222] text-[var(--theme-color)] rounded-lg transition-all shadow-sm hover:scale-105 shrink-0" aria-label="New Note">
-                                <i data-lucide="plus" class="w-4 h-4 md:w-5 md:h-5"></i>
-                            </button>
-                            <button id="switchToPreviewBtn" class="p-2 bg-white dark:bg-[#1a1a1a] border border-[var(--theme-color)] text-[var(--theme-color)] rounded-lg transition-all shadow-sm hover:scale-105 shrink-0 outline-none" aria-label="Back to Card">
-                                <i data-lucide="arrow-left" class="w-4 h-4 md:w-5 md:h-5"></i>
-                            </button>
-                        </div>
-
-                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 w-full mb-4 pb-4 border-b border-gray-100 dark:border-gray-800 shrink-0">
-                            <input type="text" id="note-title" class="np-title-input flex-1 placeholder:text-gray-300 dark:placeholder:text-gray-600 m-0 min-w-[50%]" placeholder="Note Title...">
-                            
-                            <div class="flex items-center gap-1.5 md:gap-2 shrink-0 relative">
-                                <button id="np-undo-btn" class="np-control-btn p-2 bg-black/5 dark:bg-[#222] border border-transparent rounded-lg shadow-sm text-gray-500 hover:text-[var(--theme-color)]" aria-label="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
-                                <button id="np-redo-btn" class="np-control-btn p-2 bg-black/5 dark:bg-[#222] border border-transparent rounded-lg shadow-sm text-gray-500 hover:text-[var(--theme-color)]" aria-label="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
-                                <div class="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                <button id="np-bold-btn" class="np-control-btn p-2 bg-black/5 dark:bg-[#222] border border-transparent rounded-lg shadow-sm text-gray-500 hover:text-[var(--theme-color)] btn-format-bold" aria-label="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
-                                <button id="np-underline-btn" class="np-control-btn p-2 bg-black/5 dark:bg-[#222] border border-transparent rounded-lg shadow-sm text-gray-500 hover:text-[var(--theme-color)] btn-format-underline" aria-label="Underline"><i data-lucide="underline" class="w-4 h-4"></i></button>
-                                <button id="np-highlight-btn" class="np-control-btn p-2 bg-black/5 dark:bg-[#222] border border-transparent rounded-lg shadow-sm text-gray-500 hover:text-[var(--theme-color)] btn-format-highlight" aria-label="Highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
-                                
-                                <div class="relative group/colorpicker">
-                                    <button onmousedown="event.preventDefault(); toggleTextColorMenu(event)" class="np-control-btn p-2 bg-black/5 dark:bg-[#222] border border-transparent rounded-lg shadow-sm text-gray-500 hover:text-[var(--theme-color)] btn-format-color" aria-label="Text Color"><i data-lucide="palette" class="w-4 h-4"></i></button>
-                                    <div class="text-color-menu hidden absolute top-full right-0 mt-2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] p-2 flex flex-wrap gap-1.5 rounded-xl shadow-xl z-[60] w-[165px]" onmousedown="event.preventDefault(); event.stopPropagation();" onclick="event.stopPropagation();">
-                                        <div onmousedown="event.preventDefault(); applyTextColor(activeColor)" class="dynamic-theme-color-swatch w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform" style="background-color: #51b8cb; border: 1px solid rgba(0,0,0,0.1);" aria-label="Theme Color"></div>
-                                        <div onmousedown="event.preventDefault(); applyTextColor('#ef4444')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-red-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Red"></div>
-                                        <div onmousedown="event.preventDefault(); applyTextColor('#f97316')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-orange-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Orange"></div>
-                                        <div onmousedown="event.preventDefault(); applyTextColor('#f59e0b')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-yellow-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Yellow"></div>
-                                        <div onmousedown="event.preventDefault(); applyTextColor('#84cc16')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-lime-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Lime"></div>
-                                        <div onmousedown="event.preventDefault(); applyTextColor('#10b981')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-emerald-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Green"></div>
-                                        <div onmousedown="event.preventDefault(); applyTextColor('#06b6d4')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-cyan-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Cyan"></div>
-                                        <div onmousedown="event.preventDefault(); applyTextColor('#3b82f6')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-blue-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Blue"></div>
-                                        <div onmousedown="event.preventDefault(); applyTextColor('#8b5cf6')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-violet-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Purple"></div>
-                                        <div onmousedown="event.preventDefault(); applyTextColor('#222222')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-gray-900" style="border: 1px solid rgba(60,60,60,1.1);" aria-label="Black"></div>
-                                    </div>
-                                </div>
-
-                                <div class="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                <button id="np-copy-btn" class="np-control-btn p-2 bg-black/5 dark:bg-[#222] border border-transparent rounded-lg shadow-sm text-gray-500 hover:text-[var(--theme-color)]" aria-label="Copy"><i data-lucide="copy" class="w-4 h-4"></i></button>
-                                <button id="np-download-btn" class="np-control-btn p-2 bg-black/5 dark:bg-[#222] border border-transparent rounded-lg shadow-sm text-gray-500 hover:text-[var(--theme-color)]" aria-label="Download TXT"><i data-lucide="download" class="w-4 h-4"></i></button>
-                                <button id="np-pdf-btn" class="np-control-btn p-2 bg-black/5 dark:bg-[#222] border border-transparent rounded-lg shadow-sm text-gray-500 hover:text-[var(--theme-color)]" aria-label="Download PDF"><i data-lucide="file-down" class="w-4 h-4"></i></button>
-                            </div>
-                        </div>
-
-                        <div id="note-area" contenteditable="true" data-placeholder="Start typing your notes here..." class="flex-1 w-full text-gray-700 dark:text-gray-300 placeholder:text-gray-300 dark:placeholder:text-gray-600 outline-none whitespace-pre-wrap font-medium leading-relaxed custom-scrollbar overflow-y-auto"></div>
-                        
-                        <footer class="mt-4 pt-4 border-t border-gray-50 dark:border-gray-800 flex justify-between items-center shrink-0">
-                            <div id="word-count" class="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest">0 Words</div>
-                            <div id="save-status" class="text-[9px] md:text-[10px] font-bold text-[var(--theme-color)] uppercase tracking-widest opacity-60">Synced</div>
-                        </footer>
-                    </div>
-                </div>
             </main>
         </div>
 
@@ -389,16 +316,70 @@
         <div id="floatingCategoryOptions" class="max-h-60 overflow-y-auto custom-scrollbar"></div>
     </div>
 
-    <div id="floatingImageBorderMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-40 py-1">
-        <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Image Align</div>
-        <div class="flex justify-between px-4 py-2">
-            <button onclick="cardImgAlign('left')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" aria-label="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
-            <button onclick="cardImgAlign('center')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" aria-label="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
-            <button onclick="cardImgAlign('right')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" aria-label="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+    <!-- Compact Right-Click Editor Toolbar -->
+    <div id="floatingImageToolbar" class="hidden fixed bg-[#1e1e1e] text-gray-300 border border-gray-700 rounded-xl shadow-2xl z-[200] flex items-center p-1.5 gap-1" onmousedown="event.stopPropagation()">
+        
+        <!-- Align Tools -->
+        <button onclick="cardImgAlign('left')" class="p-1.5 hover:bg-white/10 rounded-lg transition-colors" aria-label="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
+        <button onclick="cardImgAlign('center')" class="p-1.5 hover:bg-white/10 rounded-lg transition-colors" aria-label="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+        <button onclick="cardImgAlign('right')" class="p-1.5 hover:bg-white/10 rounded-lg transition-colors" aria-label="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+        
+        <div class="w-px h-5 bg-gray-700 mx-1"></div>
+        
+        <!-- Border Dropdown -->
+        <div class="relative">
+            <button onclick="toggleEdMenu('borderMenu')" class="p-1.5 hover:bg-white/10 rounded-lg flex items-center gap-1 transition-colors outline-none"><i data-lucide="square" class="w-4 h-4"></i> <i data-lucide="chevron-down" class="w-3 h-3"></i></button>
+            <div id="borderMenu" class="hidden absolute top-full left-0 mt-2 bg-[#1e1e1e] border border-gray-700 rounded-lg shadow-xl w-24 p-1 max-h-40 overflow-y-auto custom-scrollbar z-[210]">
+               <!-- Populated dynamically via JS -->
+            </div>
         </div>
-        <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
-        <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Image Border</div>
-        <div id="floatingImageBorderOptions" class="max-h-40 overflow-y-auto custom-scrollbar"></div>
+
+        <div class="w-px h-5 bg-gray-700 mx-1"></div>
+
+        <!-- Draw Tools -->
+        <button class="ed-tool-btn active p-1.5 hover:bg-white/10 rounded-lg transition-colors" data-tool="pen" title="Pen"><i data-lucide="pen-tool" class="w-4 h-4"></i></button>
+        <button class="ed-tool-btn p-1.5 hover:bg-white/10 rounded-lg transition-colors" data-tool="highlighter" title="Highlighter"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
+        <button class="ed-tool-btn p-1.5 hover:bg-white/10 rounded-lg transition-colors" data-tool="eraser" title="Eraser"><i data-lucide="eraser" class="w-4 h-4"></i></button>
+        <button class="ed-tool-btn p-1.5 hover:bg-white/10 rounded-lg transition-colors" data-tool="rect" title="Rectangle"><i data-lucide="square" class="w-4 h-4"></i></button>
+        <button class="ed-tool-btn p-1.5 hover:bg-white/10 rounded-lg transition-colors" data-tool="circle" title="Circle"><i data-lucide="circle" class="w-4 h-4"></i></button>
+        <button class="ed-tool-btn p-1.5 hover:bg-white/10 rounded-lg transition-colors" data-tool="arrow" title="Arrow"><i data-lucide="move-up-right" class="w-4 h-4"></i></button>
+
+        <div class="w-px h-5 bg-gray-700 mx-1"></div>
+
+        <!-- Color & Size -->
+        <div class="relative">
+            <button onclick="toggleEdMenu('colorMenu')" class="p-1.5 hover:bg-white/10 rounded-lg flex items-center gap-1 transition-colors outline-none">
+                <div id="edCurrentColor" class="w-3.5 h-3.5 rounded-full border border-gray-500 shadow-sm" style="background-color: #ef4444;"></div>
+                <i data-lucide="chevron-down" class="w-3 h-3"></i>
+            </button>
+            <div id="colorMenu" class="hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-[#252525] border border-gray-700 rounded-xl shadow-xl w-[200px] p-3 z-[210] cursor-default" onmousedown="event.stopPropagation()">
+                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Colors</div>
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-transparent hover:scale-110 transition scale-110 border-white" style="background-color: #ef4444;" data-color="#ef4444"></button>
+                    <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-transparent hover:scale-110 transition" style="background-color: #f59e0b;" data-color="#f59e0b"></button>
+                    <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-transparent hover:scale-110 transition" style="background-color: #eab308;" data-color="#eab308"></button>
+                    <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-transparent hover:scale-110 transition" style="background-color: #22c55e;" data-color="#22c55e"></button>
+                    <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-transparent hover:scale-110 transition" style="background-color: #0ea5e9;" data-color="#0ea5e9"></button>
+                    <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-transparent hover:scale-110 transition" style="background-color: #3b82f6;" data-color="#3b82f6"></button>
+                    <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-transparent hover:scale-110 transition" style="background-color: #a855f7;" data-color="#a855f7"></button>
+                    <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-transparent hover:scale-110 transition" style="background-color: #ec4899;" data-color="#ec4899"></button>
+                    <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-transparent hover:scale-110 transition" style="background-color: #000000;" data-color="#000000"></button>
+                    <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-transparent hover:scale-110 transition" style="background-color: #ffffff;" data-color="#ffffff"></button>
+                </div>
+                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Size</div>
+                <input type="range" id="edSizeSlider" min="1" max="50" value="5" class="w-full">
+            </div>
+        </div>
+
+        <div class="w-px h-5 bg-gray-700 mx-1"></div>
+        
+        <button onclick="edUndo()" class="p-1.5 hover:bg-white/10 rounded-lg transition-colors" title="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
+        <button onclick="edRedo()" class="p-1.5 hover:bg-white/10 rounded-lg transition-colors" title="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
+
+        <div class="w-px h-5 bg-gray-700 mx-1"></div>
+
+        <button onclick="closeInlineEditor(false)" class="p-1.5 text-gray-400 hover:text-rose-400 hover:bg-white/10 rounded-lg transition-colors" title="Cancel"><i data-lucide="x" class="w-4 h-4"></i></button>
+        <button onclick="saveInlineEditor()" class="p-1.5 text-gray-400 hover:text-emerald-400 hover:bg-white/10 rounded-lg transition-colors" title="Save"><i data-lucide="check" class="w-4 h-4"></i></button>
     </div>
 
     <div id="floatingPreviewMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-64 py-1">
@@ -458,32 +439,48 @@
         </div>
     </div>
 
-    <div id="floatingNotepadImageMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-48 py-1">
-        <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Image Options</div>
-        <div class="py-1">
-            <div class="flex justify-between px-4 py-2">
-                <button onclick="npImgAction('align-left')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" aria-label="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
-                <button onclick="npImgAction('align-center')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" aria-label="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
-                <button onclick="npImgAction('align-right')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-700 dark:text-gray-300 transition-colors" aria-label="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+    <!-- Image Editor Modal -->
+    <div id="imageEditorModal" class="hidden fixed inset-0 z-[200] bg-black/80 flex flex-col items-center justify-center">
+        <div class="bg-white dark:bg-[#1a1a1a] p-2 rounded-2xl mb-4 flex gap-2 items-center shadow-2xl border border-gray-200 dark:border-gray-700 w-[95%] max-w-3xl overflow-x-auto custom-scrollbar shrink-0">
+            <button class="ed-tool-btn p-2 rounded-xl border border-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition active" data-tool="pen" title="Pen"><i data-lucide="pen-tool" class="w-5 h-5"></i></button>
+            <button class="ed-tool-btn p-2 rounded-xl border border-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition" data-tool="highlighter" title="Highlighter"><i data-lucide="highlighter" class="w-5 h-5"></i></button>
+            <button class="ed-tool-btn p-2 rounded-xl border border-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition" data-tool="eraser" title="Eraser"><i data-lucide="eraser" class="w-5 h-5"></i></button>
+            <div class="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 shrink-0"></div>
+            <button class="ed-tool-btn p-2 rounded-xl border border-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition" data-tool="rect" title="Rectangle"><i data-lucide="square" class="w-5 h-5"></i></button>
+            <button class="ed-tool-btn p-2 rounded-xl border border-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition" data-tool="circle" title="Circle"><i data-lucide="circle" class="w-5 h-5"></i></button>
+            <button class="ed-tool-btn p-2 rounded-xl border border-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition" data-tool="arrow" title="Arrow"><i data-lucide="move-up-right" class="w-5 h-5"></i></button>
+            <div class="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 shrink-0"></div>
+            
+            <!-- Color Picker & Size -->
+            <div class="flex gap-1.5 px-1 items-center shrink-0">
+                <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-black/20 dark:border-white/20 hover:scale-110 transition scale-110 border-black dark:border-white" style="background-color: #ef4444;" data-color="#ef4444"></button>
+                <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-black/20 dark:border-white/20 hover:scale-110 transition" style="background-color: #f59e0b;" data-color="#f59e0b"></button>
+                <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-black/20 dark:border-white/20 hover:scale-110 transition" style="background-color: #eab308;" data-color="#eab308"></button>
+                <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-black/20 dark:border-white/20 hover:scale-110 transition" style="background-color: #22c55e;" data-color="#22c55e"></button>
+                <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-black/20 dark:border-white/20 hover:scale-110 transition" style="background-color: #3b82f6;" data-color="#3b82f6"></button>
+                <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-black/20 dark:border-white/20 hover:scale-110 transition" style="background-color: #a855f7;" data-color="#a855f7"></button>
+                <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-black/20 dark:border-white/20 hover:scale-110 transition" style="background-color: #000000;" data-color="#000000"></button>
+                <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-black/20 dark:border-white/20 hover:scale-110 transition" style="background-color: #ffffff;" data-color="#ffffff"></button>
             </div>
-            <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
-            <div onclick="npImgAction('grow')" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                <i data-lucide="zoom-in" class="w-4 h-4"></i> Increase Size
+            
+            <div class="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 shrink-0"></div>
+            <div class="flex items-center shrink-0 w-24 px-2">
+                <input type="range" id="edSizeSlider" min="1" max="50" value="5" class="w-full">
             </div>
-            <div onclick="npImgAction('shrink')" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                <i data-lucide="zoom-out" class="w-4 h-4"></i> Decrease Size
-            </div>
-            <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
-            <div onclick="npImgAction('up')" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                <i data-lucide="arrow-up" class="w-4 h-4"></i> Move Up
-            </div>
-            <div onclick="npImgAction('down')" class="dropdown-item flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                <i data-lucide="arrow-down" class="w-4 h-4"></i> Move Down
-            </div>
-            <div class="border-t border-gray-100 dark:border-gray-800 my-1"></div>
-            <div onclick="npImgAction('delete')" class="dropdown-item flex items-center gap-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10">
-                <i data-lucide="trash-2" class="w-4 h-4"></i> Delete Image
-            </div>
+            
+            <div class="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 shrink-0"></div>
+            <button onclick="edUndo()" class="p-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition" title="Undo"><i data-lucide="undo" class="w-5 h-5"></i></button>
+            <button onclick="edRedo()" class="p-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition" title="Redo"><i data-lucide="redo" class="w-5 h-5"></i></button>
+
+            <div class="flex-1 min-w-[10px]"></div>
+            <button onclick="closeImageEditor()" class="px-4 py-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-bold text-sm transition shrink-0">Cancel</button>
+            <button onclick="saveImageEditor()" class="px-4 py-2 rounded-xl bg-[var(--theme-color)] text-white font-bold text-sm hover:opacity-90 transition shrink-0 ml-1">Save</button>
+        </div>
+
+        <div id="edCanvasContainer" class="relative max-w-[95%] max-h-[80vh]">
+            <canvas id="edBgCanvas"></canvas>
+            <canvas id="edDrawCanvas"></canvas>
+            <canvas id="edTempCanvas" class="cursor-crosshair"></canvas>
         </div>
     </div>
 
@@ -502,11 +499,8 @@
         let showTitlePlaceholder = true, showDefPlaceholder = true, activeImageIdx = -1, activeBlockIdx = -1, activeImageIsGroup = false;
         
         let isDraggingImage = false, dragStartX = 0, dragImageIdx = -1, dragIsGroup = false, dragBlockIdx = -1, dragStartScale = 100;
-        let isResizingNpImage = false, currentNpImage = null, npDragStartX = 0, npStartWidth = 0;
         
         let imageUndoStack = [], imageRedoStack = [], isImageUndoingRedoing = false, stateBeforeDrag = null;
-
-        window.activeNotepadImage = null;
 
         window.toggleTextColorMenu = function(e) {
             e.stopPropagation();
@@ -530,65 +524,6 @@
             checkFormatState();
         };
 
-        window.openNotepadImageMenu = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            window.activeNotepadImage = e.target;
-            const menu = document.getElementById('floatingNotepadImageMenu');
-            menu.classList.remove('hidden');
-            
-            const rect = menu.getBoundingClientRect();
-            let x = e.clientX, y = e.clientY;
-            if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
-            if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
-            menu.style.left = x + 'px'; 
-            menu.style.top = y + 'px';
-        };
-
-        window.npImgAction = function(action) {
-            const img = window.activeNotepadImage;
-            if (!img) return;
-            
-            if (action === 'grow') {
-                let w = parseInt(img.style.width || 50);
-                img.style.width = Math.min(100, w + 10) + '%';
-            } else if (action === 'shrink') {
-                let w = parseInt(img.style.width || 50);
-                img.style.width = Math.max(10, w - 10) + '%';
-            } else if (action === 'up') {
-                let prev = img.previousElementSibling;
-                if(prev) {
-                    prev.insertAdjacentElement('beforebegin', img);
-                } else if (img.parentNode && img.parentNode.id !== 'note-area') {
-                    img.parentNode.insertAdjacentElement('beforebegin', img);
-                }
-            } else if (action === 'down') {
-                let next = img.nextElementSibling;
-                if(next) {
-                    next.insertAdjacentElement('afterend', img);
-                } else if (img.parentNode && img.parentNode.id !== 'note-area') {
-                    img.parentNode.insertAdjacentElement('afterend', img);
-                }
-            } else if (action === 'delete') {
-                img.remove();
-            } else if (action === 'align-left') {
-                img.style.display = 'inline-block';
-                img.style.float = 'left';
-                img.style.margin = '0.5rem 1rem 0.5rem 0';
-            } else if (action === 'align-center') {
-                img.style.display = 'block';
-                img.style.float = 'none';
-                img.style.margin = '1rem auto';
-            } else if (action === 'align-right') {
-                img.style.display = 'inline-block';
-                img.style.float = 'right';
-                img.style.margin = '0.5rem 0 0.5rem 1rem';
-            }
-            
-            document.getElementById('floatingNotepadImageMenu').classList.add('hidden');
-            document.getElementById('note-area').dispatchEvent(new Event('input', {bubbles: true}));
-        };
-
         window.cardImgAlign = function(alignType) {
             if (activeImageIdx !== -1) {
                 pushImageHistory();
@@ -597,10 +532,36 @@
                 } else {
                     uploadedImages[activeImageIdx].align = alignType;
                 }
-                updatePreview();
+                
+                // If editing is open, just update the wrapper class to prevent DOM wipe
+                if (edTarget.imgIdx !== -1) {
+                    const wrapper = edTarget.imgEl.parentElement;
+                    wrapper.className = `relative group/imgwrapper block is-editing ${alignType === 'left' ? 'mr-auto ml-0' : alignType === 'right' ? 'ml-auto mr-0' : 'mx-auto'}`;
+                } else {
+                    updatePreview();
+                }
                 syncCardState();
             }
-            document.getElementById('floatingImageBorderMenu').classList.add('hidden');
+        };
+        
+        window.setImgBorder = function(b) {
+             if (activeImageIdx !== -1) { 
+                 pushImageHistory();
+                 if (activeImageIsGroup && activeBlockIdx !== -1) {
+                     activeBlocks[activeBlockIdx].images[activeImageIdx].border = b;
+                 } else {
+                     uploadedImages[activeImageIdx].border = b;
+                 }
+                 
+                 // If editing is open, update element directly to prevent destroying canvas
+                 if (edTarget.imgIdx !== -1) {
+                     edTarget.imgEl.style.border = `${b}px solid var(--theme-color)`;
+                 } else {
+                     updatePreview(); 
+                 }
+                 syncCardState();
+                 closeEdMenus();
+             } 
         };
 
         function saveCardsToStorage() {
@@ -786,15 +747,16 @@
             }
         };
 
-        initColorPicker(); 
-        initBlendDropdown(); 
-        initFloatingMenu(); 
-        setupEventListeners(); 
-        initCards(); 
-        initNotepad();
-        
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-        initPWA();
+        window.onload = function() {
+            initColorPicker(); 
+            initBlendDropdown(); 
+            initFloatingMenu(); 
+            setupEventListeners(); 
+            initCards(); 
+            
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            initPWA();
+        };
 
         function pushImageHistory(stateOverride = null) {
             if (isImageUndoingRedoing) return;
@@ -834,6 +796,63 @@
             isImageUndoingRedoing = false;
         };
 
+        window.getNoteTextElement = function(target, isBlock) {
+            if (isBlock) {
+                return document.querySelector(`.card-extra-def-input[data-block-idx="${target}"]`);
+            }
+            return document.getElementById(target);
+        };
+
+        window.copyNoteText = function(e, target, isBlock = false) {
+            const el = window.getNoteTextElement(target, isBlock);
+            if (!el) return;
+            
+            // Fallback using execCommand for reliable iFrame/cross-origin copying
+            const textarea = document.createElement('textarea');
+            textarea.value = el.innerText;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                document.execCommand('copy');
+                // Temporary visual feedback
+                if (e && e.currentTarget) {
+                    const btn = e.currentTarget;
+                    const originalHTML = btn.innerHTML;
+                    btn.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-emerald-500"></i>';
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                    setTimeout(() => {
+                        btn.innerHTML = originalHTML;
+                        if (typeof lucide !== 'undefined') lucide.createIcons();
+                    }, 1500);
+                }
+            } catch (err) {
+                console.warn('Copy failed', err);
+            }
+            document.body.removeChild(textarea);
+        };
+
+        window.downloadNoteText = function(target, isBlock = false) {
+            const el = window.getNoteTextElement(target, isBlock);
+            if (!el) return;
+            
+            const text = el.innerText;
+            const titleInput = document.getElementById('inputTitle').value.trim();
+            const filename = (titleInput ? titleInput : 'Note') + (isBlock ? `_Extra_${target+1}` : '') + '.txt';
+
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
         function initBlendDropdown() {
             const container = document.getElementById('blendOptions');
             const menu = document.getElementById('blendDropdownMenu');
@@ -859,9 +878,22 @@
             };
         }
 
+        window.toggleEdMenu = function(menuId) {
+            const menu = document.getElementById(menuId);
+            const isHidden = menu.classList.contains('hidden');
+            closeEdMenus();
+            if (isHidden) menu.classList.remove('hidden');
+        };
+        
+        function closeEdMenus() {
+            document.getElementById('borderMenu').classList.add('hidden');
+            document.getElementById('colorMenu').classList.add('hidden');
+        }
+
         function closeAllDropdowns() { 
             document.querySelectorAll('[id$="DropdownMenu"]').forEach(el => el.classList.add('hidden')); 
             document.querySelectorAll('.text-color-menu').forEach(el => el.classList.add('hidden'));
+            closeEdMenus();
         }
         
         window.addEventListener('click', (e) => {
@@ -875,7 +907,6 @@
 
         function showFloatingCategoryMenu(x, y) {
             const menu = document.getElementById('floatingCategoryMenu');
-            document.getElementById('floatingImageBorderMenu').classList.add('hidden');
             menu.classList.remove('hidden');
             requestAnimationFrame(() => {
                 const rect = menu.getBoundingClientRect();
@@ -885,20 +916,6 @@
                 menu.style.top = y + 'px';
             });
         }
-
-        window.showFloatingImageBorderMenu = function(x, y) {
-            const menu = document.getElementById('floatingImageBorderMenu');
-            document.getElementById('floatingCategoryMenu').classList.add('hidden');
-            document.getElementById('floatingPreviewMenu').classList.add('hidden');
-            menu.classList.remove('hidden');
-            requestAnimationFrame(() => {
-                const rect = menu.getBoundingClientRect();
-                if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
-                if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
-                menu.style.left = x + 'px'; 
-                menu.style.top = y + 'px';
-            });
-        };
 
         window.showCategoryDropdown = function(e) {
             e.stopPropagation();
@@ -958,27 +975,18 @@
                 });
             }
 
-            const imgMenu = document.getElementById('floatingImageBorderMenu'), imgContainer = document.getElementById('floatingImageBorderOptions');
-            if (imgContainer) {
-                imgContainer.innerHTML = '';
+            const borderMenu = document.getElementById('borderMenu');
+            if (borderMenu) {
+                borderMenu.innerHTML = '';
                 [0, 1, 2, 3, 4, 6, 8, 10, 15, 20].forEach(b => {
                     const item = document.createElement('div');
-                    item.className = 'dropdown-item text-gray-700 dark:text-gray-300';
+                    item.className = 'dropdown-item text-gray-300 hover:text-white hover:bg-white/10';
                     item.innerText = b + 'px';
                     item.onclick = (e) => { 
                         e.stopPropagation(); 
-                        if (activeImageIdx !== -1) { 
-                            pushImageHistory();
-                            if (activeImageIsGroup && activeBlockIdx !== -1) {
-                                activeBlocks[activeBlockIdx].images[activeImageIdx].border = b;
-                            } else {
-                                uploadedImages[activeImageIdx].border = b;
-                            }
-                            updatePreview(); 
-                        } 
-                        imgMenu.classList.add('hidden'); 
+                        setImgBorder(b);
                     };
-                    imgContainer.appendChild(item);
+                    borderMenu.appendChild(item);
                 });
             }
 
@@ -1045,11 +1053,6 @@
 
             window.addEventListener('click', () => { 
                 if(catMenu) catMenu.classList.add('hidden'); 
-                const imgM = document.getElementById('floatingImageBorderMenu'); 
-                if(imgM) imgM.classList.add('hidden');
-
-                const npImgMenu = document.getElementById('floatingNotepadImageMenu');
-                if(npImgMenu) npImgMenu.classList.add('hidden');
                 
                 const prevM = document.getElementById('floatingPreviewMenu'); 
                 if(prevM && !prevM.classList.contains('hidden')) {
@@ -1129,7 +1132,7 @@
             const sel = window.getSelection(); if (!sel.rangeCount) return null;
             let node = sel.anchorNode; if (!node) return null;
             let parent = node.nodeType === 3 ? node.parentNode : node;
-            while (parent && parent.id !== 'cardDef' && parent.id !== 'cardWord' && !parent.classList.contains('card-extra-def-input') && parent.id !== 'note-area' && parent.tagName !== 'BODY') {
+            while (parent && parent.id !== 'cardDef' && parent.id !== 'cardWord' && !parent.classList.contains('card-extra-def-input') && parent.tagName !== 'BODY') {
                 if (parent.style && parent.style[styleName]) return parent.style[styleName];
                 parent = parent.parentNode;
             }
@@ -1198,7 +1201,7 @@
         function checkFormatState() {
             const activeEl = document.activeElement;
             if (!activeEl) return;
-            if (activeEl.id !== 'cardDef' && activeEl.id !== 'cardWord' && !activeEl.classList.contains('card-extra-def-input') && activeEl.id !== 'note-area') return;
+            if (activeEl.id !== 'cardDef' && activeEl.id !== 'cardWord' && !activeEl.classList.contains('card-extra-def-input')) return;
 
             const isBold = document.queryCommandState('bold');
             const isUnderline = document.queryCommandState('underline');
@@ -1240,7 +1243,7 @@
             
             document.addEventListener('selectionchange', () => { 
                 const activeEl = document.activeElement;
-                if (activeEl && (activeEl.id === 'cardDef' || activeEl.id === 'cardWord' || activeEl.classList.contains('card-extra-def-input') || activeEl.id === 'note-area')) {
+                if (activeEl && (activeEl.id === 'cardDef' || activeEl.id === 'cardWord' || activeEl.classList.contains('card-extra-def-input'))) {
                     checkFormatState(); 
                 }
             });
@@ -1298,81 +1301,15 @@
                 setManualColor('#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')); 
             });
 
-            const noteAreaEl = document.getElementById('note-area');
-            if (noteAreaEl) {
-                noteAreaEl.addEventListener('mousedown', (e) => {
-                    if (e.target.tagName === 'IMG' && e.target.classList.contains('inline-notepad-img')) {
-                        const rect = e.target.getBoundingClientRect();
-                        const clickX = e.clientX - rect.left;
-                        const edgeThreshold = 30;
-
-                        if (clickX < edgeThreshold || clickX > rect.width - edgeThreshold) {
-                            isResizingNpImage = true;
-                            currentNpImage = e.target;
-                            npDragStartX = e.clientX;
-                            npStartWidth = (currentNpImage.clientWidth / noteAreaEl.clientWidth) * 100;
-                            e.preventDefault(); 
-                        }
-                    }
-                });
-
-                noteAreaEl.addEventListener('mousemove', (e) => {
-                    if (e.target.tagName === 'IMG' && e.target.classList.contains('inline-notepad-img') && !isResizingNpImage) {
-                        const rect = e.target.getBoundingClientRect();
-                        const clickX = e.clientX - rect.left;
-                        if (clickX < 30 || clickX > rect.width - 30) {
-                            e.target.style.cursor = 'ew-resize';
-                        } else {
-                            e.target.style.cursor = 'move';
-                        }
-                    }
-                });
-
-                noteAreaEl.addEventListener('touchstart', (e) => {
-                    if (e.target.tagName === 'IMG' && e.target.classList.contains('inline-notepad-img')) {
-                        const rect = e.target.getBoundingClientRect();
-                        const touchX = e.touches[0].clientX - rect.left;
-                        const edgeThreshold = 30;
-
-                        if (touchX < edgeThreshold || touchX > rect.width - edgeThreshold) {
-                            isResizingNpImage = true;
-                            currentNpImage = e.target;
-                            npDragStartX = e.touches[0].clientX;
-                            npStartWidth = (currentNpImage.clientWidth / noteAreaEl.clientWidth) * 100;
-                            e.preventDefault(); 
-                        }
-                    }
-                });
-            }
-
-            document.getElementById('note-area').addEventListener('contextmenu', (e) => {
-                if (e.target.tagName === 'IMG' && e.target.classList.contains('inline-notepad-img')) {
-                    window.openNotepadImageMenu(e);
-                }
-            });
-            
             document.addEventListener('paste', (event) => { 
                 const clipboardData = event.clipboardData || event.originalEvent.clipboardData;
                 const items = clipboardData.items; 
                 let isImagePaste = false;
-
-                const isNotepad = event.target && event.target.closest('#notepadContainer') !== null;
                 
                 for (let index in items) { 
                     if (items[index].kind === 'file' && items[index].type.includes('image')) {
                         isImagePaste = true;
-                        if (isNotepad) {
-                            const file = items[index].getAsFile();
-                            const reader = new FileReader();
-                            reader.onload = (e) => {
-                                const imgHTML = `&nbsp;<img src="${e.target.result}" class="inline-notepad-img" style="width: 40%; max-width: 100%; height: auto; display: inline-block; margin: 0.25rem 0; border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); vertical-align: middle;" />&nbsp;`;
-                                document.execCommand('insertHTML', false, imgHTML);
-                                document.getElementById('note-area').dispatchEvent(new Event('input', {bubbles: true}));
-                            };
-                            reader.readAsDataURL(file);
-                        } else {
-                            processFile(items[index].getAsFile(), 'blocks'); 
-                        }
+                        processFile(items[index].getAsFile(), 'blocks'); 
                     }
                 } 
                 
@@ -1392,45 +1329,33 @@
             
             window.addEventListener('mousemove', (e) => {
                 handleImageResizeMove(e); 
-                
-                if (isResizingNpImage && currentNpImage) {
-                    const deltaX = e.clientX - npDragStartX;
-                    let newWidth = npStartWidth + (deltaX * 0.3);
-                    newWidth = Math.max(10, Math.min(100, newWidth));
-                    currentNpImage.style.width = newWidth + '%';
-                    e.preventDefault();
-                }
             });
 
             window.addEventListener('mouseup', (e) => {
                 handleImageResizeEnd();
-
-                if (isResizingNpImage) {
-                    isResizingNpImage = false;
-                    currentNpImage = null;
-                    if (noteAreaEl) noteAreaEl.dispatchEvent(new Event('input', {bubbles: true}));
-                }
             });
             
             window.addEventListener('touchmove', (e) => {
                 handleImageResizeMove(e);
-
-                if (isResizingNpImage && currentNpImage) {
-                    const deltaX = e.touches[0].clientX - npDragStartX;
-                    let newWidth = npStartWidth + (deltaX * 0.3);
-                    newWidth = Math.max(10, Math.min(100, newWidth));
-                    currentNpImage.style.width = newWidth + '%';
-                    e.preventDefault();
-                }
             }, { passive: false });
 
             window.addEventListener('touchend', (e) => {
                 handleImageResizeEnd();
-                
-                if (isResizingNpImage) {
-                    isResizingNpImage = false;
-                    currentNpImage = null;
-                    if (noteAreaEl) noteAreaEl.dispatchEvent(new Event('input', {bubbles: true}));
+            });
+            
+            // Auto close inline editor if user resizes window (to prevent canvas misalignment)
+            window.addEventListener('resize', () => {
+                if (edTarget.imgIdx !== -1) closeInlineEditor(false);
+            });
+
+            // Close inline editor if user clicks entirely outside the image or toolbar
+            window.addEventListener('mousedown', (e) => {
+                if (edTarget.imgIdx !== -1) {
+                    const toolbar = document.getElementById('floatingImageToolbar');
+                    const wrapper = edTarget.imgEl ? edTarget.imgEl.parentElement : null;
+                    if (toolbar && !toolbar.contains(e.target) && wrapper && !wrapper.contains(e.target)) {
+                        closeInlineEditor(false);
+                    }
                 }
             });
             
@@ -1662,24 +1587,6 @@
             }
             createCard(); 
         }
-        
-        window.toggleNotepadView = function() {
-            const menu = document.getElementById('floatingPreviewMenu');
-            if (menu) menu.classList.add('hidden');
-            const c = document.getElementById('cardContainer');
-            const n = document.getElementById('notepadContainer');
-            if (c && n) {
-                if (c.classList.contains('hidden')) {
-                    n.classList.add('hidden');
-                    n.classList.remove('flex');
-                    c.classList.remove('hidden');
-                } else {
-                    c.classList.add('hidden');
-                    n.classList.remove('hidden');
-                    n.classList.add('flex');
-                }
-            }
-        };
 
         function createCard(useDefaultColor = false) { 
             let genColor = "#51b8cb", genHue = 189, genSat = 60, genBri = 80;
@@ -1823,6 +1730,11 @@
                 type.innerText = ''; type.classList.add('hidden'); addCatBtn.classList.remove('hidden'); 
             }
             
+            // Force close any open image editors before rebuilding the DOM
+            if (edTarget.imgIdx !== -1) {
+                closeInlineEditor(false);
+            }
+
             const titleS = document.getElementById('cardTitleSection'), titleR = document.getElementById('cardTitleRestore');
             const titleText = word.innerText ? word.innerText.trim() : '';
             if (!titleText && !showTitlePlaceholder && (currentSelectedCategory === '-' || !currentSelectedCategory.trim())) { 
@@ -1860,7 +1772,12 @@
                     const img = document.createElement('img'); img.src = imgObj.src; img.className = "resizable-img h-auto object-cover rounded-[1.5rem] shadow-sm block w-full";
                     img.style.border = `${imgObj.border !== null ? imgObj.border : imgBorder}px solid ${finalColor}`; img.draggable = false;
                     img.onmousedown = (e) => handleImageResizeStart(e, idx, false); img.ontouchstart = (e) => handleImageResizeStart(e, idx, false);
-                    img.oncontextmenu = (e) => { e.preventDefault(); activeImageIdx = idx; activeImageIsGroup = false; activeBlockIdx = -1; showFloatingImageBorderMenu(e.clientX, e.clientY); };
+                    img.oncontextmenu = (e) => { 
+                        e.preventDefault(); 
+                        document.getElementById('floatingPreviewMenu').classList.add('hidden');
+                        startInlineEditor(img, idx, -1);
+                        showEditorToolbar(e.clientX, e.clientY);
+                    };
                     const moveControls = document.createElement('div'); moveControls.className = "absolute -top-3 -left-3 flex gap-1.5 z-10 hidden-in-export opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all";
                     if (idx > 0) { 
                         const lB = document.createElement('button'); lB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] md:w-[32px] md:h-[32px] outline-none p-0"; lB.style.color = finalColor; lB.style.border = `2px solid ${finalColor}`; lB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 md:w-5 md:h-5"><path d="M15 18l-6-6 6-6"/></svg>`; 
@@ -1872,6 +1789,7 @@
                         rB.onclick = (e) => { e.stopPropagation(); moveImageRight(idx); }; 
                         moveControls.appendChild(rB); 
                     }
+                    
                     const delBtn = document.createElement('button'); delBtn.className = "absolute -top-3 -right-3 opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all z-10 hidden-in-export flex items-center justify-center hover:scale-110 outline-none p-0 bg-transparent border-none w-[28px] h-[28px] md:w-[32px] md:h-[32px]"; delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-full h-full drop-shadow-md"><defs><linearGradient id="delGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ff3333" /><stop offset="100%" stop-color="#cc0000" /></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#delGrad)" stroke="#990000" stroke-width="0.5" /><path d="M8 8 L16 16 M16 8 L8 16" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" /></svg>`; 
                     delBtn.onclick = (e) => { e.stopPropagation(); removeImage(idx); };
                     wrapper.appendChild(img); 
@@ -1927,6 +1845,9 @@
                                         <button onmousedown="event.preventDefault(); execFormat('justifyLeft')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-left" aria-label="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
                                         <button onmousedown="event.preventDefault(); execFormat('justifyCenter')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-center" aria-label="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
                                         <button onmousedown="event.preventDefault(); execFormat('justifyRight')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-right" aria-label="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+                                        <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                        <button onmousedown="event.preventDefault(); copyNoteText(event, ${idx}, true)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Copy Text" title="Copy Text"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); downloadNoteText(${idx}, true)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Download .txt" title="Download .txt"><i data-lucide="file-text" class="w-4 h-4"></i></button>
                                     </div>
                                     <div class="card-extra-def-input font-medium leading-relaxed whitespace-pre-wrap outline-none" contenteditable="true" data-placeholder="Enter note here..." style="text-decoration: none; min-height: 1.5em; font-family: 'Caveat', cursive;" data-block-idx="${idx}">${block.content}</div>
                                     <button onclick="removeBlock(${idx})" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 group-hover/extradef:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" aria-label="Remove Note">
@@ -1978,7 +1899,12 @@
                                 const img = document.createElement('img'); img.src = imgObj.src; img.className = "resizable-img h-auto object-cover rounded-[1.5rem] shadow-sm block w-full";
                                 img.style.border = `${imgObj.border !== null ? imgObj.border : imgBorder}px solid ${finalColor}`; img.draggable = false;
                                 img.onmousedown = (e) => handleImageResizeStart(e, imgIdx, true, idx); img.ontouchstart = (e) => handleImageResizeStart(e, imgIdx, true, idx);
-                                img.oncontextmenu = (e) => { e.preventDefault(); activeImageIdx = imgIdx; activeImageIsGroup = true; activeBlockIdx = idx; showFloatingImageBorderMenu(e.clientX, e.clientY); };
+                                img.oncontextmenu = (e) => { 
+                                    e.preventDefault(); 
+                                    document.getElementById('floatingPreviewMenu').classList.add('hidden');
+                                    startInlineEditor(img, imgIdx, idx);
+                                    showEditorToolbar(e.clientX, e.clientY);
+                                };
                                 
                                 const moveControls = document.createElement('div'); moveControls.className = "absolute -top-3 -left-3 flex gap-1.5 z-10 hidden-in-export opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all";
                                 if (imgIdx > 0) { 
@@ -2040,200 +1966,6 @@
                 }; 
                 document.getElementById('manifest').href = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest)); 
             } catch (e) { console.error("PWA initialization skipped:", e); } 
-        }
-
-        function initNotepad() {
-            let npNotes = JSON.parse(localStorage.getItem('ali_dashboard_multiple_notes')) || [{ id: Date.now(), title: 'Note 1', content: '', createdAt: new Date().toISOString() }];
-            let npCurrentId = npNotes[0]?.id || Date.now();
-            
-            const list = document.getElementById('notes-list');
-            const area = document.getElementById('note-area');
-            const titleInput = document.getElementById('note-title');
-            
-            let undoStack = [], redoStack = [], historyTimeout, isUndoingRedoing = false;
-            
-            function save() { 
-                localStorage.setItem('ali_dashboard_multiple_notes', JSON.stringify(npNotes)); 
-            }
-            
-            function render() { 
-                list.innerHTML = ''; 
-                npNotes.forEach((n, idx) => { 
-                    const isActive = n.id === npCurrentId;
-                    const btn = document.createElement('button'); 
-                    btn.className = `px-4 py-2 text-xs font-bold rounded-xl whitespace-nowrap transition-all flex items-center gap-2 group ${isActive ? 'text-white shadow-md' : 'bg-black/5 text-gray-500 hover:bg-black/10 dark:bg-[#222] dark:hover:bg-[#333]'}`; 
-                    if (isActive) btn.style.backgroundColor = 'var(--theme-color)';
-                    btn.onclick = () => select(n.id); 
-                    btn.innerHTML = `<span>${n.title.trim() || `Note ${idx + 1}`}</span>`; 
-                    if (npNotes.length > 1) {
-                        const del = document.createElement('span'); 
-                        del.innerHTML = '<i data-lucide="trash-2" class="w-3 h-3"></i>'; 
-                        del.className = `p-1 rounded-full transition-colors ${isActive ? 'hover:bg-black/20 text-white/80' : 'hover:bg-rose-100 text-rose-500 hover:text-rose-600'}`; 
-                        del.onclick = (e) => { 
-                            e.stopPropagation(); 
-                            npNotes = npNotes.filter(x => x.id !== n.id); 
-                            if (isActive) select(npNotes[0].id); else render(); 
-                            save(); 
-                        }; 
-                        btn.appendChild(del);
-                    }
-                    list.appendChild(btn); 
-                }); 
-                if (typeof lucide !== 'undefined') lucide.createIcons();
-            }
-            
-            function select(id) { 
-                npCurrentId = id; 
-                const n = npNotes.find(x => x.id === id); 
-                if(n) { 
-                    titleInput.value = n.title; 
-                    area.innerHTML = n.content; 
-                    undoStack = [{ title: n.title, content: n.content }]; 
-                    redoStack = []; 
-                } 
-                update(false); 
-                render(); 
-            }
-            
-            function update(push = true) { 
-                const text = area.innerText.trim();
-                const words = text ? text.split(/\s+/).length : 0;
-                const wc = document.getElementById('word-count');
-                if (wc) wc.innerText = `${words} Words`;
-
-                const idx = npNotes.findIndex(x => x.id === npCurrentId); 
-                if(idx !== -1) { 
-                    npNotes[idx].content = area.innerHTML; 
-                    npNotes[idx].title = titleInput.value; 
-                    save(); 
-                    render(); 
-                } 
-                if (push !== false && !isUndoingRedoing) { 
-                    clearTimeout(historyTimeout); 
-                    historyTimeout = setTimeout(() => { 
-                        const top = undoStack[undoStack.length - 1]; 
-                        if (!top || top.title !== titleInput.value || top.content !== area.innerHTML) { 
-                            undoStack.push({ title: titleInput.value, content: area.innerHTML }); 
-                            if (undoStack.length > 50) undoStack.shift(); 
-                            redoStack = []; 
-                        } 
-                    }, 500); 
-                } 
-            }
-
-            document.getElementById('np-undo-btn').onclick = () => { 
-                if(undoStack.length > 1) { 
-                    isUndoingRedoing = true; 
-                    redoStack.push(undoStack.pop()); 
-                    const prev = undoStack[undoStack.length-1]; 
-                    titleInput.value = prev.title; 
-                    area.innerHTML = prev.content; 
-                    update(false); 
-                    isUndoingRedoing = false; 
-                } 
-            };
-            document.getElementById('np-redo-btn').onclick = () => { 
-                if(redoStack.length > 0) { 
-                    isUndoingRedoing = true; 
-                    const next = redoStack.pop(); 
-                    undoStack.push(next); 
-                    titleInput.value = next.title; 
-                    area.innerHTML = next.content; 
-                    update(false); 
-                    isUndoingRedoing = false; 
-                } 
-            };
-            document.getElementById('np-bold-btn').onclick = () => { document.execCommand('bold'); update(); };
-            document.getElementById('np-underline-btn').onclick = () => { document.execCommand('underline'); update(); };
-            document.getElementById('np-highlight-btn').onclick = () => { 
-                document.execCommand('styleWithCSS', false, true);
-                let bgStyle = getSelectionStyle('backgroundColor');
-                if (bgStyle && bgStyle !== 'transparent' && bgStyle !== 'rgba(0, 0, 0, 0)') {
-                    document.execCommand('hiliteColor', false, 'transparent'); 
-                    removeStyleFromSelection('backgroundColor');
-                } else {
-                    document.execCommand('hiliteColor', false, hexToRgba(activeColor, 0.4));
-                }
-                update(); 
-            };
-            
-            document.getElementById('new-note-btn').onclick = () => { 
-                const newNum = npNotes.length + 1;
-                const n = { id: Date.now(), title: `Note ${newNum}`, content: '', createdAt: new Date().toISOString() }; 
-                npNotes.push(n); 
-                select(n.id); 
-                titleInput.focus(); 
-            };
-            
-            document.getElementById('np-copy-btn').onclick = () => { 
-                const r = document.createRange(); 
-                r.selectNodeContents(area); 
-                const s = window.getSelection(); 
-                s.removeAllRanges(); 
-                s.addRange(r); 
-                document.execCommand('copy'); 
-                s.removeAllRanges(); 
-                const b = document.getElementById('np-copy-btn'), i = b.innerHTML; 
-                b.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-[var(--theme-color)]"></i>'; 
-                if (typeof lucide !== 'undefined') lucide.createIcons(); 
-                setTimeout(() => { b.innerHTML = i; if (typeof lucide !== 'undefined') lucide.createIcons(); }, 2000); 
-            };
-
-            const downloadBtn = document.getElementById('np-download-btn');
-            downloadBtn.addEventListener('click', () => { 
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = area.innerHTML;
-                const textToSave = tempDiv.innerText || tempDiv.textContent;
-
-                const blob = new Blob([textToSave], { type:'text/plain' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a'); 
-                a.href = url; 
-                a.download = `${titleInput.value.trim() || 'Untitled'}.txt`; 
-                a.click(); 
-                URL.revokeObjectURL(url);
-            });
-
-            const pdfBtn = document.getElementById('np-pdf-btn');
-            if (pdfBtn) {
-                pdfBtn.addEventListener('click', () => {
-                    const element = document.createElement('div');
-                    element.style.padding = '40px';
-                    element.style.color = '#222';
-                    element.innerHTML = `<h1 style="font-family: 'Caveat', cursive !important; font-size: 36px; border-bottom: 2px dashed #d0ebf0; padding-bottom: 10px; margin-bottom: 20px;">${titleInput.value.trim() || 'Untitled Note'}</h1><div style="font-family: 'Caveat', cursive !important; white-space: pre-wrap; word-wrap: break-word; line-height: 1.6; font-size: 26px; font-weight: 500; margin: 0; padding: 0;">${area.innerHTML}</div>`;
-                    
-                    const opt = {
-                      margin:       10,
-                      filename:     `${titleInput.value.trim() || 'Untitled'}.pdf`,
-                      image:        { type: 'jpeg', quality: 0.98 },
-                      html2canvas:  { scale: 2 },
-                      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                    };
-                    
-                    html2pdf().set(opt).from(element).save();
-                });
-            }
-            
-            area.addEventListener('input', update); 
-            area.addEventListener('keydown', (e) => {
-                if (e.key === 'Tab') {
-                    e.preventDefault();
-                    document.execCommand('insertText', false, '\t');
-                }
-            });
-            titleInput.addEventListener('input', update); 
-
-            const switchToPreviewBtn = document.getElementById('switchToPreviewBtn');
-            const notepadContainer = document.getElementById('notepadContainer');
-            const cardContainer = document.getElementById('cardContainer');
-
-            switchToPreviewBtn.addEventListener('click', () => {
-                notepadContainer.classList.add('hidden');
-                notepadContainer.classList.remove('flex');
-                cardContainer.classList.remove('hidden');
-            });
-
-            select(npCurrentId);
         }
 
         let isDownloading = false;
@@ -2394,6 +2126,279 @@
                 isDownloadingPDF = false; 
             }
         }
+
+        // --- Image Editor Logic ---
+        let edTool = 'pen', edColor = '#ef4444', edSize = 5;
+        let edIsDrawing = false, edStartX = 0, edStartY = 0;
+        let edUndoStack = [], edRedoStack = [];
+        let edTarget = { imgIdx: -1, blockIdx: -1, imgEl: null, drawC: null, tempC: null };
+        
+        function showEditorToolbar(clientX, clientY) {
+            const toolbar = document.getElementById('floatingImageToolbar');
+            toolbar.classList.remove('hidden');
+            
+            requestAnimationFrame(() => {
+                const rect = toolbar.getBoundingClientRect();
+                let x = clientX, y = clientY;
+                if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
+                if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
+                toolbar.style.left = x + 'px'; 
+                toolbar.style.top = y + 'px';
+            });
+        }
+
+        function startInlineEditor(img, imgIdx, blockIdx) {
+            // If already editing another image, safely close it first
+            if (edTarget.imgIdx !== -1) {
+                closeInlineEditor(false); 
+            }
+
+            edTarget = { imgEl: img, imgIdx, blockIdx, drawC: null, tempC: null };
+            activeImageIdx = imgIdx;
+            activeBlockIdx = blockIdx;
+            activeImageIsGroup = (blockIdx !== -1);
+
+            const wrapper = img.parentElement;
+            wrapper.classList.add('is-editing'); // Hides standard move/delete controls
+            
+            const style = window.getComputedStyle(img);
+            const br = style.borderRadius;
+
+            // Canvas for committed strokes
+            const drawC = document.createElement('canvas');
+            drawC.className = "absolute top-0 left-0 w-full h-full z-20 pointer-events-none";
+            drawC.style.borderRadius = br;
+            drawC.width = img.clientWidth;
+            drawC.height = img.clientHeight;
+            
+            // Canvas for active strokes/events
+            const tempC = document.createElement('canvas');
+            tempC.className = "absolute top-0 left-0 w-full h-full z-30 cursor-crosshair touch-none";
+            tempC.style.borderRadius = br;
+            tempC.width = img.clientWidth;
+            tempC.height = img.clientHeight;
+            
+            // Allow moving the toolbar if right clicked again while editing
+            tempC.oncontextmenu = (e) => {
+                e.preventDefault();
+                showEditorToolbar(e.clientX, e.clientY);
+            };
+
+            wrapper.appendChild(drawC);
+            wrapper.appendChild(tempC);
+
+            edTarget.drawC = drawC;
+            edTarget.tempC = tempC;
+
+            edUndoStack = []; edRedoStack = [];
+            saveEdState();
+
+            initEdEvents(tempC);
+        }
+
+        function closeInlineEditor(save = false) {
+            if (edTarget.imgIdx === -1) return;
+            
+            const wrapper = edTarget.imgEl ? edTarget.imgEl.parentElement : null;
+            if (wrapper) {
+                wrapper.classList.remove('is-editing');
+                if (edTarget.drawC && wrapper.contains(edTarget.drawC)) wrapper.removeChild(edTarget.drawC);
+                if (edTarget.tempC && wrapper.contains(edTarget.tempC)) wrapper.removeChild(edTarget.tempC);
+            }
+
+            document.getElementById('floatingImageToolbar').classList.add('hidden');
+            closeEdMenus();
+            
+            edTarget = { imgIdx: -1, blockIdx: -1, imgEl: null, drawC: null, tempC: null };
+            activeImageIdx = -1;
+            activeBlockIdx = -1;
+        }
+
+        function saveInlineEditor() {
+            if (edTarget.imgIdx === -1) return;
+            const imgObj = edTarget.blockIdx === -1 ? uploadedImages[edTarget.imgIdx] : activeBlocks[edTarget.blockIdx].images[edTarget.imgIdx];
+
+            const imgEl = edTarget.imgEl;
+            const drawC = edTarget.drawC;
+
+            const resultC = document.createElement('canvas');
+            resultC.width = imgEl.naturalWidth;
+            resultC.height = imgEl.naturalHeight;
+            const ctx = resultC.getContext('2d');
+            
+            // Draw original image at full resolution
+            ctx.drawImage(imgEl, 0, 0, resultC.width, resultC.height);
+            
+            // Draw the strokes scaled up to match the natural resolution
+            ctx.drawImage(drawC, 0, 0, resultC.width, resultC.height);
+            
+            const newSrc = resultC.toDataURL('image/png');
+            
+            pushImageHistory();
+            imgObj.src = newSrc;
+            
+            closeInlineEditor(true);
+            updatePreview();
+            syncCardState();
+        }
+
+        document.querySelectorAll('.ed-tool-btn').forEach(btn => {
+            btn.onclick = (e) => {
+                document.querySelectorAll('.ed-tool-btn').forEach(b => {
+                    b.classList.remove('active'); b.classList.remove('text-[var(--theme-color)]');
+                });
+                const tBtn = e.currentTarget;
+                tBtn.classList.add('active');
+                tBtn.style.color = 'var(--theme-color)';
+                edTool = tBtn.dataset.tool;
+            };
+        });
+        
+        document.querySelectorAll('.ed-color-btn').forEach(btn => {
+            btn.onclick = (e) => {
+                document.querySelectorAll('.ed-color-btn').forEach(b => b.classList.remove('scale-110', 'border-white'));
+                e.currentTarget.classList.add('scale-110', 'border-white');
+                edColor = e.currentTarget.dataset.color;
+                document.getElementById('edCurrentColor').style.backgroundColor = edColor;
+            };
+        });
+        
+        document.getElementById('edSizeSlider').oninput = (e) => { edSize = e.target.value; };
+
+        function initEdEvents(tempC) {
+            const getPos = (e, canvas) => {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                // Internal coords match exact client bounds for our inline canvas
+                return { x: clientX - rect.left, y: clientY - rect.top };
+            };
+            
+            tempC.addEventListener('mousedown', (e) => { if(e.button === 0) edStart(getPos(e, tempC)); });
+            tempC.addEventListener('touchstart', (e) => { e.preventDefault(); edStart(getPos(e, tempC)); }, {passive: false});
+            tempC.addEventListener('mousemove', (e) => edMove(getPos(e, tempC)));
+            tempC.addEventListener('touchmove', (e) => { e.preventDefault(); edMove(getPos(e, tempC)); }, {passive: false});
+            tempC.addEventListener('mouseup', (e) => { if(e.button === 0) edEnd(); });
+            tempC.addEventListener('touchend', edEnd);
+            tempC.addEventListener('mouseout', edEnd);
+        }
+
+        function edStart(pos) {
+            edIsDrawing = true;
+            edStartX = pos.x; edStartY = pos.y;
+            
+            const drawCtx = edTarget.drawC.getContext('2d');
+            drawCtx.lineCap = 'round';
+            drawCtx.lineJoin = 'round';
+            drawCtx.lineWidth = edSize;
+            
+            if (edTool === 'eraser') {
+                drawCtx.globalCompositeOperation = 'destination-out';
+                drawCtx.strokeStyle = 'rgba(0,0,0,1)';
+            } else {
+                drawCtx.globalCompositeOperation = 'source-over';
+                drawCtx.strokeStyle = edTool === 'highlighter' ? hexToRgba(edColor, 0.005) : edColor;
+            }
+            
+            if (edTool === 'pen' || edTool === 'highlighter' || edTool === 'eraser') {
+                drawCtx.beginPath();
+                drawCtx.moveTo(pos.x, pos.y);
+            }
+        }
+
+        function edMove(pos) {
+            if (!edIsDrawing) return;
+            const drawCtx = edTarget.drawC.getContext('2d');
+            const tempCtx = edTarget.tempC.getContext('2d');
+            const tempC = edTarget.tempC;
+            
+            if (edTool === 'pen' || edTool === 'highlighter' || edTool === 'eraser') {
+                drawCtx.lineTo(pos.x, pos.y);
+                drawCtx.stroke();
+            } else {
+                tempCtx.clearRect(0, 0, tempC.width, tempC.height);
+                tempCtx.lineCap = 'round'; tempCtx.lineJoin = 'round';
+                tempCtx.lineWidth = edSize;
+                tempCtx.strokeStyle = edTool === 'highlighter' ? hexToRgba(edColor, 0.2) : edColor;
+                tempCtx.beginPath();
+                
+                if (edTool === 'rect') {
+                    tempCtx.rect(edStartX, edStartY, pos.x - edStartX, pos.y - edStartY);
+                } else if (edTool === 'circle') {
+                    const radius = Math.sqrt(Math.pow(pos.x - edStartX, 2) + Math.pow(pos.y - edStartY, 2));
+                    tempCtx.arc(edStartX, edStartY, radius, 0, 2 * Math.PI);
+                } else if (edTool === 'arrow') {
+                    drawEdArrow(tempCtx, edStartX, edStartY, pos.x, pos.y);
+                }
+                
+                if (edTool !== 'arrow') tempCtx.stroke();
+            }
+        }
+
+        function edEnd() {
+            if (!edIsDrawing) return;
+            edIsDrawing = false;
+            
+            if (edTool === 'rect' || edTool === 'circle' || edTool === 'arrow') {
+                const drawCtx = edTarget.drawC.getContext('2d');
+                const tempC = edTarget.tempC;
+                const tempCtx = tempC.getContext('2d');
+                
+                drawCtx.globalCompositeOperation = 'source-over';
+                drawCtx.drawImage(tempC, 0, 0);
+                tempCtx.clearRect(0, 0, tempC.width, tempC.height);
+            }
+            
+            saveEdState();
+        }
+
+        function drawEdArrow(ctx, fromX, fromY, toX, toY) {
+            const headlen = Math.max(10, edSize * 2);
+            const dx = toX - fromX;
+            const dy = toY - fromY;
+            const angle = Math.atan2(dy, dx);
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
+            ctx.stroke();
+        }
+
+        function saveEdState() {
+            if (!edTarget.drawC) return;
+            edUndoStack.push(edTarget.drawC.toDataURL());
+            if (edUndoStack.length > 20) edUndoStack.shift();
+            edRedoStack = [];
+        }
+
+        function edUndo() {
+            if (edUndoStack.length > 1) {
+                edRedoStack.push(edUndoStack.pop());
+                restoreEdState(edUndoStack[edUndoStack.length - 1]);
+            }
+        }
+
+        function edRedo() {
+            if (edRedoStack.length > 0) {
+                const state = edRedoStack.pop();
+                edUndoStack.push(state);
+                restoreEdState(state);
+            }
+        }
+
+        function restoreEdState(dataUrl) {
+            if (!edTarget.drawC) return;
+            const ctx = edTarget.drawC.getContext('2d');
+            const img = new Image();
+            img.onload = () => {
+                ctx.clearRect(0, 0, edTarget.drawC.width, edTarget.drawC.height);
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.drawImage(img, 0, 0);
+            };
+            img.src = dataUrl;
+        }
+
     </script>
 </body>
 </html>
