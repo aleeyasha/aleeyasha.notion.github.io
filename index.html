@@ -140,10 +140,14 @@
         }
         .resizable-img:active { cursor: ew-resize; box-shadow: 0 0 0 4px rgba(172, 135, 102, 0.3); }
         
-        /* Hand-drawn typography */
+        /* Hand-drawn typography & Lists reset */
         #cardWord, #cardDef, .card-extra-def-input, #cardType { font-family: 'Caveat', cursive !important; }
         #cardDef, .card-extra-def-input { tab-size: 4; -moz-tab-size: 4; }
         .handdrawn-title { font-family: 'Caveat', cursive !important; }
+        
+        #cardWord ul, #cardDef ul, .card-extra-def-input ul { list-style-type: disc; padding-left: 1.5rem; margin-top: 0.25rem; margin-bottom: 0.25rem; }
+        #cardWord ol, #cardDef ol, .card-extra-def-input ol { list-style-type: decimal; padding-left: 1.5rem; margin-top: 0.25rem; margin-bottom: 0.25rem; }
+        #cardWord li, #cardDef li, .card-extra-def-input li { margin-bottom: 0.25rem; }
 
         /* ContentEditable Placeholder Styling */
         [contenteditable]:empty:before {
@@ -168,6 +172,7 @@
     <input type="hidden" id="inputTitle" value="">
     <textarea id="inputDef" class="hidden"></textarea>
     <input type="file" id="imageInput" class="hidden" accept="image/*" multiple>
+    <input type="file" id="fileImportInput" class="hidden" accept=".png, .pdf">
     <button id="btnInstallApp" class="hidden"></button>
 
     <div id="mainLayout" class="relative z-10 w-full flex flex-col items-center pt-8 md:pt-12 pb-10">
@@ -180,8 +185,11 @@
                 
                 <div class="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-[100] opacity-0 invisible group-hover/logo:opacity-100 group-hover/logo:visible transition-all duration-300">
                     <div class="bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl w-80 overflow-hidden">
-                        <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
-                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Your Cards</span>
+                        <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center gap-2">
+                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex-1">Your Cards</span>
+                            <button onclick="document.getElementById('fileImportInput').click()" class="cursor-pointer transition-all hover:scale-110 outline-none flex items-center justify-center text-gray-400 hover:text-[var(--theme-color)] drop-shadow-sm" aria-label="Import PNG/PDF">
+                                <i data-lucide="upload" class="w-4 h-4"></i>
+                            </button>
                             <button onclick="createCard()" oncontextmenu="event.preventDefault(); createCard(true);" class="cursor-pointer transition-all hover:scale-110 hover:rotate-90 duration-300 outline-none flex items-center justify-center text-[#e7f135] hover:text-[#51b8cb] drop-shadow-sm" aria-label="New Card">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 md:w-5 md:h-5">
                                     <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -204,7 +212,7 @@
                             <i data-lucide="download" class="w-4 h-4 md:w-5 md:h-5"></i>
                         </button>
                         <div class="absolute top-full pt-2 opacity-0 pointer-events-none group-hover/dl:opacity-100 group-hover/dl:pointer-events-auto transition-all duration-300 z-0 -translate-y-2 group-hover/dl:translate-y-0">
-                            <button id="cardDownloadPdfBtn" onclick="downloadPDF()" class="bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[36px] h-[36px] md:w-[44px] md:h-[44px] outline-none text-[var(--theme-color)] border-2 border-[var(--theme-color)]" aria-label="Download Card PDF">
+                            <button id="cardDownloadPdfBtn" onclick="downloadPDF()" oncontextmenu="event.preventDefault(); downloadPDF(true)" class="bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[36px] h-[36px] md:w-[44px] md:h-[44px] outline-none text-[var(--theme-color)] border-2 border-[var(--theme-color)]" aria-label="Download Card PDF">
                                 <i data-lucide="file-down" class="w-4 h-4 md:w-5 md:h-5"></i>
                             </button>
                         </div>
@@ -218,7 +226,7 @@
 
                         <div id="cardTitleSection" class="group/title relative flex items-center flex-wrap gap-2 md:gap-4 py-1 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                             
-                            <div class="format-toolbar absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-lg border border-[#d0ebf0] dark:border-[#333] rounded-xl flex items-center p-1 gap-1 opacity-0 pointer-events-none group-focus-within/title:opacity-100 group-focus-within/title:pointer-events-auto transition-all z-20 translate-y-2 group-focus-within/title:translate-y-0">
+                            <div class="format-toolbar absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-lg border border-[#d0ebf0] dark:border-[#333] rounded-xl flex flex-wrap justify-center items-center p-1 gap-1 w-max max-w-[280px] md:max-w-none opacity-0 pointer-events-none group-focus-within/title:opacity-100 group-focus-within/title:pointer-events-auto transition-all z-20 translate-y-2 group-focus-within/title:translate-y-0">
                                 <div class="relative">
                                     <button id="toolbarTitleSizeBtn" onmousedown="event.preventDefault();" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors flex items-center gap-1 text-[11px] font-bold min-w-[40px] justify-center" aria-label="Font Size">
                                         <span id="toolbarTitleSizeLabel">32</span>
@@ -250,7 +258,7 @@
                             </div>
 
                             <div id="cardNotesSection" class="group/def relative py-1 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                                <div class="format-toolbar absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-lg border border-[#d0ebf0] dark:border-[#333] rounded-xl flex items-center p-1 gap-1 opacity-0 pointer-events-none group-focus-within/def:opacity-100 group-hover/def:opacity-100 group-focus-within/def:pointer-events-auto group-hover/def:pointer-events-auto transition-all z-20 translate-y-2 group-hover/def:translate-y-0 group-focus-within/def:translate-y-0">
+                                <div class="format-toolbar absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-lg border border-[#d0ebf0] dark:border-[#333] rounded-xl flex flex-wrap justify-center items-center p-1 gap-1 w-[320px] md:w-max opacity-0 pointer-events-none group-focus-within/def:opacity-100 group-hover/def:opacity-100 group-focus-within/def:pointer-events-auto group-hover/def:pointer-events-auto transition-all z-20 translate-y-2 group-hover/def:translate-y-0 group-focus-within/def:translate-y-0">
                                     <button onmousedown="event.preventDefault(); execFormat('undo')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
                                     <button onmousedown="event.preventDefault(); execFormat('redo')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
                                     <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
@@ -278,9 +286,16 @@
                                     <button onmousedown="event.preventDefault(); execFormat('justifyLeft')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-left" aria-label="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
                                     <button onmousedown="event.preventDefault(); execFormat('justifyCenter')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-center" aria-label="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
                                     <button onmousedown="event.preventDefault(); execFormat('justifyRight')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-right" aria-label="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+                                    
+                                    <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                    <button onmousedown="event.preventDefault(); execFormat('insertUnorderedList')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-ul" aria-label="Bullet List"><i data-lucide="list" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); execFormat('insertOrderedList')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-ol" aria-label="Ordered List"><i data-lucide="list-ordered" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); sortSelectedTextAZ()" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Sort A-Z" title="Sort A-Z"><i data-lucide="arrow-down-a-z" class="w-4 h-4"></i></button>
+
                                     <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
                                     <button onmousedown="event.preventDefault(); copyNoteText(event, 'cardDef')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Copy Text" title="Copy Text"><i data-lucide="copy" class="w-4 h-4"></i></button>
-                                    <button onmousedown="event.preventDefault(); downloadNoteText('cardDef')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Download .txt" title="Download .txt"><i data-lucide="file-text" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); downloadNoteText('cardDef')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Download .txt" title="Download .txt"><i data-lucide="file-down" class="w-4 h-4"></i></button>
+                                    
                                     <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
                                     <div class="relative">
                                         <button id="toolbarDefSizeBtn" onmousedown="event.preventDefault();" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors flex items-center gap-1 text-[11px] font-bold min-w-[40px] justify-center" aria-label="Font Size">
@@ -483,8 +498,19 @@
             <canvas id="edTempCanvas" class="cursor-crosshair"></canvas>
         </div>
     </div>
+    
+    <!-- Custom Toast Message -->
+    <div id="toast-msg" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-xl shadow-lg z-[999] transition-opacity duration-300 opacity-0 pointer-events-none text-sm font-medium"></div>
 
     <script>
+        function showToast(msg) {
+            let toast = document.getElementById('toast-msg');
+            toast.innerText = msg;
+            toast.classList.remove('opacity-0');
+            clearTimeout(toast.timeout);
+            toast.timeout = setTimeout(() => { toast.classList.add('opacity-0'); }, 3500);
+        }
+
         const categoryColors = {
             "Principles of Flight": "#6366f1", "Meteorology": "#0ea5e9", "Navigation": "#10b981", "Flight Planning and Monitoring": "#f59e0b",
             "Aircraft General Knowledge": "#475569", "Human Performance": "#f43f5e", "Air Law": "#8b5cf6", "Operational Procedures": "#06b6d4",
@@ -853,6 +879,54 @@
             URL.revokeObjectURL(url);
         };
 
+        // File Import mechanism handles PNG and PDF natively exported by this app
+        document.getElementById('fileImportInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const text = evt.target.result;
+                const markerIndex = text.lastIndexOf("NOTION_APP_DATA:");
+                
+                if (markerIndex !== -1) {
+                    try {
+                        const jsonStr = text.substring(markerIndex + 16);
+                        const cardData = JSON.parse(jsonStr);
+                        
+                        // Give it a fresh ID so it doesn't overwrite an existing card silently
+                        cardData.id = 'card_' + Date.now() + Math.random().toString(36).substr(2, 9);
+                        cards.push(cardData);
+                        saveCardsToStorage();
+                        switchCard(cardData.id);
+                        showToast("Card imported successfully!");
+                    } catch(err) {
+                        showToast("Failed to parse card data from file.");
+                    }
+                } else {
+                    showToast("No editable card data found in this file. Make sure you import a PNG or PDF created by this app.");
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
+        });
+
+        window.sortSelectedTextAZ = function() {
+            const sel = window.getSelection();
+            if (!sel.rangeCount || sel.isCollapsed) return;
+            const text = sel.toString();
+            if (!text) return;
+            
+            const sortedText = text.split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0)
+                .sort((a, b) => a.localeCompare(b, undefined, {sensitivity: 'base'}))
+                .join('\n');
+                
+            document.execCommand('insertText', false, sortedText);
+            syncCardState();
+        };
+
         function initBlendDropdown() {
             const container = document.getElementById('blendOptions');
             const menu = document.getElementById('blendDropdownMenu');
@@ -1208,6 +1282,8 @@
             const isLeft = document.queryCommandState('justifyLeft');
             const isCenter = document.queryCommandState('justifyCenter');
             const isRight = document.queryCommandState('justifyRight');
+            const isUl = document.queryCommandState('insertUnorderedList');
+            const isOl = document.queryCommandState('insertOrderedList');
 
             let bgStyle = getSelectionStyle('backgroundColor');
             const isHighlighted = bgStyle && bgStyle !== 'transparent' && bgStyle !== 'rgba(0, 0, 0, 0)';
@@ -1234,6 +1310,8 @@
             toggleBtns('.btn-format-left', isLeft);
             toggleBtns('.btn-format-center', isCenter);
             toggleBtns('.btn-format-right', isRight);
+            toggleBtns('.btn-format-ul', isUl);
+            toggleBtns('.btn-format-ol', isOl);
             toggleBtns('.btn-format-highlight', isHighlighted);
             toggleBtns('.btn-format-color', isColored);
         }
@@ -1817,7 +1895,7 @@
                         if (block.type === 'text') {
                             return `
                                 <div class="group/extradef relative py-1 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors mt-1" id="block-wrapper-${idx}" data-block-type="text">
-                                    <div class="format-toolbar absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-lg border border-[#d0ebf0] dark:border-[#333] rounded-xl flex items-center p-1 gap-1 opacity-0 pointer-events-none group-focus-within/extradef:opacity-100 group-hover/extradef:opacity-100 group-focus-within/extradef:pointer-events-auto group-hover/extradef:pointer-events-auto transition-all z-20 translate-y-2 group-hover/extradef:translate-y-0 group-focus-within/extradef:translate-y-0">
+                                    <div class="format-toolbar absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-lg border border-[#d0ebf0] dark:border-[#333] rounded-xl flex flex-wrap justify-center items-center p-1 gap-1 w-[320px] md:w-max opacity-0 pointer-events-none group-focus-within/extradef:opacity-100 group-hover/extradef:opacity-100 group-focus-within/extradef:pointer-events-auto group-hover/extradef:pointer-events-auto transition-all z-20 translate-y-2 group-hover/extradef:translate-y-0 group-focus-within/extradef:translate-y-0">
                                         <button onmousedown="event.preventDefault(); execFormat('undo')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
                                         <button onmousedown="event.preventDefault(); execFormat('redo')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
                                         <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
@@ -1845,9 +1923,24 @@
                                         <button onmousedown="event.preventDefault(); execFormat('justifyLeft')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-left" aria-label="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
                                         <button onmousedown="event.preventDefault(); execFormat('justifyCenter')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-center" aria-label="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
                                         <button onmousedown="event.preventDefault(); execFormat('justifyRight')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-right" aria-label="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+                                        
+                                        <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                        <button onmousedown="event.preventDefault(); execFormat('insertUnorderedList')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-ul" aria-label="Bullet List"><i data-lucide="list" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); execFormat('insertOrderedList')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-ol" aria-label="Ordered List"><i data-lucide="list-ordered" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); sortSelectedTextAZ()" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Sort A-Z" title="Sort A-Z"><i data-lucide="arrow-down-a-z" class="w-4 h-4"></i></button>
+
                                         <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
                                         <button onmousedown="event.preventDefault(); copyNoteText(event, ${idx}, true)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Copy Text" title="Copy Text"><i data-lucide="copy" class="w-4 h-4"></i></button>
-                                        <button onmousedown="event.preventDefault(); downloadNoteText(${idx}, true)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Download .txt" title="Download .txt"><i data-lucide="file-text" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); downloadNoteText(${idx}, true)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Download .txt" title="Download .txt"><i data-lucide="file-down" class="w-4 h-4"></i></button>
+                                        
+                                        <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                        <div class="relative">
+                                            <button id="toolbarDefSizeBtn" onmousedown="event.preventDefault();" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors flex items-center gap-1 text-[11px] font-bold min-w-[40px] justify-center" aria-label="Font Size">
+                                                <span id="toolbarDefSizeLabel">24</span>
+                                                <i data-lucide="chevron-down" class="w-3 h-3"></i>
+                                            </button>
+                                            <div id="toolbarDefSizeDropdownMenu" onmousedown="event.preventDefault();" class="hidden absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[60] overflow-hidden w-16 max-h-48 overflow-y-auto custom-scrollbar"></div>
+                                        </div>
                                     </div>
                                     <div class="card-extra-def-input font-medium leading-relaxed whitespace-pre-wrap outline-none" contenteditable="true" data-placeholder="Enter note here..." style="text-decoration: none; min-height: 1.5em; font-family: 'Caveat', cursive;" data-block-idx="${idx}">${block.content}</div>
                                     <button onclick="removeBlock(${idx})" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 group-hover/extradef:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" aria-label="Remove Note">
@@ -2008,23 +2101,39 @@
                     }
                 });
                 
-                card.classList.add('card-shadow'); 
-                const l = document.createElement('a'); 
-                l.download = `${f}.png`; 
-                l.href = canvas.toDataURL('image/png'); 
-                l.click();
+                syncCardState();
+                const cardState = cards.find(c => c.id === activeCardId);
+                const marker = "\nNOTION_APP_DATA:" + JSON.stringify(cardState);
+
+                canvas.toBlob(blob => {
+                    const finalBlob = new Blob([blob, marker], { type: 'image/png' });
+                    const url = URL.createObjectURL(finalBlob);
+                    
+                    const l = document.createElement('a'); 
+                    l.download = `${f}.png`; 
+                    l.href = url; 
+                    l.click();
+                    
+                    URL.revokeObjectURL(url);
+                    card.classList.add('card-shadow'); 
+                    isDownloading = false;
+                });
             } catch (e) { 
                 console.error("Export failed", e); 
                 card.classList.add('card-shadow'); 
-            } finally { 
-                isDownloading = false; 
+                isDownloading = false;
             }
         }
 
         let isDownloadingPDF = false;
-        async function downloadPDF() {
+        async function downloadPDF(openInNewTab = false) {
             if (isDownloadingPDF) return; 
             isDownloadingPDF = true; 
+            
+            let newTab = null;
+            if (openInNewTab) {
+                newTab = window.open('', '_blank');
+            }
             
             const cardWordEl = document.getElementById('cardWord');
             const tempDiv = document.createElement('div');
@@ -2118,9 +2227,32 @@
                     jsPDF:        { unit: 'px', format: [w, h + 1], orientation: w > h ? 'landscape' : 'portrait' }
                 };
                 
-                await html2pdf().set(opt).from(card).save();
+                const pdfBlob = await html2pdf().set(opt).from(card).output('blob');
+                
+                syncCardState();
+                const cardState = cards.find(c => c.id === activeCardId);
+                const marker = "\nNOTION_APP_DATA:" + JSON.stringify(cardState);
+                
+                const finalBlob = new Blob([pdfBlob, marker], { type: 'application/pdf' });
+                const url = URL.createObjectURL(finalBlob);
+                
+                if (openInNewTab) {
+                    if (newTab) {
+                        newTab.location.href = url;
+                    } else {
+                        window.open(url, '_blank');
+                    }
+                } else {
+                    const l = document.createElement('a');
+                    l.download = `${f}.pdf`;
+                    l.href = url;
+                    l.click();
+                }
+                setTimeout(() => URL.revokeObjectURL(url), 2000);
+                
             } catch (e) { 
                 console.error("Export failed", e); 
+                if (newTab) newTab.close();
             } finally { 
                 card.classList.add('card-shadow'); 
                 isDownloadingPDF = false; 
