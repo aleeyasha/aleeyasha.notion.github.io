@@ -175,37 +175,11 @@
     <input type="file" id="fileImportInput" class="hidden" accept=".png, .pdf">
     <button id="btnInstallApp" class="hidden"></button>
 
-    <div id="mainLayout" class="relative z-10 w-full flex flex-col items-center pt-8 md:pt-12 pb-10">
+    <div id="mainLayout" class="relative z-10 w-full min-h-screen flex flex-col items-center p-3 md:p-6">
         
-        <header class="w-full flex justify-center items-center mb-6 md:mb-8 pointer-events-none select-none z-20">
-            <div class="relative flex items-center pointer-events-auto group/logo" onmouseenter="populateHeaderCardsList()">
-                <div class="cursor-pointer transition-all hover:scale-105">
-                    <img src="image_c2e349.png" alt="aliyasa logo" class="h-10 md:h-14 object-contain drop-shadow-md" onerror="this.onerror=null; this.outerHTML='<h1 class=\'handdrawn-title text-4xl md:text-5xl font-bold tracking-wider\'><span class=\'text-gray-400\'>ali</span><span class=\'text-[#51b8cb]\'>yasa</span></h1>';">
-                </div>
-                
-                <div class="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-[100] opacity-0 invisible group-hover/logo:opacity-100 group-hover/logo:visible transition-all duration-300">
-                    <div class="bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl w-80 overflow-hidden">
-                        <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center gap-2">
-                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex-1">Your Cards</span>
-                            <button onclick="document.getElementById('fileImportInput').click()" class="cursor-pointer transition-all hover:scale-110 outline-none flex items-center justify-center text-gray-400 hover:text-[var(--theme-color)] drop-shadow-sm" aria-label="Import PNG/PDF">
-                                <i data-lucide="upload" class="w-4 h-4"></i>
-                            </button>
-                            <button onclick="createCard()" oncontextmenu="event.preventDefault(); createCard(true);" class="cursor-pointer transition-all hover:scale-110 hover:rotate-90 duration-300 outline-none flex items-center justify-center text-[#e7f135] hover:text-[#51b8cb] drop-shadow-sm" aria-label="New Card">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 md:w-5 md:h-5">
-                                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                                </svg>
-                            </button>
-                        </div>
-                        <div id="headerCardsList" class="max-h-60 overflow-y-auto custom-scrollbar pb-1"></div>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <main class="w-full px-3 md:px-4 flex justify-center">
+        <main class="w-full flex-1 flex flex-col items-stretch">
             
-            <div id="cardContainer" class="rounded-[2rem] md:rounded-[3rem] card-shadow overflow-hidden border-[4px] md:border-[6px] border-[var(--theme-color)] relative transition-all duration-500 min-h-[400px] md:min-h-[600px] w-full max-w-[1050px] group/maincard theme-blend-bg-card">
+            <div id="cardContainer" class="rounded-[2rem] md:rounded-[3rem] card-shadow overflow-hidden border-[4px] md:border-[6px] border-[var(--theme-color)] relative transition-all duration-500 w-full flex-1 flex flex-col group/maincard theme-blend-bg-card">
 
                     <div class="absolute top-4 right-4 md:top-6 md:right-6 z-[30] hidden-in-export opacity-100 lg:opacity-0 group-hover/maincard:opacity-100 transition-all group/dl flex flex-col items-center">
                         <button id="cardDownloadBtn" onclick="downloadPNG()" class="bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[36px] h-[36px] md:w-[44px] md:h-[44px] outline-none text-[var(--theme-color)] border-2 border-[var(--theme-color)] relative z-10" aria-label="Download Card PNG">
@@ -218,7 +192,7 @@
                         </div>
                     </div>
 
-                    <div class="pt-6 md:pt-10 px-6 md:px-20 pb-8 md:pb-20 group/card flex flex-col h-full">
+                    <div class="pt-6 md:pt-10 px-6 md:px-20 pb-8 md:pb-20 group/card flex flex-col flex-1">
                         
                         <div id="cardTitleRestore" onclick="restoreTitle()" class="hidden cursor-pointer py-2 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl border-2 border-dashed border-transparent hover:border-[var(--theme-color)] dark:hover:border-[#333] text-center text-gray-400 hover:text-[var(--theme-color)] opacity-100 lg:opacity-0 group-hover/card:opacity-100 transition-all flex items-center justify-center gap-2">
                             <i data-lucide="plus" class="w-4 h-4"></i> <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Add Title / Category</span>
@@ -397,9 +371,27 @@
         <button onclick="saveInlineEditor()" class="p-1.5 text-gray-400 hover:text-emerald-400 hover:bg-white/10 rounded-lg transition-colors" title="Save"><i data-lucide="check" class="w-4 h-4"></i></button>
     </div>
 
-    <div id="floatingPreviewMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-64 py-1">
-        <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
-            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Menu</span>
+    <div id="floatingPreviewMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-72 py-1 flex flex-col max-h-[85vh]">
+        
+        <!-- Cards Section Header -->
+        <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
+            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Your Cards</span>
+            <div class="flex items-center gap-1">
+                <button onclick="document.getElementById('fileImportInput').click()" class="text-gray-400 hover:text-[var(--theme-color)] transition-colors outline-none cursor-pointer p-1" aria-label="Import PNG/PDF" title="Import">
+                    <i data-lucide="upload" class="w-4 h-4"></i>
+                </button>
+                <button onclick="createCard()" oncontextmenu="event.preventDefault(); createCard(true);" class="text-[#e7f135] hover:text-[#51b8cb] transition-colors outline-none cursor-pointer p-1" aria-label="New Card" title="New Card">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Cards List -->
+        <div id="headerCardsList" class="overflow-y-auto custom-scrollbar pb-1 shrink max-h-48"></div>
+        
+        <!-- Actions Section Header -->
+        <div class="px-4 py-2 border-t border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0 bg-black/5 dark:bg-white/5 mt-1">
+            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Card Actions</span>
             <div class="flex items-center gap-1">
                 <button id="contextDeleteCardBtn" class="text-gray-400 hover:text-rose-500 transition-colors outline-none cursor-pointer p-1" aria-label="Delete Card">
                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
@@ -418,43 +410,44 @@
                 </button>
             </div>
         </div>
-        <div id="floatingLayoutOptions" class="hidden py-1 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mt-1 mb-1"></div>
-        <div class="py-1">
-            <div id="themeColorToggleBtn" class="dropdown-item flex items-center justify-between gap-2 transition-colors">
-                <div class="flex items-center gap-2"><i data-lucide="palette" class="w-4 h-4"></i> Theme Color</div>
-                <i data-lucide="chevron-down" class="w-3 h-3 transition-transform" id="themeColorChevron"></i>
-            </div>
-            <div id="floatingThemeColorOptions" class="hidden py-2 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mt-1 px-3">
-                <div class="flex flex-wrap items-center justify-end gap-2 mb-3">
-                    <div class="flex items-center gap-1">
+        
+        <!-- Layout & Theme Sections -->
+        <div class="overflow-y-auto custom-scrollbar shrink-0">
+            <div id="floatingLayoutOptions" class="hidden py-1 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mt-1 mb-1"></div>
+            <div class="py-1">
+                <div id="themeColorToggleBtn" class="dropdown-item flex items-center justify-between gap-2 transition-colors">
+                    <div class="flex items-center gap-2"><i data-lucide="palette" class="w-4 h-4"></i> Theme Color</div>
+                    <i data-lucide="chevron-down" class="w-3 h-3 transition-transform" id="themeColorChevron"></i>
+                </div>
+                <div id="floatingThemeColorOptions" class="hidden py-2 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mt-1 px-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                         <button id="btnRandomColor" class="p-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-gray-400 hover:text-[var(--theme-color)] rounded-lg transition-all shadow-sm hover:border-gray-300 dark:hover:border-gray-600 outline-none" aria-label="Generate Random Palette">
                             <i data-lucide="shuffle" class="w-3 h-3"></i>
                         </button>
-                        <div class="relative shrink-0 w-20">
-                            <button id="blendBtn" class="w-full px-2 py-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-[var(--theme-color)] text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group hover:border-gray-300 dark:hover:border-gray-600">
+                        <div class="relative shrink-0 w-24">
+                            <button id="blendBtn" class="w-full px-2 py-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-[var(--theme-color)] text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group hover:border-gray-300 dark:hover:border-gray-600">
                                 <span class="text-gray-400">Blend</span>
                                 <span id="blendValueLabel">10%</span>
                                 <i data-lucide="chevron-down" class="w-3 h-3 text-gray-400 transition-transform group-hover:translate-y-0.5 shrink-0"></i>
                             </button>
                             <div id="blendDropdownMenu" class="hidden absolute right-0 mt-2 w-full bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[70] overflow-hidden">
-                                <div id="blendOptions" class="py-1"></div>
+                                <div id="blendOptions" class="py-1 max-h-32 overflow-y-auto custom-scrollbar"></div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div id="colorMap" class="mb-3 h-24 w-full relative cursor-crosshair border border-gray-200 dark:border-[#333] rounded-xl overflow-hidden bg-red-500">
-                    <div class="color-map-white absolute inset-0 bg-gradient-to-r from-white to-transparent"></div>
-                    <div class="color-map-black absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
-                    <div id="colorMarker" class="absolute w-4 h-4 border-2 border-white rounded-full shadow-sm pointer-events-none transform -translate-x-1/2 -translate-y-1/2" style="top: 20%; left: 80%;"></div>
-                </div>
-                <div class="px-1 mb-1">
-                    <input type="range" id="inputHue" min="0" max="360" value="189" class="w-full cursor-pointer">
+                    <div id="colorMap" class="mb-3 h-24 w-full relative cursor-crosshair border border-gray-200 dark:border-[#333] rounded-xl overflow-hidden bg-red-500">
+                        <div class="color-map-white absolute inset-0 bg-gradient-to-r from-white to-transparent"></div>
+                        <div class="color-map-black absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
+                        <div id="colorMarker" class="absolute w-4 h-4 border-2 border-white rounded-full shadow-sm pointer-events-none transform -translate-x-1/2 -translate-y-1/2" style="top: 20%; left: 80%;"></div>
+                    </div>
+                    <div class="px-1 mb-1">
+                        <input type="range" id="inputHue" min="0" max="360" value="189" class="w-full cursor-pointer">
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Image Editor Modal -->
     <div id="imageEditorModal" class="hidden fixed inset-0 z-[200] bg-black/80 flex flex-col items-center justify-center">
         <div class="bg-white dark:bg-[#1a1a1a] p-2 rounded-2xl mb-4 flex gap-2 items-center shadow-2xl border border-gray-200 dark:border-gray-700 w-[95%] max-w-3xl overflow-x-auto custom-scrollbar shrink-0">
             <button class="ed-tool-btn p-2 rounded-xl border border-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition active" data-tool="pen" title="Pen"><i data-lucide="pen-tool" class="w-5 h-5"></i></button>
@@ -687,8 +680,8 @@
                     item.onclick = (evt) => {
                         evt.stopPropagation();
                         if (!isActive) switchCard(c.id);
-                        const logoGroup = document.querySelector('.group\\/logo');
-                        if (logoGroup) logoGroup.dispatchEvent(new Event('mouseleave'));
+                        const menu = document.getElementById('floatingPreviewMenu');
+                        if (menu) menu.classList.add('hidden');
                     };
                     
                     item.appendChild(leftPart);
@@ -737,6 +730,42 @@
             }, 50);
         };
         
+        window.insertExtraNote = function(idx) {
+            activeBlocks.splice(idx, 0, { type: 'text', content: '' });
+            updatePreview();
+            setTimeout(() => {
+                const newEl = document.querySelector(`.card-extra-def-input[data-block-idx="${idx}"]`);
+                if (newEl) newEl.focus();
+            }, 50);
+            syncCardState();
+        };
+
+        window.addBlockCol = function(idx, colIdx) {
+            let block = activeBlocks[idx];
+            if (!Array.isArray(block.content)) {
+                block.content = [block.content];
+            }
+            block.content.splice(colIdx + 1, 0, '');
+            updatePreview();
+            syncCardState();
+        };
+
+        window.removeBlockCol = function(idx, colIdx) {
+            let block = activeBlocks[idx];
+            if (Array.isArray(block.content)) {
+                block.content.splice(colIdx, 1);
+                if (block.content.length === 0) {
+                    activeBlocks.splice(idx, 1);
+                } else if (block.content.length === 1) {
+                    block.content = block.content[0];
+                }
+            } else {
+                activeBlocks.splice(idx, 1);
+            }
+            updatePreview();
+            syncCardState();
+        };
+
         window.removeBlock = function(idx) {
             activeBlocks.splice(idx, 1);
             updatePreview();
@@ -822,15 +851,17 @@
             isImageUndoingRedoing = false;
         };
 
-        window.getNoteTextElement = function(target, isBlock) {
+        window.getNoteTextElement = function(target, isBlock, colIdx = 0) {
             if (isBlock) {
+                const el = document.querySelector(`.card-extra-def-input[data-block-idx="${target}"][data-col-idx="${colIdx}"]`);
+                if (el) return el;
                 return document.querySelector(`.card-extra-def-input[data-block-idx="${target}"]`);
             }
             return document.getElementById(target);
         };
 
-        window.copyNoteText = function(e, target, isBlock = false) {
-            const el = window.getNoteTextElement(target, isBlock);
+        window.copyNoteText = function(e, target, isBlock = false, colIdx = 0) {
+            const el = window.getNoteTextElement(target, isBlock, colIdx);
             if (!el) return;
             
             // Fallback using execCommand for reliable iFrame/cross-origin copying
@@ -860,13 +891,13 @@
             document.body.removeChild(textarea);
         };
 
-        window.downloadNoteText = function(target, isBlock = false) {
-            const el = window.getNoteTextElement(target, isBlock);
+        window.downloadNoteText = function(target, isBlock = false, colIdx = 0) {
+            const el = window.getNoteTextElement(target, isBlock, colIdx);
             if (!el) return;
             
             const text = el.innerText;
             const titleInput = document.getElementById('inputTitle').value.trim();
-            const filename = (titleInput ? titleInput : 'Note') + (isBlock ? `_Extra_${target+1}` : '') + '.txt';
+            const filename = (titleInput ? titleInput : 'Note') + (isBlock ? `_Extra_${target+1}_Col_${colIdx+1}` : '') + '.txt';
 
             const blob = new Blob([text], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
@@ -1362,8 +1393,13 @@
             document.getElementById('cardContainer').addEventListener('input', (e) => {
                 if (e.target.classList.contains('card-extra-def-input')) {
                     const idx = e.target.getAttribute('data-block-idx');
+                    const colIdx = e.target.getAttribute('data-col-idx');
                     if (idx !== null && activeBlocks[idx]) {
-                        activeBlocks[idx].content = e.target.innerHTML;
+                        if (Array.isArray(activeBlocks[idx].content)) {
+                            activeBlocks[idx].content[colIdx || 0] = e.target.innerHTML;
+                        } else {
+                            activeBlocks[idx].content = e.target.innerHTML;
+                        }
                         syncCardState();
                     }
                 }
@@ -1893,8 +1929,19 @@
                 if (needsRebuild) {
                     blocksContainer.innerHTML = activeBlocks.map((block, idx) => {
                         if (block.type === 'text') {
+                            const contents = Array.isArray(block.content) ? block.content : [block.content];
+                            const isMulti = contents.length > 1;
+                            const outerClass = isMulti ? "flex flex-col sm:flex-row gap-2 w-full mt-1" : "w-full mt-1";
+                            
                             return `
-                                <div class="group/extradef relative py-1 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors mt-1" id="block-wrapper-${idx}" data-block-type="text">
+                                <div class="${outerClass}" id="block-wrapper-${idx}" data-block-type="text">
+                                    ${contents.map((content, colIdx) => {
+                                        const innerClass = isMulti 
+                                            ? "group/extradef relative py-2 px-2 md:px-4 rounded-xl md:rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors flex-1 min-w-0"
+                                            : "group/extradef relative py-1 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors mt-1";
+                                        
+                                        return `
+                                <div class="${innerClass}" data-col-idx="${colIdx}">
                                     <div class="format-toolbar absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-lg border border-[#d0ebf0] dark:border-[#333] rounded-xl flex flex-wrap justify-center items-center p-1 gap-1 w-[320px] md:w-max opacity-0 pointer-events-none group-focus-within/extradef:opacity-100 group-hover/extradef:opacity-100 group-focus-within/extradef:pointer-events-auto group-hover/extradef:pointer-events-auto transition-all z-20 translate-y-2 group-hover/extradef:translate-y-0 group-focus-within/extradef:translate-y-0">
                                         <button onmousedown="event.preventDefault(); execFormat('undo')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
                                         <button onmousedown="event.preventDefault(); execFormat('redo')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
@@ -1930,22 +1977,33 @@
                                         <button onmousedown="event.preventDefault(); sortSelectedTextAZ()" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Sort A-Z" title="Sort A-Z"><i data-lucide="arrow-down-a-z" class="w-4 h-4"></i></button>
 
                                         <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                        <button onmousedown="event.preventDefault(); copyNoteText(event, ${idx}, true)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Copy Text" title="Copy Text"><i data-lucide="copy" class="w-4 h-4"></i></button>
-                                        <button onmousedown="event.preventDefault(); downloadNoteText(${idx}, true)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Download .txt" title="Download .txt"><i data-lucide="file-down" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); copyNoteText(event, ${idx}, true, ${colIdx})" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Copy Text" title="Copy Text"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); downloadNoteText(${idx}, true, ${colIdx})" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Download .txt" title="Download .txt"><i data-lucide="file-down" class="w-4 h-4"></i></button>
                                         
                                         <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
                                         <div class="relative">
                                             <button id="toolbarDefSizeBtn" onmousedown="event.preventDefault();" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors flex items-center gap-1 text-[11px] font-bold min-w-[40px] justify-center" aria-label="Font Size">
-                                                <span id="toolbarDefSizeLabel">24</span>
+                                                <span class="toolbarExtraDefSizeLabel">${defSize}</span>
                                                 <i data-lucide="chevron-down" class="w-3 h-3"></i>
                                             </button>
-                                            <div id="toolbarDefSizeDropdownMenu" onmousedown="event.preventDefault();" class="hidden absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[60] overflow-hidden w-16 max-h-48 overflow-y-auto custom-scrollbar"></div>
                                         </div>
                                     </div>
-                                    <div class="card-extra-def-input font-medium leading-relaxed whitespace-pre-wrap outline-none" contenteditable="true" data-placeholder="Enter note here..." style="text-decoration: none; min-height: 1.5em; font-family: 'Caveat', cursive;" data-block-idx="${idx}">${block.content}</div>
-                                    <button onclick="removeBlock(${idx})" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 group-hover/extradef:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" aria-label="Remove Note">
-                                        <i data-lucide="x" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
-                                    </button>
+                                    <div class="card-extra-def-input font-medium leading-relaxed whitespace-pre-wrap outline-none" contenteditable="true" data-placeholder="Enter note here..." style="text-decoration: none; min-height: 1.5em; font-family: 'Caveat', cursive;" data-block-idx="${idx}" data-col-idx="${colIdx}">${content}</div>
+                                    
+                                    <div class="absolute top-1/2 -translate-y-1/2 right-2 md:right-4 flex flex-col sm:flex-row items-center gap-1 opacity-100 lg:opacity-0 group-hover/extradef:opacity-100 transition-opacity z-10 hidden-in-export">
+                                        <button onclick="insertExtraNote(${idx + 1})" class="p-1 md:p-1.5 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-[var(--theme-color)] border border-gray-100 dark:border-[#333]" aria-label="Add Note Below" title="Add Note Below">
+                                            <i data-lucide="arrow-down" class="w-3 h-3 md:w-3.5 md:h-3.5"></i>
+                                        </button>
+                                        <button onclick="addBlockCol(${idx}, ${colIdx})" class="p-1 md:p-1.5 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-[var(--theme-color)] border border-gray-100 dark:border-[#333]" aria-label="Add Note Next To" title="Add Note Next To">
+                                            <i data-lucide="columns" class="w-3 h-3 md:w-3.5 md:h-3.5"></i>
+                                        </button>
+                                        <button onclick="removeBlockCol(${idx}, ${colIdx})" class="p-1 md:p-1.5 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 border border-gray-100 dark:border-[#333]" aria-label="Remove Note" title="Remove Note">
+                                            <i data-lucide="x" class="w-3 h-3 md:w-3.5 md:h-3.5"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                        `;
+                                    }).join('')}
                                 </div>
                             `;
                         } else if (block.type === 'imageGroup') {
@@ -1961,14 +2019,17 @@
 
                 activeBlocks.forEach((block, idx) => {
                     if (block.type === 'text') {
-                        const el = blocksContainer.querySelector(`[data-block-idx="${idx}"]`);
-                        if (el) {
-                            el.style.color = textColor;
-                            el.style.fontSize = defSize + 'px'; 
-                            if (el.innerHTML !== block.content) {
-                                el.innerHTML = block.content;
+                        const contents = Array.isArray(block.content) ? block.content : [block.content];
+                        contents.forEach((text, colIdx) => {
+                            const el = blocksContainer.querySelector(`[data-block-idx="${idx}"][data-col-idx="${colIdx}"]`);
+                            if (el) {
+                                el.style.color = textColor;
+                                el.style.fontSize = defSize + 'px'; 
+                                if (el.innerHTML !== text) {
+                                    el.innerHTML = text;
+                                }
                             }
-                        }
+                        });
                     } else if (block.type === 'imageGroup') {
                         const groupContainer = document.getElementById(`image-group-${idx}`);
                         if (groupContainer) {
@@ -2259,7 +2320,6 @@
             }
         }
 
-        // --- Image Editor Logic ---
         let edTool = 'pen', edColor = '#ef4444', edSize = 5;
         let edIsDrawing = false, edStartX = 0, edStartY = 0;
         let edUndoStack = [], edRedoStack = [];
