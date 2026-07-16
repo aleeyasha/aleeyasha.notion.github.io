@@ -45,13 +45,6 @@
         .theme-blend-bg { background-color: var(--theme-blend, #ffffff) !important; }
         .dark .theme-blend-bg { background-color: #1a1a1a !important; }
 
-        .card-shadow { 
-            box-shadow: 0 20px 40px -10px rgba(81, 184, 203, 0.15), 0 0 15px rgba(0, 0, 0, 0.02); 
-        }
-        .dark .card-shadow { 
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 0, 0, 0.2); 
-        }
-        
         @keyframes fadeIn { 
             from { opacity: 0; transform: translateY(10px); } 
             to { opacity: 1; transform: translateY(0); } 
@@ -118,13 +111,6 @@
             backface-visibility: hidden; -webkit-font-smoothing: antialiased; 
             margin: 0 auto; transition: all 0.3s ease; 
         }
-        .editor-scroll-area { max-height: calc(100vh - 8rem); overflow-y: auto; scrollbar-gutter: stable; }
-
-        #builderArea h2 { color: #222222 !important; }
-        .dark #builderArea { background-color: #1a1a1a !important; border-color: #333 !important; }
-        .dark #builderArea h2, .dark #builderArea label { color: #f1f1f1 !important; }
-        .dark .bg-\[\#FAFAFA\] { background-color: #111 !important; border-color: #333 !important; }
-        .dark .bg-white { background-color: #1a1a1a !important; border-color: #333 !important; }
         
         .dropdown-item { 
             padding: 10px 16px; cursor: pointer; font-size: 11px; font-weight: 600; 
@@ -132,8 +118,6 @@
         }
         .dropdown-item:hover { background-color: #e8f6f8; color: #51b8cb; }
         .dark .dropdown-item:hover { background-color: #333; }
-
-        #brand-logo-container { cursor: pointer; }
 
         .resizable-img { 
             cursor: ew-resize; user-select: none; -webkit-user-drag: none; transition: box-shadow 0.2s ease; 
@@ -167,7 +151,7 @@
     </style>
     <style id="dynamic-card-styles"></style>
 </head>
-<body class="relative min-h-screen">
+<body class="relative min-h-screen p-0 m-0 overflow-hidden">
 
     <input type="hidden" id="inputTitle" value="">
     <textarea id="inputDef" class="hidden"></textarea>
@@ -175,12 +159,13 @@
     <input type="file" id="fileImportInput" class="hidden" accept=".png, .pdf">
     <button id="btnInstallApp" class="hidden"></button>
 
-    <div id="mainLayout" class="relative z-10 w-full min-h-screen flex flex-col items-center p-3 md:p-6">
+    <div id="mainLayout" class="relative z-10 w-full flex flex-col items-center h-screen overflow-y-auto custom-scrollbar">
         
-        <main class="w-full flex-1 flex flex-col items-stretch">
+        <main class="w-full flex justify-center flex-1">
             
-            <div id="cardContainer" class="rounded-[2rem] md:rounded-[3rem] card-shadow overflow-hidden border-[4px] md:border-[6px] border-[var(--theme-color)] relative transition-all duration-500 w-full flex-1 flex flex-col group/maincard theme-blend-bg-card">
+            <div id="cardContainer" class="border-[8px] md:border-[12px] border-[var(--theme-color)] relative transition-all duration-500 w-full min-h-screen group/maincard theme-blend-bg-card">
 
+                    <!-- Export Tools -->
                     <div class="absolute top-4 right-4 md:top-6 md:right-6 z-[30] hidden-in-export opacity-100 lg:opacity-0 group-hover/maincard:opacity-100 transition-all group/dl flex flex-col items-center">
                         <button id="cardDownloadBtn" onclick="downloadPNG()" class="bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[36px] h-[36px] md:w-[44px] md:h-[44px] outline-none text-[var(--theme-color)] border-2 border-[var(--theme-color)] relative z-10" aria-label="Download Card PNG">
                             <i data-lucide="download" class="w-4 h-4 md:w-5 md:h-5"></i>
@@ -192,7 +177,7 @@
                         </div>
                     </div>
 
-                    <div class="pt-6 md:pt-10 px-6 md:px-20 pb-8 md:pb-20 group/card flex flex-col flex-1">
+                    <div class="pt-6 md:pt-10 px-6 md:px-20 pb-8 md:pb-20 group/card flex flex-col h-full max-w-[1400px] mx-auto">
                         
                         <div id="cardTitleRestore" onclick="restoreTitle()" class="hidden cursor-pointer py-2 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl border-2 border-dashed border-transparent hover:border-[var(--theme-color)] dark:hover:border-[#333] text-center text-gray-400 hover:text-[var(--theme-color)] opacity-100 lg:opacity-0 group-hover/card:opacity-100 transition-all flex items-center justify-center gap-2">
                             <i data-lucide="plus" class="w-4 h-4"></i> <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Add Title / Category</span>
@@ -231,58 +216,68 @@
                                 <i data-lucide="plus" class="w-4 h-4"></i> <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Add Notes</span>
                             </div>
 
-                            <div id="cardNotesSection" class="group/def relative py-1 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                                <div class="format-toolbar absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-lg border border-[#d0ebf0] dark:border-[#333] rounded-xl flex flex-wrap justify-center items-center p-1 gap-1 w-[320px] md:w-max opacity-0 pointer-events-none group-focus-within/def:opacity-100 group-hover/def:opacity-100 group-focus-within/def:pointer-events-auto group-hover/def:pointer-events-auto transition-all z-20 translate-y-2 group-hover/def:translate-y-0 group-focus-within/def:translate-y-0">
-                                    <button onmousedown="event.preventDefault(); execFormat('undo')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
-                                    <button onmousedown="event.preventDefault(); execFormat('redo')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
-                                    <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                    <button onmousedown="event.preventDefault(); execFormat('bold')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-bold" aria-label="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
-                                    <button onmousedown="event.preventDefault(); execFormat('underline')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-underline" aria-label="Underline"><i data-lucide="underline" class="w-4 h-4"></i></button>
-                                    <button onmousedown="event.preventDefault(); execFormat('highlight')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-highlight" aria-label="Highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
-                                    
-                                    <div class="relative group/colorpicker">
-                                        <button onmousedown="event.preventDefault(); toggleTextColorMenu(event)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-color" aria-label="Text Color"><i data-lucide="palette" class="w-4 h-4"></i></button>
-                                        <div class="text-color-menu hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] p-2 flex flex-wrap gap-1.5 rounded-xl shadow-xl z-[60] w-[165px]" onmousedown="event.preventDefault(); event.stopPropagation();" onclick="event.stopPropagation();">
-                                            <div onmousedown="event.preventDefault(); applyTextColor(activeColor)" class="dynamic-theme-color-swatch w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform" style="background-color: #51b8cb; border: 1px solid rgba(0,0,0,0.1);" aria-label="Theme Color"></div>
-                                            <div onmousedown="event.preventDefault(); applyTextColor('#ef4444')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-red-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Red"></div>
-                                            <div onmousedown="event.preventDefault(); applyTextColor('#f97316')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-orange-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Orange"></div>
-                                            <div onmousedown="event.preventDefault(); applyTextColor('#f59e0b')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-yellow-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Yellow"></div>
-                                            <div onmousedown="event.preventDefault(); applyTextColor('#84cc16')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-lime-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Lime"></div>
-                                            <div onmousedown="event.preventDefault(); applyTextColor('#10b981')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-emerald-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Green"></div>
-                                            <div onmousedown="event.preventDefault(); applyTextColor('#06b6d4')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-cyan-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Cyan"></div>
-                                            <div onmousedown="event.preventDefault(); applyTextColor('#3b82f6')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-blue-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Blue"></div>
-                                            <div onmousedown="event.preventDefault(); applyTextColor('#8b5cf6')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-violet-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Purple"></div>
-                                            <div onmousedown="event.preventDefault(); applyTextColor('#222222')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-gray-900" style="border: 1px solid rgba(60,60,60,1.1);" aria-label="Black"></div>
+                            <div class="flex flex-col md:flex-row gap-4 w-full" id="inlineNotesRow">
+                                <div id="cardNotesSection" class="flex-1 group/def relative py-1 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                                    <div class="format-toolbar absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-lg border border-[#d0ebf0] dark:border-[#333] rounded-xl flex flex-wrap justify-center items-center p-1 gap-1 w-[320px] md:w-max opacity-0 pointer-events-none group-focus-within/def:opacity-100 group-hover/def:opacity-100 group-focus-within/def:pointer-events-auto group-hover/def:pointer-events-auto transition-all z-20 translate-y-2 group-hover/def:translate-y-0 group-focus-within/def:translate-y-0">
+                                        <button onmousedown="event.preventDefault(); execFormat('undo')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); execFormat('redo')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
+                                        <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                        <button onmousedown="event.preventDefault(); execFormat('bold')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-bold" aria-label="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); execFormat('underline')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-underline" aria-label="Underline"><i data-lucide="underline" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); execFormat('highlight')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-highlight" aria-label="Highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
+                                        
+                                        <div class="relative group/colorpicker">
+                                            <button onmousedown="event.preventDefault(); toggleTextColorMenu(event)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-color" aria-label="Text Color"><i data-lucide="palette" class="w-4 h-4"></i></button>
+                                            <div class="text-color-menu hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] p-2 flex flex-wrap gap-1.5 rounded-xl shadow-xl z-[60] w-[165px]" onmousedown="event.preventDefault(); event.stopPropagation();" onclick="event.stopPropagation();">
+                                                <div onmousedown="event.preventDefault(); applyTextColor(activeColor)" class="dynamic-theme-color-swatch w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform" style="background-color: #51b8cb; border: 1px solid rgba(0,0,0,0.1);" aria-label="Theme Color"></div>
+                                                <div onmousedown="event.preventDefault(); applyTextColor('#ef4444')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-red-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Red"></div>
+                                                <div onmousedown="event.preventDefault(); applyTextColor('#f97316')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-orange-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Orange"></div>
+                                                <div onmousedown="event.preventDefault(); applyTextColor('#f59e0b')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-yellow-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Yellow"></div>
+                                                <div onmousedown="event.preventDefault(); applyTextColor('#84cc16')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-lime-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Lime"></div>
+                                                <div onmousedown="event.preventDefault(); applyTextColor('#10b981')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-emerald-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Green"></div>
+                                                <div onmousedown="event.preventDefault(); applyTextColor('#06b6d4')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-cyan-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Cyan"></div>
+                                                <div onmousedown="event.preventDefault(); applyTextColor('#3b82f6')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-blue-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Blue"></div>
+                                                <div onmousedown="event.preventDefault(); applyTextColor('#8b5cf6')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-violet-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Purple"></div>
+                                                <div onmousedown="event.preventDefault(); applyTextColor('#222222')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-gray-900" style="border: 1px solid rgba(60,60,60,1.1);" aria-label="Black"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                        <button onmousedown="event.preventDefault(); execFormat('justifyLeft')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-left" aria-label="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); execFormat('justifyCenter')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-center" aria-label="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); execFormat('justifyRight')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-right" aria-label="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+                                        
+                                        <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                        <button onmousedown="event.preventDefault(); execFormat('insertUnorderedList')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-ul" aria-label="Bullet List"><i data-lucide="list" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); execFormat('insertOrderedList')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-ol" aria-label="Ordered List"><i data-lucide="list-ordered" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); sortSelectedTextAZ()" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Sort A-Z" title="Sort A-Z"><i data-lucide="arrow-down-a-z" class="w-4 h-4"></i></button>
+
+                                        <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                        <button onmousedown="event.preventDefault(); copyNoteText(event, 'cardDef')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Copy Text" title="Copy Text"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); downloadNoteText('cardDef')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Download .txt" title="Download .txt"><i data-lucide="file-down" class="w-4 h-4"></i></button>
+                                        
+                                        <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                        <button onmousedown="event.preventDefault(); toggleSpeechToText('cardDef', false, this)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Dictate" title="Dictate"><i data-lucide="mic" class="w-4 h-4"></i></button>
+                                        
+                                        <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                        <button onmousedown="event.preventDefault(); addPrimaryNote('next')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Add Note Next To" title="Add Note Next To"><i data-lucide="panel-right" class="w-4 h-4"></i></button>
+                                        <button onmousedown="event.preventDefault(); addPrimaryNote('below')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Add Note Below" title="Add Note Below"><i data-lucide="panel-bottom" class="w-4 h-4"></i></button>
+
+                                        <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                        <div class="relative">
+                                            <button id="toolbarDefSizeBtn" onmousedown="event.preventDefault();" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors flex items-center gap-1 text-[11px] font-bold min-w-[40px] justify-center" aria-label="Font Size">
+                                                <span id="toolbarDefSizeLabel">24</span>
+                                                <i data-lucide="chevron-down" class="w-3 h-3"></i>
+                                            </button>
+                                            <div id="toolbarDefSizeDropdownMenu" onmousedown="event.preventDefault();" class="hidden absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[60] overflow-hidden w-16 max-h-48 overflow-y-auto custom-scrollbar"></div>
                                         </div>
                                     </div>
-
-                                    <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                    <button onmousedown="event.preventDefault(); execFormat('justifyLeft')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-left" aria-label="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
-                                    <button onmousedown="event.preventDefault(); execFormat('justifyCenter')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-center" aria-label="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
-                                    <button onmousedown="event.preventDefault(); execFormat('justifyRight')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-right" aria-label="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
-                                    
-                                    <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                    <button onmousedown="event.preventDefault(); execFormat('insertUnorderedList')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-ul" aria-label="Bullet List"><i data-lucide="list" class="w-4 h-4"></i></button>
-                                    <button onmousedown="event.preventDefault(); execFormat('insertOrderedList')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-ol" aria-label="Ordered List"><i data-lucide="list-ordered" class="w-4 h-4"></i></button>
-                                    <button onmousedown="event.preventDefault(); sortSelectedTextAZ()" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Sort A-Z" title="Sort A-Z"><i data-lucide="arrow-down-a-z" class="w-4 h-4"></i></button>
-
-                                    <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                    <button onmousedown="event.preventDefault(); copyNoteText(event, 'cardDef')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Copy Text" title="Copy Text"><i data-lucide="copy" class="w-4 h-4"></i></button>
-                                    <button onmousedown="event.preventDefault(); downloadNoteText('cardDef')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Download .txt" title="Download .txt"><i data-lucide="file-down" class="w-4 h-4"></i></button>
-                                    
-                                    <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                    <div class="relative">
-                                        <button id="toolbarDefSizeBtn" onmousedown="event.preventDefault();" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors flex items-center gap-1 text-[11px] font-bold min-w-[40px] justify-center" aria-label="Font Size">
-                                            <span id="toolbarDefSizeLabel">24</span>
-                                            <i data-lucide="chevron-down" class="w-3 h-3"></i>
-                                        </button>
-                                        <div id="toolbarDefSizeDropdownMenu" onmousedown="event.preventDefault();" class="hidden absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[60] overflow-hidden w-16 max-h-48 overflow-y-auto custom-scrollbar"></div>
-                                    </div>
+                                    <div id="cardDef" contenteditable="true" data-placeholder="Enter definition or notes..." class="font-medium leading-relaxed whitespace-pre-wrap outline-none" style="text-decoration: none; min-height: 1.5em;"></div>
+                                    <button onclick="clearDef()" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 group-hover/def:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" aria-label="Remove Notes Section">
+                                        <i data-lucide="x" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
+                                    </button>
                                 </div>
-                                <div id="cardDef" contenteditable="true" data-placeholder="Enter definition or notes..." class="font-medium leading-relaxed whitespace-pre-wrap outline-none" style="text-decoration: none; min-height: 1.5em;"></div>
-                                <button onclick="clearDef()" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 group-hover/def:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" aria-label="Remove Notes Section">
-                                    <i data-lucide="x" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
-                                </button>
+                                <div id="inlineExtraNotesContainer" class="flex flex-col md:flex-row gap-4 flex-1 empty:hidden"></div>
                             </div>
                             
                             <div id="cardImagesContainer" class="flex flex-wrap gap-4 md:gap-9 w-full justify-center mt-2" style="padding-top: 0px;"></div>
@@ -371,31 +366,26 @@
         <button onclick="saveInlineEditor()" class="p-1.5 text-gray-400 hover:text-emerald-400 hover:bg-white/10 rounded-lg transition-colors" title="Save"><i data-lucide="check" class="w-4 h-4"></i></button>
     </div>
 
-    <div id="floatingPreviewMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-72 py-1 flex flex-col max-h-[85vh]">
+    <div id="floatingPreviewMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-64 py-1">
         
-        <!-- Cards Section Header -->
-        <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
-            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Your Cards</span>
-            <div class="flex items-center gap-1">
-                <button onclick="document.getElementById('fileImportInput').click()" class="text-gray-400 hover:text-[var(--theme-color)] transition-colors outline-none cursor-pointer p-1" aria-label="Import PNG/PDF" title="Import">
-                    <i data-lucide="upload" class="w-4 h-4"></i>
-                </button>
-                <button onclick="createCard()" oncontextmenu="event.preventDefault(); createCard(true);" class="text-[#e7f135] hover:text-[#51b8cb] transition-colors outline-none cursor-pointer p-1" aria-label="New Card" title="New Card">
-                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                </button>
-            </div>
+        <!-- Cards List integrated into context menu -->
+        <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center gap-2">
+            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex-1">Your Cards</span>
+            <button onclick="document.getElementById('fileImportInput').click()" class="cursor-pointer transition-all hover:scale-110 outline-none flex items-center justify-center text-gray-400 hover:text-[var(--theme-color)] drop-shadow-sm" aria-label="Import PNG/PDF">
+                <i data-lucide="upload" class="w-4 h-4"></i>
+            </button>
+            <button onclick="createCard()" oncontextmenu="event.preventDefault(); createCard(true);" class="cursor-pointer transition-all hover:scale-110 hover:rotate-90 duration-300 outline-none flex items-center justify-center text-[#e7f135] hover:text-[#51b8cb] drop-shadow-sm" aria-label="New Card">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 md:w-5 md:h-5">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+            </button>
         </div>
-        
-        <!-- Cards List -->
-        <div id="headerCardsList" class="overflow-y-auto custom-scrollbar pb-1 shrink max-h-48"></div>
-        
-        <!-- Actions Section Header -->
-        <div class="px-4 py-2 border-t border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0 bg-black/5 dark:bg-white/5 mt-1">
-            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Card Actions</span>
+        <div id="headerCardsList" class="max-h-40 overflow-y-auto custom-scrollbar pb-1 border-b border-gray-100 dark:border-gray-800"></div>
+
+        <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between mt-1">
+            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Controls</span>
             <div class="flex items-center gap-1">
-                <button id="contextDeleteCardBtn" class="text-gray-400 hover:text-rose-500 transition-colors outline-none cursor-pointer p-1" aria-label="Delete Card">
-                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                </button>
                 <button id="imageLayoutToggleBtn" class="text-gray-400 hover:text-[#51b8cb] transition-colors outline-none cursor-pointer p-1" aria-label="Image Layout">
                     <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
                 </button>
@@ -410,85 +400,39 @@
                 </button>
             </div>
         </div>
-        
-        <!-- Layout & Theme Sections -->
-        <div class="overflow-y-auto custom-scrollbar shrink-0">
-            <div id="floatingLayoutOptions" class="hidden py-1 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mt-1 mb-1"></div>
-            <div class="py-1">
-                <div id="themeColorToggleBtn" class="dropdown-item flex items-center justify-between gap-2 transition-colors">
-                    <div class="flex items-center gap-2"><i data-lucide="palette" class="w-4 h-4"></i> Theme Color</div>
-                    <i data-lucide="chevron-down" class="w-3 h-3 transition-transform" id="themeColorChevron"></i>
-                </div>
-                <div id="floatingThemeColorOptions" class="hidden py-2 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mt-1 px-3">
-                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <div id="floatingLayoutOptions" class="hidden py-1 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mt-1 mb-1"></div>
+        <div class="py-1">
+            <div id="themeColorToggleBtn" class="dropdown-item flex items-center justify-between gap-2 transition-colors">
+                <div class="flex items-center gap-2"><i data-lucide="palette" class="w-4 h-4"></i> Theme Color</div>
+                <i data-lucide="chevron-down" class="w-3 h-3 transition-transform" id="themeColorChevron"></i>
+            </div>
+            <div id="floatingThemeColorOptions" class="hidden py-2 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mt-1 px-3">
+                <div class="flex flex-wrap items-center justify-end gap-2 mb-3">
+                    <div class="flex items-center gap-1">
                         <button id="btnRandomColor" class="p-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-gray-400 hover:text-[var(--theme-color)] rounded-lg transition-all shadow-sm hover:border-gray-300 dark:hover:border-gray-600 outline-none" aria-label="Generate Random Palette">
                             <i data-lucide="shuffle" class="w-3 h-3"></i>
                         </button>
-                        <div class="relative shrink-0 w-24">
-                            <button id="blendBtn" class="w-full px-2 py-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-[var(--theme-color)] text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group hover:border-gray-300 dark:hover:border-gray-600">
+                        <div class="relative shrink-0 w-20">
+                            <button id="blendBtn" class="w-full px-2 py-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-[var(--theme-color)] text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group hover:border-gray-300 dark:hover:border-gray-600">
                                 <span class="text-gray-400">Blend</span>
-                                <span id="blendValueLabel">10%</span>
+                                <span id="blendValueLabel">20%</span>
                                 <i data-lucide="chevron-down" class="w-3 h-3 text-gray-400 transition-transform group-hover:translate-y-0.5 shrink-0"></i>
                             </button>
                             <div id="blendDropdownMenu" class="hidden absolute right-0 mt-2 w-full bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[70] overflow-hidden">
-                                <div id="blendOptions" class="py-1 max-h-32 overflow-y-auto custom-scrollbar"></div>
+                                <div id="blendOptions" class="py-1"></div>
                             </div>
                         </div>
                     </div>
-                    <div id="colorMap" class="mb-3 h-24 w-full relative cursor-crosshair border border-gray-200 dark:border-[#333] rounded-xl overflow-hidden bg-red-500">
-                        <div class="color-map-white absolute inset-0 bg-gradient-to-r from-white to-transparent"></div>
-                        <div class="color-map-black absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
-                        <div id="colorMarker" class="absolute w-4 h-4 border-2 border-white rounded-full shadow-sm pointer-events-none transform -translate-x-1/2 -translate-y-1/2" style="top: 20%; left: 80%;"></div>
-                    </div>
-                    <div class="px-1 mb-1">
-                        <input type="range" id="inputHue" min="0" max="360" value="189" class="w-full cursor-pointer">
-                    </div>
+                </div>
+                <div id="colorMap" class="mb-3 h-24 w-full relative cursor-crosshair border border-gray-200 dark:border-[#333] rounded-xl overflow-hidden bg-red-500">
+                    <div class="color-map-white absolute inset-0 bg-gradient-to-r from-white to-transparent"></div>
+                    <div class="color-map-black absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
+                    <div id="colorMarker" class="absolute w-4 h-4 border-2 border-white rounded-full shadow-sm pointer-events-none transform -translate-x-1/2 -translate-y-1/2" style="top: 20%; left: 80%;"></div>
+                </div>
+                <div class="px-1 mb-1">
+                    <input type="range" id="inputHue" min="0" max="360" value="189" class="w-full cursor-pointer">
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div id="imageEditorModal" class="hidden fixed inset-0 z-[200] bg-black/80 flex flex-col items-center justify-center">
-        <div class="bg-white dark:bg-[#1a1a1a] p-2 rounded-2xl mb-4 flex gap-2 items-center shadow-2xl border border-gray-200 dark:border-gray-700 w-[95%] max-w-3xl overflow-x-auto custom-scrollbar shrink-0">
-            <button class="ed-tool-btn p-2 rounded-xl border border-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition active" data-tool="pen" title="Pen"><i data-lucide="pen-tool" class="w-5 h-5"></i></button>
-            <button class="ed-tool-btn p-2 rounded-xl border border-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition" data-tool="highlighter" title="Highlighter"><i data-lucide="highlighter" class="w-5 h-5"></i></button>
-            <button class="ed-tool-btn p-2 rounded-xl border border-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition" data-tool="eraser" title="Eraser"><i data-lucide="eraser" class="w-5 h-5"></i></button>
-            <div class="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 shrink-0"></div>
-            <button class="ed-tool-btn p-2 rounded-xl border border-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition" data-tool="rect" title="Rectangle"><i data-lucide="square" class="w-5 h-5"></i></button>
-            <button class="ed-tool-btn p-2 rounded-xl border border-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition" data-tool="circle" title="Circle"><i data-lucide="circle" class="w-5 h-5"></i></button>
-            <button class="ed-tool-btn p-2 rounded-xl border border-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition" data-tool="arrow" title="Arrow"><i data-lucide="move-up-right" class="w-5 h-5"></i></button>
-            <div class="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 shrink-0"></div>
-            
-            <!-- Color Picker & Size -->
-            <div class="flex gap-1.5 px-1 items-center shrink-0">
-                <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-black/20 dark:border-white/20 hover:scale-110 transition scale-110 border-black dark:border-white" style="background-color: #ef4444;" data-color="#ef4444"></button>
-                <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-black/20 dark:border-white/20 hover:scale-110 transition" style="background-color: #f59e0b;" data-color="#f59e0b"></button>
-                <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-black/20 dark:border-white/20 hover:scale-110 transition" style="background-color: #eab308;" data-color="#eab308"></button>
-                <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-black/20 dark:border-white/20 hover:scale-110 transition" style="background-color: #22c55e;" data-color="#22c55e"></button>
-                <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-black/20 dark:border-white/20 hover:scale-110 transition" style="background-color: #3b82f6;" data-color="#3b82f6"></button>
-                <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-black/20 dark:border-white/20 hover:scale-110 transition" style="background-color: #a855f7;" data-color="#a855f7"></button>
-                <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-black/20 dark:border-white/20 hover:scale-110 transition" style="background-color: #000000;" data-color="#000000"></button>
-                <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-black/20 dark:border-white/20 hover:scale-110 transition" style="background-color: #ffffff;" data-color="#ffffff"></button>
-            </div>
-            
-            <div class="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 shrink-0"></div>
-            <div class="flex items-center shrink-0 w-24 px-2">
-                <input type="range" id="edSizeSlider" min="1" max="50" value="5" class="w-full">
-            </div>
-            
-            <div class="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 shrink-0"></div>
-            <button onclick="edUndo()" class="p-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition" title="Undo"><i data-lucide="undo" class="w-5 h-5"></i></button>
-            <button onclick="edRedo()" class="p-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition" title="Redo"><i data-lucide="redo" class="w-5 h-5"></i></button>
-
-            <div class="flex-1 min-w-[10px]"></div>
-            <button onclick="closeImageEditor()" class="px-4 py-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-bold text-sm transition shrink-0">Cancel</button>
-            <button onclick="saveImageEditor()" class="px-4 py-2 rounded-xl bg-[var(--theme-color)] text-white font-bold text-sm hover:opacity-90 transition shrink-0 ml-1">Save</button>
-        </div>
-
-        <div id="edCanvasContainer" class="relative max-w-[95%] max-h-[80vh]">
-            <canvas id="edBgCanvas"></canvas>
-            <canvas id="edDrawCanvas"></canvas>
-            <canvas id="edTempCanvas" class="cursor-crosshair"></canvas>
         </div>
     </div>
     
@@ -511,34 +455,155 @@
         };
         const CONSTANT_ICON_COLOR = "#51b8cb"; 
         
-        let activeColor = "#51b8cb", hue = 189, saturation = 60, brightness = 80, uploadedImages = [];
-        let activeBlocks = []; 
+        // ------------------ GLOBAL STATE VARIABLES ------------------
+        let activeColor = "#51b8cb", hue = 189, saturation = 60, brightness = 80;
+        let uploadedImages = [], activeBlocks = []; 
         let cards = [], activeCardId = null, isSwitching = false;
-        let currentSelectedCategory = "-", currentSelectedSize = 32, currentSelectedDefSize = 24, currentSelectedExtraDefSize = 24, currentImageBorder = 2, currentImageCols = 0, currentBlendPercentage = 10, deferredPrompt = null;
-        let showTitlePlaceholder = true, showDefPlaceholder = true, activeImageIdx = -1, activeBlockIdx = -1, activeImageIsGroup = false;
+        
+        let currentSelectedCategory = "-", currentSelectedSize = 32, currentSelectedDefSize = 24, currentSelectedExtraDefSize = 24;
+        let currentImageBorder = 2, currentImageCols = 0, currentBlendPercentage = 20, deferredPrompt = null;
+        let showTitlePlaceholder = true, showDefPlaceholder = true;
+        
+        let activeImageIdx = -1, activeBlockIdx = -1, activeImageIsGroup = false;
         
         let isDraggingImage = false, dragStartX = 0, dragImageIdx = -1, dragIsGroup = false, dragBlockIdx = -1, dragStartScale = 100;
+        let dragWithCtrl = false, dragStartXOffset = 0;
         
         let imageUndoStack = [], imageRedoStack = [], isImageUndoingRedoing = false, stateBeforeDrag = null;
+
+        let recognition = null;
+        let isRecording = false;
+        let activeMicBtn = null;
+
+        window.toggleSpeechToText = function(targetIdx, isBlock, btnEl) {
+            if (isRecording) {
+                if (recognition) recognition.stop();
+                return;
+            }
+
+            const el = window.getNoteTextElement(targetIdx, isBlock);
+            if (!el) return;
+            
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                showToast("Speech recognition is not supported in this browser.");
+                return;
+            }
+
+            recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.continuous = true;
+            recognition.interimResults = true;
+
+            recognition.onstart = function() {
+                isRecording = true;
+                activeMicBtn = btnEl;
+                btnEl.classList.add('text-red-500', 'animate-pulse');
+                btnEl.classList.remove('text-gray-500', 'hover:text-[var(--theme-color)]');
+                showToast("Listening...");
+            };
+
+            recognition.onresult = function(event) {
+                let finalTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    }
+                }
+                if (finalTranscript) {
+                    if (document.activeElement !== el) {
+                        el.focus();
+                        const selection = window.getSelection();
+                        selection.selectAllChildren(el);
+                        selection.collapseToEnd();
+                    }
+                    document.execCommand('insertText', false, finalTranscript + ' ');
+                    syncCardState();
+                }
+            };
+
+            recognition.onerror = function(event) {
+                showToast("Microphone error: " + event.error);
+                stopRecordingUI();
+            };
+
+            recognition.onend = function() {
+                stopRecordingUI();
+            };
+
+            function stopRecordingUI() {
+                isRecording = false;
+                if (activeMicBtn) {
+                    activeMicBtn.classList.remove('text-red-500', 'animate-pulse');
+                    activeMicBtn.classList.add('text-gray-500', 'hover:text-[var(--theme-color)]');
+                    activeMicBtn = null;
+                }
+            }
+
+            recognition.start();
+        };
+
+        window.addExtraNoteRelative = function(idx, position) {
+            if (position === 'next') {
+                let isPrimaryInline = activeBlocks[idx].isPrimaryInline;
+                let groupId = activeBlocks[idx].groupId;
+                if (!isPrimaryInline && !groupId) {
+                    groupId = 'group_' + Date.now();
+                    activeBlocks[idx].groupId = groupId;
+                }
+                activeBlocks.splice(idx + 1, 0, { type: 'text', isPrimaryInline: isPrimaryInline, groupId: groupId, content: '' });
+            } else if (position === 'below') {
+                activeBlocks.splice(idx + 1, 0, { type: 'text', content: '' });
+            }
+            updatePreview();
+            syncCardState();
+            setTimeout(() => {
+                const inputs = document.querySelectorAll('.card-extra-def-input');
+                for(let i=0; i<inputs.length; i++) {
+                    if (parseInt(inputs[i].getAttribute('data-block-idx')) === idx + 1) {
+                        inputs[i].focus();
+                        break;
+                    }
+                }
+            }, 50);
+        };
+
+        window.addPrimaryNote = function(position) {
+            if (position === 'next') {
+                activeBlocks.unshift({ type: 'text', isPrimaryInline: true, content: '' });
+            } else if (position === 'below') {
+                activeBlocks.unshift({ type: 'text', content: '' });
+            }
+            updatePreview();
+            syncCardState();
+            setTimeout(() => {
+                const inputs = document.querySelectorAll('.card-extra-def-input');
+                if (inputs.length > 0) inputs[0].focus();
+            }, 50);
+        };
+
+        window.addExtraNote = function() {
+            activeBlocks.push({ type: 'text', content: '' });
+            updatePreview();
+            syncCardState();
+            setTimeout(() => {
+                const inputs = document.querySelectorAll('.card-extra-def-input');
+                if (inputs.length > 0) inputs[inputs.length - 1].focus();
+            }, 50);
+        };
 
         window.toggleTextColorMenu = function(e) {
             e.stopPropagation();
             const targetMenu = e.currentTarget.nextElementSibling;
             const isHidden = targetMenu.classList.contains('hidden');
-            
             document.querySelectorAll('.text-color-menu').forEach(m => m.classList.add('hidden'));
-            
-            if (isHidden) {
-                targetMenu.classList.remove('hidden');
-            }
+            if (isHidden) targetMenu.classList.remove('hidden');
         };
 
         window.applyTextColor = function(color) {
             document.execCommand('styleWithCSS', false, true);
             document.execCommand('foreColor', false, color);
-            
             document.querySelectorAll('.text-color-menu').forEach(m => m.classList.add('hidden'));
-            
             syncCardState();
             checkFormatState();
         };
@@ -552,7 +617,6 @@
                     uploadedImages[activeImageIdx].align = alignType;
                 }
                 
-                // If editing is open, just update the wrapper class to prevent DOM wipe
                 if (edTarget.imgIdx !== -1) {
                     const wrapper = edTarget.imgEl.parentElement;
                     wrapper.className = `relative group/imgwrapper block is-editing ${alignType === 'left' ? 'mr-auto ml-0' : alignType === 'right' ? 'ml-auto mr-0' : 'mx-auto'}`;
@@ -571,8 +635,6 @@
                  } else {
                      uploadedImages[activeImageIdx].border = b;
                  }
-                 
-                 // If editing is open, update element directly to prevent destroying canvas
                  if (edTarget.imgIdx !== -1) {
                      edTarget.imgEl.style.border = `${b}px solid var(--theme-color)`;
                  } else {
@@ -591,6 +653,7 @@
             }
         }
 
+        // ------------------ MENU & CARD LIST RENDERERS ------------------
         window.populateHeaderCardsList = function() {
             const list = document.getElementById('headerCardsList');
             if (!list) return;
@@ -598,7 +661,7 @@
             
             if (cards.length === 0) {
                 const emptyItem = document.createElement('div');
-                emptyItem.className = 'dropdown-item text-gray-400 dark:text-gray-500 italic cursor-default opacity-60';
+                emptyItem.className = 'dropdown-item text-gray-400 dark:text-gray-500 italic cursor-default opacity-60 text-center';
                 emptyItem.innerText = 'No cards';
                 list.appendChild(emptyItem);
             } else {
@@ -607,11 +670,8 @@
                     const item = document.createElement('div');
                     
                     let itemClass = 'dropdown-item flex items-center justify-between group/carditem transition-all ';
-                    if (isActive) {
-                        itemClass += 'bg-[#e8f6f8] dark:bg-[#222] shadow-sm';
-                    } else {
-                        itemClass += 'hover:bg-black/5 dark:hover:bg-white/5';
-                    }
+                    if (isActive) itemClass += 'bg-[#e8f6f8] dark:bg-[#222] shadow-sm';
+                    else itemClass += 'hover:bg-black/5 dark:hover:bg-white/5';
                     item.className = itemClass;
                     
                     item.draggable = true;
@@ -625,12 +685,9 @@
                         e.dataTransfer.dropEffect = 'move';
                         item.classList.add('bg-black/10', 'dark:bg-white/10', 'scale-[1.02]');
                     });
-                    item.addEventListener('dragleave', () => {
-                        item.classList.remove('bg-black/10', 'dark:bg-white/10', 'scale-[1.02]');
-                    });
+                    item.addEventListener('dragleave', () => item.classList.remove('bg-black/10', 'dark:bg-white/10', 'scale-[1.02]'));
                     item.addEventListener('drop', (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
+                        e.preventDefault(); e.stopPropagation();
                         item.classList.remove('bg-black/10', 'dark:bg-white/10', 'scale-[1.02]');
                         const fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
                         const toIdx = cards.indexOf(c);
@@ -643,12 +700,9 @@
                     });
                     item.addEventListener('dragend', () => {
                         item.classList.remove('opacity-40');
-                        document.querySelectorAll('#headerCardsList .dropdown-item').forEach(el => {
-                            el.classList.remove('bg-black/10', 'dark:bg-white/10', 'scale-[1.02]');
-                        });
+                        document.querySelectorAll('#headerCardsList .dropdown-item').forEach(el => el.classList.remove('bg-black/10', 'dark:bg-white/10', 'scale-[1.02]'));
                     });
 
-                    // Set the text and icon color to match the card's theme color
                     const cardColor = c.color && c.color.hex ? c.color.hex : '#51b8cb';
                     item.style.color = cardColor;
                     
@@ -660,7 +714,6 @@
                     delBtn.className = 'text-gray-400 hover:text-rose-500 transition-colors p-1 rounded-md opacity-0 group-hover/carditem:opacity-100 outline-none shrink-0';
                     delBtn.innerHTML = '<i data-lucide="trash-2" class="w-3.5 h-3.5"></i>';
                     delBtn.setAttribute('aria-label', 'Delete Card');
-                    
                     if (cards.length <= 1) delBtn.style.display = 'none';
 
                     delBtn.onclick = (evt) => {
@@ -669,19 +722,15 @@
                         if (index > -1) {
                             cards.splice(index, 1);
                             saveCardsToStorage();
-                            if (isActive && cards.length > 0) {
-                                switchCard(cards[Math.max(0, index - 1)].id);
-                            } else {
-                                populateHeaderCardsList(); 
-                            }
+                            if (isActive && cards.length > 0) switchCard(cards[Math.max(0, index - 1)].id);
+                            else populateHeaderCardsList(); 
                         }
                     };
 
                     item.onclick = (evt) => {
                         evt.stopPropagation();
                         if (!isActive) switchCard(c.id);
-                        const menu = document.getElementById('floatingPreviewMenu');
-                        if (menu) menu.classList.add('hidden');
+                        document.getElementById('floatingPreviewMenu').classList.add('hidden');
                     };
                     
                     item.appendChild(leftPart);
@@ -696,8 +745,7 @@
             if (e.currentTarget && e.currentTarget.id === 'cardContainer') {
                 if (e.target.closest('#cardWord') || e.target.closest('#cardType') || e.target.closest('#cardDef') || e.target.closest('.card-extra-def-input') || e.target.closest('[id^="preview-wrapper-"]')) return;
             }
-            e.preventDefault();
-            e.stopPropagation();
+            e.preventDefault(); e.stopPropagation();
             
             const undoImgBtn = document.getElementById('contextUndoImageBtn');
             if (undoImgBtn) {
@@ -721,8 +769,9 @@
             });
         };
 
-        window.addExtraNote = function() {
-            activeBlocks.push({ type: 'text', content: '' });
+        window.addNote = function(layoutType) {
+            // layoutType can be 'inline' (next to) or 'block' (below)
+            activeBlocks.push({ type: 'text', inline: (layoutType === 'inline'), content: '' });
             updatePreview();
             setTimeout(() => {
                 const inputs = document.querySelectorAll('.card-extra-def-input');
@@ -730,42 +779,6 @@
             }, 50);
         };
         
-        window.insertExtraNote = function(idx) {
-            activeBlocks.splice(idx, 0, { type: 'text', content: '' });
-            updatePreview();
-            setTimeout(() => {
-                const newEl = document.querySelector(`.card-extra-def-input[data-block-idx="${idx}"]`);
-                if (newEl) newEl.focus();
-            }, 50);
-            syncCardState();
-        };
-
-        window.addBlockCol = function(idx, colIdx) {
-            let block = activeBlocks[idx];
-            if (!Array.isArray(block.content)) {
-                block.content = [block.content];
-            }
-            block.content.splice(colIdx + 1, 0, '');
-            updatePreview();
-            syncCardState();
-        };
-
-        window.removeBlockCol = function(idx, colIdx) {
-            let block = activeBlocks[idx];
-            if (Array.isArray(block.content)) {
-                block.content.splice(colIdx, 1);
-                if (block.content.length === 0) {
-                    activeBlocks.splice(idx, 1);
-                } else if (block.content.length === 1) {
-                    block.content = block.content[0];
-                }
-            } else {
-                activeBlocks.splice(idx, 1);
-            }
-            updatePreview();
-            syncCardState();
-        };
-
         window.removeBlock = function(idx) {
             activeBlocks.splice(idx, 1);
             updatePreview();
@@ -775,9 +788,7 @@
         window.removeImageFromGroup = function(blockIdx, imgIdx) {
             pushImageHistory();
             activeBlocks[blockIdx].images.splice(imgIdx, 1);
-            if (activeBlocks[blockIdx].images.length === 0) {
-                activeBlocks.splice(blockIdx, 1);
-            }
+            if (activeBlocks[blockIdx].images.length === 0) activeBlocks.splice(blockIdx, 1);
             updatePreview();
             syncCardState();
         };
@@ -787,8 +798,7 @@
                 pushImageHistory();
                 const group = activeBlocks[blockIdx].images;
                 [group[imgIdx - 1], group[imgIdx]] = [group[imgIdx], group[imgIdx - 1]];
-                updatePreview();
-                syncCardState();
+                updatePreview(); syncCardState();
             }
         };
 
@@ -797,20 +807,8 @@
             if (imgIdx < group.length - 1) {
                 pushImageHistory();
                 [group[imgIdx], group[imgIdx + 1]] = [group[imgIdx + 1], group[imgIdx]];
-                updatePreview();
-                syncCardState();
+                updatePreview(); syncCardState();
             }
-        };
-
-        window.onload = function() {
-            initColorPicker(); 
-            initBlendDropdown(); 
-            initFloatingMenu(); 
-            setupEventListeners(); 
-            initCards(); 
-            
-            if (typeof lucide !== 'undefined') lucide.createIcons();
-            initPWA();
         };
 
         function pushImageHistory(stateOverride = null) {
@@ -831,10 +829,8 @@
                 blocks: JSON.parse(JSON.stringify(activeBlocks))
             });
             const st = imageUndoStack.pop();
-            uploadedImages = st.top || [];
-            activeBlocks = st.blocks || [];
-            updatePreview();
-            isImageUndoingRedoing = false;
+            uploadedImages = st.top || []; activeBlocks = st.blocks || [];
+            updatePreview(); isImageUndoingRedoing = false;
         };
         
         window.redoImageAction = function() {
@@ -845,36 +841,36 @@
                 blocks: JSON.parse(JSON.stringify(activeBlocks))
             });
             const st = imageRedoStack.pop();
-            uploadedImages = st.top || [];
-            activeBlocks = st.blocks || [];
-            updatePreview();
-            isImageUndoingRedoing = false;
+            uploadedImages = st.top || []; activeBlocks = st.blocks || [];
+            updatePreview(); isImageUndoingRedoing = false;
         };
 
-        window.getNoteTextElement = function(target, isBlock, colIdx = 0) {
-            if (isBlock) {
-                const el = document.querySelector(`.card-extra-def-input[data-block-idx="${target}"][data-col-idx="${colIdx}"]`);
-                if (el) return el;
-                return document.querySelector(`.card-extra-def-input[data-block-idx="${target}"]`);
-            }
+        window.onload = function() {
+            initColorPicker(); 
+            initBlendDropdown(); 
+            initFloatingMenu(); 
+            setupEventListeners(); 
+            initCards(); 
+            
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            initPWA();
+        };
+
+        window.getNoteTextElement = function(target, isBlock) {
+            if (isBlock) return document.querySelector(`.card-extra-def-input[data-block-idx="${target}"]`);
             return document.getElementById(target);
         };
 
-        window.copyNoteText = function(e, target, isBlock = false, colIdx = 0) {
-            const el = window.getNoteTextElement(target, isBlock, colIdx);
+        window.copyNoteText = function(e, target, isBlock = false) {
+            const el = window.getNoteTextElement(target, isBlock);
             if (!el) return;
-            
-            // Fallback using execCommand for reliable iFrame/cross-origin copying
             const textarea = document.createElement('textarea');
-            textarea.value = el.innerText;
-            textarea.style.position = 'fixed';
-            textarea.style.opacity = '0';
+            textarea.value = el.innerText; textarea.style.position = 'fixed'; textarea.style.opacity = '0';
             document.body.appendChild(textarea);
             textarea.select();
             
             try {
                 document.execCommand('copy');
-                // Temporary visual feedback
                 if (e && e.currentTarget) {
                     const btn = e.currentTarget;
                     const originalHTML = btn.innerHTML;
@@ -885,61 +881,46 @@
                         if (typeof lucide !== 'undefined') lucide.createIcons();
                     }, 1500);
                 }
-            } catch (err) {
-                console.warn('Copy failed', err);
-            }
+            } catch (err) { console.warn('Copy failed', err); }
             document.body.removeChild(textarea);
         };
 
-        window.downloadNoteText = function(target, isBlock = false, colIdx = 0) {
-            const el = window.getNoteTextElement(target, isBlock, colIdx);
+        window.downloadNoteText = function(target, isBlock = false) {
+            const el = window.getNoteTextElement(target, isBlock);
             if (!el) return;
-            
             const text = el.innerText;
             const titleInput = document.getElementById('inputTitle').value.trim();
-            const filename = (titleInput ? titleInput : 'Note') + (isBlock ? `_Extra_${target+1}_Col_${colIdx+1}` : '') + '.txt';
+            const filename = (titleInput ? titleInput : 'Note') + (isBlock ? `_Extra_${target+1}` : '') + '.txt';
 
             const blob = new Blob([text], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            const a = document.createElement('a'); a.href = url; a.download = filename;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
             URL.revokeObjectURL(url);
         };
 
-        // File Import mechanism handles PNG and PDF natively exported by this app
         document.getElementById('fileImportInput').addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
-            
             const reader = new FileReader();
             reader.onload = function(evt) {
                 const text = evt.target.result;
                 const markerIndex = text.lastIndexOf("NOTION_APP_DATA:");
-                
                 if (markerIndex !== -1) {
                     try {
                         const jsonStr = text.substring(markerIndex + 16);
                         const cardData = JSON.parse(jsonStr);
-                        
-                        // Give it a fresh ID so it doesn't overwrite an existing card silently
                         cardData.id = 'card_' + Date.now() + Math.random().toString(36).substr(2, 9);
                         cards.push(cardData);
                         saveCardsToStorage();
                         switchCard(cardData.id);
                         showToast("Card imported successfully!");
-                    } catch(err) {
-                        showToast("Failed to parse card data from file.");
-                    }
+                    } catch(err) { showToast("Failed to parse card data from file."); }
                 } else {
-                    showToast("No editable card data found in this file. Make sure you import a PNG or PDF created by this app.");
+                    showToast("No editable card data found in this file.");
                 }
             };
-            reader.readAsText(file);
-            e.target.value = '';
+            reader.readAsText(file); e.target.value = '';
         });
 
         window.sortSelectedTextAZ = function() {
@@ -947,40 +928,25 @@
             if (!sel.rangeCount || sel.isCollapsed) return;
             const text = sel.toString();
             if (!text) return;
-            
             const sortedText = text.split('\n')
                 .map(line => line.trim())
                 .filter(line => line.length > 0)
                 .sort((a, b) => a.localeCompare(b, undefined, {sensitivity: 'base'}))
                 .join('\n');
-                
             document.execCommand('insertText', false, sortedText);
             syncCardState();
         };
 
         function initBlendDropdown() {
-            const container = document.getElementById('blendOptions');
-            const menu = document.getElementById('blendDropdownMenu');
-            const btn = document.getElementById('blendBtn');
-            
+            const container = document.getElementById('blendOptions'), menu = document.getElementById('blendDropdownMenu'), btn = document.getElementById('blendBtn');
             [0, 5, 10, 15, 20, 25, 30, 40, 50, 75, 100].forEach(b => {
                 const item = document.createElement('div');
                 item.className = 'dropdown-item text-gray-700 dark:text-gray-300';
                 item.innerText = b + '%';
-                item.onclick = (e) => { 
-                    e.stopPropagation(); 
-                    selectBlend(b); 
-                    menu.classList.add('hidden'); 
-                };
+                item.onclick = (e) => { e.stopPropagation(); selectBlend(b); menu.classList.add('hidden'); };
                 container.appendChild(item);
             });
-            
-            btn.onclick = (e) => { 
-                e.stopPropagation(); 
-                const isHidden = menu.classList.contains('hidden');
-                closeAllDropdowns(); 
-                if (isHidden) menu.classList.remove('hidden'); 
-            };
+            btn.onclick = (e) => { e.stopPropagation(); const isHidden = menu.classList.contains('hidden'); closeAllDropdowns(); if (isHidden) menu.classList.remove('hidden'); };
         }
 
         window.toggleEdMenu = function(menuId) {
@@ -1008,6 +974,21 @@
             if (!e.target.closest('[id$="Btn"]') && !e.target.closest('.format-toolbar')) {
                 document.querySelectorAll('[id$="DropdownMenu"]').forEach(el => el.classList.add('hidden')); 
             }
+            
+            const catMenu = document.getElementById('floatingCategoryMenu');
+            if(catMenu) catMenu.classList.add('hidden'); 
+            
+            const prevM = document.getElementById('floatingPreviewMenu'); 
+            if(prevM && !prevM.classList.contains('hidden')) {
+                // Ignore clicks that happen inside the right-click menu itself so options can be selected
+                if (!prevM.contains(e.target)) {
+                    prevM.classList.add('hidden');
+                    const layoutOptions = document.getElementById('floatingLayoutOptions');
+                    if (layoutOptions) layoutOptions.classList.add('hidden');
+                    const themeColorOptions = document.getElementById('floatingThemeColorOptions');
+                    if (themeColorOptions) themeColorOptions.classList.add('hidden');
+                }
+            }
         });
 
         function showFloatingCategoryMenu(x, y) {
@@ -1017,8 +998,7 @@
                 const rect = menu.getBoundingClientRect();
                 if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
                 if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
-                menu.style.left = x + 'px'; 
-                menu.style.top = y + 'px';
+                menu.style.left = x + 'px'; menu.style.top = y + 'px';
             });
         }
 
@@ -1040,16 +1020,6 @@
                 item.innerText = size;
                 item.onmousedown = (e) => { e.preventDefault(); selectDefSize(size); defMenu.classList.add('hidden'); };
                 if (defMenu) defMenu.appendChild(item);
-            });
-
-            const extraDefMenu = document.getElementById('toolbarExtraDefSizeDropdownMenu'), extraDefBtn = document.getElementById('toolbarExtraDefSizeBtn');
-            if (extraDefBtn) extraDefBtn.onclick = (e) => { e.stopPropagation(); closeAllDropdowns(); extraDefMenu.classList.toggle('hidden'); };
-            defSizes.forEach(size => {
-                const item = document.createElement('div');
-                item.className = 'dropdown-item text-gray-700 dark:text-gray-300 text-center py-1.5';
-                item.innerText = size;
-                item.onmousedown = (e) => { e.preventDefault(); selectExtraDefSize(size); extraDefMenu.classList.add('hidden'); };
-                if (extraDefMenu) extraDefMenu.appendChild(item);
             });
 
             const titleMenu = document.getElementById('toolbarTitleSizeDropdownMenu'), titleBtn = document.getElementById('toolbarTitleSizeBtn');
@@ -1087,10 +1057,7 @@
                     const item = document.createElement('div');
                     item.className = 'dropdown-item text-gray-300 hover:text-white hover:bg-white/10';
                     item.innerText = b + 'px';
-                    item.onclick = (e) => { 
-                        e.stopPropagation(); 
-                        setImgBorder(b);
-                    };
+                    item.onclick = (e) => { e.stopPropagation(); setImgBorder(b); };
                     borderMenu.appendChild(item);
                 });
             }
@@ -1103,12 +1070,9 @@
                     item.className = 'dropdown-item text-gray-700 dark:text-gray-300 flex items-center justify-between';
                     item.innerHTML = `<span>${c === 0 ? 'Auto Layout' : c + ' Columns'}</span>`;
                     item.onclick = (e) => { 
-                        e.stopPropagation(); 
-                        selectImageCols(c); 
+                        e.stopPropagation(); selectImageCols(c); 
                         document.getElementById('floatingPreviewMenu').classList.add('hidden'); 
                         layoutOptions.classList.add('hidden');
-                        const chevron = document.getElementById('imageLayoutChevron');
-                        if (chevron) chevron.classList.remove('rotate-180');
                     };
                     layoutOptions.appendChild(item);
                 });
@@ -1119,8 +1083,6 @@
                 imageLayoutToggleBtn.onclick = (e) => {
                     e.stopPropagation();
                     if (layoutOptions) layoutOptions.classList.toggle('hidden');
-                    const chevron = document.getElementById('imageLayoutChevron');
-                    if (chevron) chevron.classList.toggle('rotate-180');
                 };
             }
 
@@ -1139,38 +1101,6 @@
                     if (chevron) chevron.classList.toggle('rotate-180');
                 };
             }
-
-            const deleteCardBtn = document.getElementById('contextDeleteCardBtn');
-            if (deleteCardBtn) {
-                deleteCardBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    document.getElementById('floatingPreviewMenu').classList.add('hidden');
-                    if (cards.length > 1) {
-                        const index = cards.findIndex(c => c.id === activeCardId);
-                        if (index > -1) {
-                            cards.splice(index, 1);
-                            saveCardsToStorage();
-                            switchCard(cards[Math.max(0, index - 1)].id);
-                        }
-                    }
-                };
-            }
-
-            window.addEventListener('click', () => { 
-                if(catMenu) catMenu.classList.add('hidden'); 
-                
-                const prevM = document.getElementById('floatingPreviewMenu'); 
-                if(prevM && !prevM.classList.contains('hidden')) {
-                    prevM.classList.add('hidden');
-                    if (layoutOptions) layoutOptions.classList.add('hidden');
-                    const chevron = document.getElementById('imageLayoutChevron');
-                    if (chevron) chevron.classList.remove('rotate-180');
-                    
-                    if (themeColorOptions) themeColorOptions.classList.add('hidden');
-                    const tChevron = document.getElementById('themeColorChevron');
-                    if (tChevron) tChevron.classList.remove('rotate-180');
-                }
-            });
 
             document.getElementById('cardContainer').addEventListener('contextmenu', window.openCardContextMenu);
         }
@@ -1194,8 +1124,6 @@
         }
         function selectExtraDefSize(size) { 
             currentSelectedExtraDefSize = size; 
-            const label = document.getElementById('toolbarExtraDefSizeLabel'); 
-            if(label) label.innerText = size; 
             updatePreview(); 
         }
         function selectImageBorder(border) { currentImageBorder = border; updatePreview(); }
@@ -1206,32 +1134,11 @@
             updatePreview(); 
         }
 
-        window.clearTitle = function() { 
-            document.getElementById('inputTitle').value = ''; 
-            currentSelectedCategory = '-'; 
-            showTitlePlaceholder = false; 
-            updatePreview(); 
-        };
-        window.clearDef = function() { 
-            document.getElementById('inputDef').value = ''; 
-            showDefPlaceholder = false; 
-            updatePreview(); 
-        };
-        window.restoreTitle = function() { 
-            showTitlePlaceholder = true; 
-            updatePreview(); 
-            setTimeout(() => document.getElementById('cardWord').focus(), 50); 
-        };
-        window.restoreDef = function() { 
-            showDefPlaceholder = true; 
-            updatePreview(); 
-            setTimeout(() => document.getElementById('cardDef').focus(), 50); 
-        };
-        window.restoreCategory = function() { 
-            currentSelectedCategory = ''; 
-            updatePreview(); 
-            setTimeout(() => document.getElementById('cardType').focus(), 50); 
-        };
+        window.clearTitle = function() { document.getElementById('inputTitle').value = ''; currentSelectedCategory = '-'; showTitlePlaceholder = false; updatePreview(); };
+        window.clearDef = function() { document.getElementById('inputDef').value = ''; showDefPlaceholder = false; updatePreview(); };
+        window.restoreTitle = function() { showTitlePlaceholder = true; updatePreview(); setTimeout(() => document.getElementById('cardWord').focus(), 50); };
+        window.restoreDef = function() { showDefPlaceholder = true; updatePreview(); setTimeout(() => document.getElementById('cardDef').focus(), 50); };
+        window.restoreCategory = function() { currentSelectedCategory = ''; updatePreview(); setTimeout(() => document.getElementById('cardType').focus(), 50); };
 
         function getSelectionStyle(styleName) {
             const sel = window.getSelection(); if (!sel.rangeCount) return null;
@@ -1298,9 +1205,7 @@
                 document.getElementById('inputDef').value = target.innerHTML;
                 showDefPlaceholder = true; 
             }
-            
-            syncCardState(); 
-            checkFormatState();
+            syncCardState(); checkFormatState();
         };
 
         function checkFormatState() {
@@ -1308,43 +1213,17 @@
             if (!activeEl) return;
             if (activeEl.id !== 'cardDef' && activeEl.id !== 'cardWord' && !activeEl.classList.contains('card-extra-def-input')) return;
 
-            const isBold = document.queryCommandState('bold');
-            const isUnderline = document.queryCommandState('underline');
-            const isLeft = document.queryCommandState('justifyLeft');
-            const isCenter = document.queryCommandState('justifyCenter');
-            const isRight = document.queryCommandState('justifyRight');
-            const isUl = document.queryCommandState('insertUnorderedList');
-            const isOl = document.queryCommandState('insertOrderedList');
-
-            let bgStyle = getSelectionStyle('backgroundColor');
-            const isHighlighted = bgStyle && bgStyle !== 'transparent' && bgStyle !== 'rgba(0, 0, 0, 0)';
-            let fStyle = getSelectionStyle('color');
-            const activeRgb = hexToRgb(activeColor);
-            const isColored = fStyle && fStyle.replace(/\s/g, '').toLowerCase() === `rgb(${activeRgb.r},${activeRgb.g},${activeRgb.b})`;
+            const isBold = document.queryCommandState('bold'), isUnderline = document.queryCommandState('underline'), isLeft = document.queryCommandState('justifyLeft'), isCenter = document.queryCommandState('justifyCenter'), isRight = document.queryCommandState('justifyRight'), isUl = document.queryCommandState('insertUnorderedList'), isOl = document.queryCommandState('insertOrderedList');
+            let bgStyle = getSelectionStyle('backgroundColor'); const isHighlighted = bgStyle && bgStyle !== 'transparent' && bgStyle !== 'rgba(0, 0, 0, 0)';
+            let fStyle = getSelectionStyle('color'); const activeRgb = hexToRgb(activeColor); const isColored = fStyle && fStyle.replace(/\s/g, '').toLowerCase() === `rgb(${activeRgb.r},${activeRgb.g},${activeRgb.b})`;
 
             const toggleBtns = (selector, isActive) => {
                 document.querySelectorAll(selector).forEach(btn => {
-                    if (isActive) {
-                        btn.style.color = 'var(--theme-color)';
-                        btn.classList.add('bg-black/5', 'dark:bg-[#333]');
-                        btn.classList.remove('text-gray-500');
-                    } else {
-                        btn.style.color = '';
-                        btn.classList.remove('bg-black/5', 'dark:bg-[#333]');
-                        btn.classList.add('text-gray-500');
-                    }
+                    if (isActive) { btn.style.color = 'var(--theme-color)'; btn.classList.add('bg-black/5', 'dark:bg-[#333]'); btn.classList.remove('text-gray-500'); } 
+                    else { btn.style.color = ''; btn.classList.remove('bg-black/5', 'dark:bg-[#333]'); btn.classList.add('text-gray-500'); }
                 });
             };
-
-            toggleBtns('.btn-format-bold', isBold);
-            toggleBtns('.btn-format-underline', isUnderline);
-            toggleBtns('.btn-format-left', isLeft);
-            toggleBtns('.btn-format-center', isCenter);
-            toggleBtns('.btn-format-right', isRight);
-            toggleBtns('.btn-format-ul', isUl);
-            toggleBtns('.btn-format-ol', isOl);
-            toggleBtns('.btn-format-highlight', isHighlighted);
-            toggleBtns('.btn-format-color', isColored);
+            toggleBtns('.btn-format-bold', isBold); toggleBtns('.btn-format-underline', isUnderline); toggleBtns('.btn-format-left', isLeft); toggleBtns('.btn-format-center', isCenter); toggleBtns('.btn-format-right', isRight); toggleBtns('.btn-format-ul', isUl); toggleBtns('.btn-format-ol', isOl); toggleBtns('.btn-format-highlight', isHighlighted); toggleBtns('.btn-format-color', isColored);
         }
 
         function setupEventListeners() {
@@ -1352,62 +1231,41 @@
             
             document.addEventListener('selectionchange', () => { 
                 const activeEl = document.activeElement;
-                if (activeEl && (activeEl.id === 'cardDef' || activeEl.id === 'cardWord' || activeEl.classList.contains('card-extra-def-input'))) {
-                    checkFormatState(); 
-                }
+                if (activeEl && (activeEl.id === 'cardDef' || activeEl.id === 'cardWord' || activeEl.classList.contains('card-extra-def-input'))) checkFormatState(); 
             });
             
             document.getElementById('cardWord').addEventListener('input', (e) => { 
-                document.getElementById('inputTitle').value = e.target.innerHTML; 
-                showTitlePlaceholder = true; 
-                syncCardState(); 
+                document.getElementById('inputTitle').value = e.target.innerHTML; showTitlePlaceholder = true; syncCardState(); 
             });
             
             const cardTypeEl = document.getElementById('cardType');
             cardTypeEl.addEventListener('input', (e) => { 
-                const val = e.target.innerText.trim(); 
-                currentSelectedCategory = val || '-'; 
-                if (categoryColors[val]) setManualColor(categoryColors[val]); 
-                syncCardState(); 
+                const val = e.target.innerText.trim(); currentSelectedCategory = val || '-'; 
+                if (categoryColors[val]) setManualColor(categoryColors[val]); syncCardState(); 
             });
             cardTypeEl.addEventListener('blur', (e) => { 
-                if (!e.target.innerText.trim()) { 
-                    currentSelectedCategory = '-'; 
-                    updatePreview(); 
-                } 
+                if (!e.target.innerText.trim()) { currentSelectedCategory = '-'; updatePreview(); } 
             });
             
             const cardDefEl = document.getElementById('cardDef');
             cardDefEl.addEventListener('input', (e) => { 
-                document.getElementById('inputDef').value = e.target.innerHTML; 
-                showDefPlaceholder = true; 
-                syncCardState(); 
+                document.getElementById('inputDef').value = e.target.innerHTML; showDefPlaceholder = true; syncCardState(); 
             });
             cardDefEl.addEventListener('keydown', (e) => {
-                if (e.key === 'Tab') {
-                    e.preventDefault();
-                    document.execCommand('insertText', false, '\t');
-                }
+                if (e.key === 'Tab') { e.preventDefault(); document.execCommand('insertText', false, '\t'); }
             });
 
             document.getElementById('cardContainer').addEventListener('input', (e) => {
                 if (e.target.classList.contains('card-extra-def-input')) {
                     const idx = e.target.getAttribute('data-block-idx');
-                    const colIdx = e.target.getAttribute('data-col-idx');
                     if (idx !== null && activeBlocks[idx]) {
-                        if (Array.isArray(activeBlocks[idx].content)) {
-                            activeBlocks[idx].content[colIdx || 0] = e.target.innerHTML;
-                        } else {
-                            activeBlocks[idx].content = e.target.innerHTML;
-                        }
-                        syncCardState();
+                        activeBlocks[idx].content = e.target.innerHTML; syncCardState();
                     }
                 }
             });
             document.getElementById('cardContainer').addEventListener('keydown', (e) => {
                 if (e.target.classList.contains('card-extra-def-input') && e.key === 'Tab') {
-                    e.preventDefault();
-                    document.execCommand('insertText', false, '\t');
+                    e.preventDefault(); document.execCommand('insertText', false, '\t');
                 }
             });
 
@@ -1417,94 +1275,58 @@
 
             document.addEventListener('paste', (event) => { 
                 const clipboardData = event.clipboardData || event.originalEvent.clipboardData;
-                const items = clipboardData.items; 
-                let isImagePaste = false;
-                
+                const items = clipboardData.items; let isImagePaste = false;
                 for (let index in items) { 
                     if (items[index].kind === 'file' && items[index].type.includes('image')) {
-                        isImagePaste = true;
-                        processFile(items[index].getAsFile(), 'blocks'); 
+                        isImagePaste = true; processFile(items[index].getAsFile(), 'blocks'); 
                     }
                 } 
-                
-                if (isImagePaste) {
-                    event.preventDefault();
-                    return;
-                }
-                
+                if (isImagePaste) { event.preventDefault(); return; }
                 if (event.target && event.target.isContentEditable) {
                     const text = clipboardData.getData('text/plain');
-                    if (text) {
-                        event.preventDefault();
-                        document.execCommand('insertText', false, text);
-                    }
+                    if (text) { event.preventDefault(); document.execCommand('insertText', false, text); }
                 }
             });
             
-            window.addEventListener('mousemove', (e) => {
-                handleImageResizeMove(e); 
-            });
-
-            window.addEventListener('mouseup', (e) => {
-                handleImageResizeEnd();
-            });
+            window.addEventListener('mousemove', handleImageResizeMove);
+            window.addEventListener('mouseup', handleImageResizeEnd);
+            window.addEventListener('touchmove', (e) => handleImageResizeMove(e), { passive: false });
+            window.addEventListener('touchend', handleImageResizeEnd);
             
-            window.addEventListener('touchmove', (e) => {
-                handleImageResizeMove(e);
-            }, { passive: false });
-
-            window.addEventListener('touchend', (e) => {
-                handleImageResizeEnd();
-            });
-            
-            // Auto close inline editor if user resizes window (to prevent canvas misalignment)
-            window.addEventListener('resize', () => {
-                if (edTarget.imgIdx !== -1) closeInlineEditor(false);
-            });
-
-            // Close inline editor if user clicks entirely outside the image or toolbar
+            window.addEventListener('resize', () => { if (edTarget.imgIdx !== -1) closeInlineEditor(false); });
             window.addEventListener('mousedown', (e) => {
                 if (edTarget.imgIdx !== -1) {
                     const toolbar = document.getElementById('floatingImageToolbar');
                     const wrapper = edTarget.imgEl ? edTarget.imgEl.parentElement : null;
-                    if (toolbar && !toolbar.contains(e.target) && wrapper && !wrapper.contains(e.target)) {
-                        closeInlineEditor(false);
-                    }
+                    if (toolbar && !toolbar.contains(e.target) && wrapper && !wrapper.contains(e.target)) closeInlineEditor(false);
                 }
             });
             
             window.addEventListener('beforeinstallprompt', (e) => { 
-                e.preventDefault(); 
-                deferredPrompt = e; 
-                const b = document.getElementById('btnInstallApp'); 
-                if (b) { 
-                    b.classList.remove('hidden'); 
-                    b.classList.add('flex'); 
-                } 
+                e.preventDefault(); deferredPrompt = e; const b = document.getElementById('btnInstallApp'); 
+                if (b) { b.classList.remove('hidden'); b.classList.add('flex'); } 
             });
             document.getElementById('btnInstallApp').addEventListener('click', async () => { 
                 if (deferredPrompt) { 
-                    deferredPrompt.prompt(); 
-                    await deferredPrompt.userChoice; 
-                    deferredPrompt = null; 
-                    const b = document.getElementById('btnInstallApp'); 
-                    b.classList.add('hidden'); 
-                    b.classList.remove('flex'); 
+                    deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; 
+                    const b = document.getElementById('btnInstallApp'); b.classList.add('hidden'); b.classList.remove('flex'); 
                 } 
             });
         }
 
         function handleImageResizeStart(e, imgIdx, isGroup = false, blockIdx = -1) { 
-            stateBeforeDrag = {
-                top: JSON.parse(JSON.stringify(uploadedImages)),
-                blocks: JSON.parse(JSON.stringify(activeBlocks))
-            };
-            isDraggingImage = true; 
-            dragIsGroup = isGroup;
-            dragBlockIdx = blockIdx;
-            dragImageIdx = imgIdx; 
+            stateBeforeDrag = { top: JSON.parse(JSON.stringify(uploadedImages)), blocks: JSON.parse(JSON.stringify(activeBlocks)) };
+            isDraggingImage = true; dragIsGroup = isGroup; dragBlockIdx = blockIdx; dragImageIdx = imgIdx; 
             dragStartX = (e.type === 'touchstart') ? e.touches[0].clientX : e.clientX; 
-            dragStartScale = isGroup ? activeBlocks[blockIdx].images[imgIdx].scale : uploadedImages[imgIdx].scale; 
+            
+            // Accept Shift, Alt, or Ctrl for drag translations
+            dragWithCtrl = e.shiftKey || e.altKey || e.ctrlKey || e.metaKey;
+            
+            if (dragWithCtrl) {
+                dragStartXOffset = isGroup ? (activeBlocks[blockIdx].images[imgIdx].translateX || 0) : (uploadedImages[imgIdx].translateX || 0);
+            } else {
+                dragStartScale = isGroup ? activeBlocks[blockIdx].images[imgIdx].scale : uploadedImages[imgIdx].scale; 
+            }
             if (e.type === 'mousedown') e.preventDefault(); 
         }
         
@@ -1512,16 +1334,29 @@
             if (!isDraggingImage || dragImageIdx === -1) return; 
             const currentX = (e.type === 'touchmove') ? e.touches[0].clientX : e.clientX;
             const deltaX = currentX - dragStartX; 
-            let newScale = Math.max(10, Math.min(200, dragStartScale + (deltaX * 0.5))); 
             
-            if (dragIsGroup) {
-                activeBlocks[dragBlockIdx].images[dragImageIdx].scale = newScale; 
-                const w = document.getElementById(`preview-wrapper-group-${dragBlockIdx}-${dragImageIdx}`); 
-                if (w) w.style.width = newScale + '%'; 
+            if (dragWithCtrl) {
+                let newTranslateX = dragStartXOffset + deltaX;
+                if (dragIsGroup) {
+                    activeBlocks[dragBlockIdx].images[dragImageIdx].translateX = newTranslateX; 
+                    const w = document.getElementById(`preview-wrapper-group-${dragBlockIdx}-${dragImageIdx}`); 
+                    if (w) w.style.transform = `translateX(${newTranslateX}px)`; 
+                } else {
+                    uploadedImages[dragImageIdx].translateX = newTranslateX; 
+                    const w = document.getElementById(`preview-wrapper-${dragImageIdx}`); 
+                    if (w) w.style.transform = `translateX(${newTranslateX}px)`; 
+                }
             } else {
-                uploadedImages[dragImageIdx].scale = newScale; 
-                const w = document.getElementById(`preview-wrapper-${dragImageIdx}`); 
-                if (w) w.style.width = newScale + '%'; 
+                let newScale = Math.max(10, Math.min(200, dragStartScale + (deltaX * 0.5))); 
+                if (dragIsGroup) {
+                    activeBlocks[dragBlockIdx].images[dragImageIdx].scale = newScale; 
+                    const w = document.getElementById(`preview-wrapper-group-${dragBlockIdx}-${dragImageIdx}`); 
+                    if (w) w.style.width = newScale + '%'; 
+                } else {
+                    uploadedImages[dragImageIdx].scale = newScale; 
+                    const w = document.getElementById(`preview-wrapper-${dragImageIdx}`); 
+                    if (w) w.style.width = newScale + '%'; 
+                }
             }
             
             if (e.type === 'touchmove') e.preventDefault(); 
@@ -1529,67 +1364,46 @@
         
         function handleImageResizeEnd() { 
             if (isDraggingImage) { 
-                const targetScale = dragIsGroup ? activeBlocks[dragBlockIdx].images[dragImageIdx].scale : uploadedImages[dragImageIdx].scale;
-                if (dragImageIdx !== -1 && targetScale !== dragStartScale) {
-                    pushImageHistory(stateBeforeDrag);
+                let changed = false;
+                if (dragWithCtrl) {
+                    const targetTranslateX = dragIsGroup ? (activeBlocks[dragBlockIdx].images[dragImageIdx].translateX || 0) : (uploadedImages[dragImageIdx].translateX || 0);
+                    if (targetTranslateX !== dragStartXOffset) changed = true;
+                } else {
+                    const targetScale = dragIsGroup ? activeBlocks[dragBlockIdx].images[dragImageIdx].scale : uploadedImages[dragImageIdx].scale;
+                    if (targetScale !== dragStartScale) changed = true;
                 }
-                isDraggingImage = false; 
-                dragImageIdx = -1; 
-                dragBlockIdx = -1;
-                dragIsGroup = false;
-                updatePreview(); 
+                if (dragImageIdx !== -1 && changed) pushImageHistory(stateBeforeDrag);
+                
+                isDraggingImage = false; dragImageIdx = -1; dragBlockIdx = -1; dragIsGroup = false; dragWithCtrl = false;
+                updatePreview(); syncCardState();
             } 
         }
 
         function initColorPicker() {
             const map = document.getElementById('colorMap'), hueSlider = document.getElementById('inputHue');
             if (!map || !hueSlider) return;
-            
-            hueSlider.addEventListener('input', (e) => { 
-                hue = e.target.value; 
-                map.style.backgroundColor = `hsl(${hue}, 100%, 50%)`; 
-                calculateActiveColor(); 
-            });
-            
+            hueSlider.addEventListener('input', (e) => { hue = e.target.value; map.style.backgroundColor = `hsl(${hue}, 100%, 50%)`; calculateActiveColor(); });
             const handleMapSelection = (e) => {
                 const rect = map.getBoundingClientRect(); 
                 let x = (e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0)) - rect.left;
                 let y = (e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0)) - rect.top;
-                
-                x = Math.max(0, Math.min(x, rect.width)); 
-                y = Math.max(0, Math.min(y, rect.height));
-                
-                saturation = (x / rect.width) * 100; 
-                brightness = 100 - (y / rect.height) * 100;
-                
-                document.getElementById('colorMarker').style.left = x + 'px'; 
-                document.getElementById('colorMarker').style.top = y + 'px'; 
+                x = Math.max(0, Math.min(x, rect.width)); y = Math.max(0, Math.min(y, rect.height));
+                saturation = (x / rect.width) * 100; brightness = 100 - (y / rect.height) * 100;
+                document.getElementById('colorMarker').style.left = x + 'px'; document.getElementById('colorMarker').style.top = y + 'px'; 
                 calculateActiveColor();
             };
-            
             map.addEventListener('mousedown', (e) => { 
                 handleMapSelection(e); 
                 const onMouseMove = (moveEvent) => handleMapSelection(moveEvent);
-                const onMouseUp = () => { 
-                    document.removeEventListener('mousemove', onMouseMove); 
-                    document.removeEventListener('mouseup', onMouseUp); 
-                }; 
-                document.addEventListener('mousemove', onMouseMove); 
-                document.addEventListener('mouseup', onMouseUp); 
+                const onMouseUp = () => { document.removeEventListener('mousemove', onMouseMove); document.removeEventListener('mouseup', onMouseUp); }; 
+                document.addEventListener('mousemove', onMouseMove); document.addEventListener('mouseup', onMouseUp); 
             });
         }
 
         function calculateActiveColor() {
             const s = saturation / 100, v = brightness / 100, i = Math.floor(hue / 60), f = hue / 60 - i, p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s);
             let r, g, b; 
-            switch(i % 6) { 
-                case 0: r = v, g = t, b = p; break; 
-                case 1: r = q, g = v, b = p; break; 
-                case 2: r = p, g = v, b = t; break; 
-                case 3: r = p, g = q, b = v; break; 
-                case 4: r = t, g = p, b = v; break; 
-                case 5: r = v, g = p, b = q; break; 
-            }
+            switch(i % 6) { case 0: r = v, g = t, b = p; break; case 1: r = q, g = v, b = p; break; case 2: r = p, g = v, b = t; break; case 3: r = p, g = q, b = v; break; case 4: r = t, g = p, b = v; break; case 5: r = v, g = p, b = q; break; }
             activeColor = rgbToHex(Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)); 
             updatePreview();
         }
@@ -1597,18 +1411,11 @@
         function setManualColor(hex, forceHue=null, forceSat=null, forceBri=null) {
             activeColor = hex; 
             const rgb = hexToRgb(hex), hsb = rgbToHsb(rgb.r, rgb.g, rgb.b); 
-            hue = forceHue !== null ? forceHue : hsb.h; 
-            saturation = forceSat !== null ? forceSat : hsb.s; 
-            brightness = forceBri !== null ? forceBri : hsb.b;
-            
+            hue = forceHue !== null ? forceHue : hsb.h; saturation = forceSat !== null ? forceSat : hsb.s; brightness = forceBri !== null ? forceBri : hsb.b;
             const map = document.getElementById('colorMap');
             if (map) {
-                const rect = map.getBoundingClientRect();
-                const marker = document.getElementById('colorMarker');
-                if (marker) { 
-                    marker.style.left = (saturation / 100) * (rect.width || 510) + 'px'; 
-                    marker.style.top = (1 - brightness / 100) * (rect.height || 200) + 'px'; 
-                }
+                const rect = map.getBoundingClientRect(); const marker = document.getElementById('colorMarker');
+                if (marker) { marker.style.left = (saturation / 100) * (rect.width || 510) + 'px'; marker.style.top = (1 - brightness / 100) * (rect.height || 200) + 'px'; }
                 map.style.backgroundColor = `hsl(${hue}, 100%, 50%)`; 
             }
             const hS = document.getElementById('inputHue'); if (hS) hS.value = hue;
@@ -1620,17 +1427,8 @@
         function rgbToHsb(r, g, b) { 
             r /= 255; g /= 255; b /= 255; 
             const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min; 
-            let h, s, v = max; 
-            s = max === 0 ? 0 : d / max; 
-            if (max === min) h = 0; 
-            else { 
-                switch(max) { 
-                    case r: h = (g - b) / d + (g < b ? 6 : 0); break; 
-                    case g: h = (b - r) / d + 2; break; 
-                    case b: h = (r - g) / d + 4; break; 
-                } 
-                h /= 6; 
-            } 
+            let h, s, v = max; s = max === 0 ? 0 : d / max; 
+            if (max === min) h = 0; else { switch(max) { case r: h = (g - b) / d + (g < b ? 6 : 0); break; case g: h = (b - r) / d + 2; break; case b: h = (r - g) / d + 4; break; } h /= 6; } 
             return { h: h * 360, s: s * 100, b: v * 100 }; 
         }
 
@@ -1642,45 +1440,25 @@
                 pushImageHistory();
                 if (position === 'blocks') {
                     if (activeBlocks.length > 0 && activeBlocks[activeBlocks.length - 1].type === 'imageGroup') {
-                        activeBlocks[activeBlocks.length - 1].images.push({ src: e.target.result, scale: 100, border: null, align: 'center' });
+                        activeBlocks[activeBlocks.length - 1].images.push({ src: e.target.result, scale: 100, border: null, align: 'center', translateX: 0 });
                     } else {
-                        activeBlocks.push({ type: 'imageGroup', images: [{ src: e.target.result, scale: 100, border: null, align: 'center' }] });
+                        activeBlocks.push({ type: 'imageGroup', images: [{ src: e.target.result, scale: 100, border: null, align: 'center', translateX: 0 }] });
                     }
                 } else {
-                    uploadedImages.push({ src: e.target.result, scale: 100, border: null, align: 'center' }); 
+                    uploadedImages.push({ src: e.target.result, scale: 100, border: null, align: 'center', translateX: 0 }); 
                 }
                 updatePreview(); 
             }; 
             reader.readAsDataURL(file); 
         }
         
-        function moveImageLeft(idx) { 
-            if (idx > 0) { 
-                pushImageHistory();
-                [uploadedImages[idx - 1], uploadedImages[idx]] = [uploadedImages[idx], uploadedImages[idx - 1]]; 
-                updatePreview(); 
-            } 
-        }
-        
-        function moveImageRight(idx) { 
-            if (idx < uploadedImages.length - 1) { 
-                pushImageHistory();
-                [uploadedImages[idx], uploadedImages[idx + 1]] = [uploadedImages[idx + 1], uploadedImages[idx]]; 
-                updatePreview(); 
-            } 
-        }
-        
-        function removeImage(idx) { 
-            pushImageHistory();
-            uploadedImages.splice(idx, 1); 
-            updatePreview(); 
-        }
+        function moveImageLeft(idx) { if (idx > 0) { pushImageHistory(); [uploadedImages[idx - 1], uploadedImages[idx]] = [uploadedImages[idx], uploadedImages[idx - 1]]; updatePreview(); } }
+        function moveImageRight(idx) { if (idx < uploadedImages.length - 1) { pushImageHistory(); [uploadedImages[idx], uploadedImages[idx + 1]] = [uploadedImages[idx + 1], uploadedImages[idx]]; updatePreview(); } }
+        function removeImage(idx) { pushImageHistory(); uploadedImages.splice(idx, 1); updatePreview(); }
         
         function getLightShade(hex, blendPercentage) { 
             const rgb = hexToRgb(hex), factor = blendPercentage / 100, 
-            r = Math.round(255 - (255 - rgb.r) * factor), 
-            g = Math.round(255 - (255 - rgb.g) * factor), 
-            b = Math.round(255 - (255 - rgb.b) * factor); 
+            r = Math.round(255 - (255 - rgb.r) * factor), g = Math.round(255 - (255 - rgb.g) * factor), b = Math.round(255 - (255 - rgb.b) * factor); 
             return `rgb(${r}, ${g}, ${b})`; 
         }
         function hexToRgba(hex, alpha) { const rgb = hexToRgb(hex); return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`; }
@@ -1691,121 +1469,68 @@
                 try {
                     const parsedCards = JSON.parse(savedCards);
                     if (parsedCards && parsedCards.length > 0) {
-                        cards = parsedCards;
-                        switchCard(cards[0].id);
-                        return;
+                        cards = parsedCards; switchCard(cards[0].id); return;
                     }
-                } catch (e) {
-                    console.error("Error loading saved cards", e);
-                }
+                } catch (e) { console.error("Error loading saved cards", e); }
             }
             createCard(); 
         }
 
         function createCard(useDefaultColor = false) { 
             let genColor = "#51b8cb", genHue = 189, genSat = 60, genBri = 80;
-            
-            // Generate a random color for all subsequent cards unless right-clicked (useDefaultColor)
             if (cards.length > 0 && !useDefaultColor) {
                 genColor = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
-                const rgb = hexToRgb(genColor);
-                const hsb = rgbToHsb(rgb.r, rgb.g, rgb.b);
-                genHue = hsb.h;
-                genSat = hsb.s;
-                genBri = hsb.b;
+                const rgb = hexToRgb(genColor); const hsb = rgbToHsb(rgb.r, rgb.g, rgb.b);
+                genHue = hsb.h; genSat = hsb.s; genBri = hsb.b;
             }
-
             const newCard = { 
                 id: 'card_' + Date.now() + Math.random().toString(36).substr(2, 9), 
                 title: '', category: '-', definition: '', blocks: [], images: [],
                 color: { hex: genColor, hue: genHue, sat: genSat, bri: genBri }, 
-                textSize: 32, defSize: 24, imageBorder: 2, imageCols: 0, blend: 10, 
+                textSize: 32, defSize: 24, imageBorder: 2, imageCols: 0, blend: 20, 
                 showTitlePlaceholder: true, showDefPlaceholder: false 
             }; 
-            cards.push(newCard);
-            saveCardsToStorage(); 
-            switchCard(newCard.id); 
+            cards.push(newCard); saveCardsToStorage(); switchCard(newCard.id); 
         }
         
-        function switchCard(id) { 
-            activeCardId = id; 
-            loadCurrentCard(); 
-            populateHeaderCardsList(); 
-        }
+        function switchCard(id) { activeCardId = id; loadCurrentCard(); populateHeaderCardsList(); }
 
         function loadCurrentCard() { 
-            isSwitching = true; 
-            const card = cards.find(c => c.id === activeCardId); 
-            if (!card) return; 
-            
-            imageUndoStack = [];
-            imageRedoStack = [];
+            isSwitching = true; const card = cards.find(c => c.id === activeCardId); if (!card) return; 
+            imageUndoStack = []; imageRedoStack = [];
             
             if (card.extraNotes || card.bottomImages) {
                 card.blocks = [];
-                if (card.extraNotes && card.extraNotes.length > 0) {
-                    card.extraNotes.forEach(note => {
-                        card.blocks.push({ type: 'text', content: note });
-                    });
-                }
-                if (card.bottomImages && card.bottomImages.length > 0) {
-                    card.blocks.push({ type: 'imageGroup', images: [...card.bottomImages] });
-                }
-                delete card.extraNotes;
-                delete card.bottomImages;
+                if (card.extraNotes && card.extraNotes.length > 0) card.extraNotes.forEach(note => card.blocks.push({ type: 'text', inline: false, content: note }));
+                if (card.bottomImages && card.bottomImages.length > 0) card.blocks.push({ type: 'imageGroup', images: [...card.bottomImages] });
+                delete card.extraNotes; delete card.bottomImages;
             }
             if (!card.blocks) card.blocks = [];
 
             document.getElementById('inputTitle').value = card.title; 
-            showTitlePlaceholder = card.showTitlePlaceholder !== false; 
-            showDefPlaceholder = card.showDefPlaceholder !== false; 
+            showTitlePlaceholder = card.showTitlePlaceholder !== false; showDefPlaceholder = card.showDefPlaceholder !== false; 
+            selectCategory(card.category || "-"); selectTextSize(card.textSize || 32); selectDefSize(card.defSize || 24); 
             
-            selectCategory(card.category || "-"); 
-            selectTextSize(card.textSize || 32); 
-            selectDefSize(card.defSize || 24); 
-            
-            currentImageBorder = card.imageBorder || 2; 
-            selectImageCols(card.imageCols || 0); 
-            
+            currentImageBorder = card.imageBorder || 2; selectImageCols(card.imageCols || 0); 
             const sL = document.getElementById('toolbarDefSizeLabel'); if (sL) sL.innerText = card.defSize || 24; 
             const tL = document.getElementById('toolbarTitleSizeLabel'); if (tL) tL.innerText = card.textSize || 32; 
             
-            currentBlendPercentage = card.blend !== undefined ? card.blend : 10; 
-            document.getElementById('blendValueLabel').innerText = currentBlendPercentage + '%'; 
+            currentBlendPercentage = card.blend !== undefined ? card.blend : 20; document.getElementById('blendValueLabel').innerText = currentBlendPercentage + '%'; 
             document.getElementById('inputDef').value = card.definition; 
+            uploadedImages = [...(card.images || [])]; activeBlocks = JSON.parse(JSON.stringify(card.blocks || []));
+            activeColor = card.color.hex; hue = card.color.hue; saturation = card.color.sat; brightness = card.color.bri; 
             
-            uploadedImages = [...(card.images || [])]; 
-            activeBlocks = JSON.parse(JSON.stringify(card.blocks || []));
-
-            activeColor = card.color.hex; 
-            hue = card.color.hue; saturation = card.color.sat; brightness = card.color.bri; 
-            
-            setManualColor(activeColor, hue, saturation, brightness); 
-            isSwitching = false; 
+            setManualColor(activeColor, hue, saturation, brightness); isSwitching = false; 
         }
         
         function syncCardState() { 
-            if (!activeCardId || isSwitching) return; 
-            const card = cards.find(c => c.id === activeCardId); 
-            if (!card) return; 
-            
-            card.title = document.getElementById('inputTitle').value; 
-            card.category = currentSelectedCategory; 
-            card.definition = document.getElementById('inputDef').value; 
-            
-            card.images = [...uploadedImages]; 
-            card.blocks = JSON.parse(JSON.stringify(activeBlocks)); 
-
+            if (!activeCardId || isSwitching) return; const card = cards.find(c => c.id === activeCardId); if (!card) return; 
+            card.title = document.getElementById('inputTitle').value; card.category = currentSelectedCategory; card.definition = document.getElementById('inputDef').value; 
+            card.images = [...uploadedImages]; card.blocks = JSON.parse(JSON.stringify(activeBlocks)); 
             card.color = { hex: activeColor, hue: hue, sat: saturation, bri: brightness }; 
-            card.textSize = currentSelectedSize; 
-            card.defSize = currentSelectedDefSize; 
-            card.extraDefSize = currentSelectedExtraDefSize; 
-            card.imageBorder = currentImageBorder; 
-            card.imageCols = currentImageCols; 
-            card.blend = currentBlendPercentage; 
-            card.showTitlePlaceholder = showTitlePlaceholder; 
-            card.showDefPlaceholder = showDefPlaceholder; 
-
+            card.textSize = currentSelectedSize; card.defSize = currentSelectedDefSize; card.extraDefSize = currentSelectedExtraDefSize; 
+            card.imageBorder = currentImageBorder; card.imageCols = currentImageCols; card.blend = currentBlendPercentage; 
+            card.showTitlePlaceholder = showTitlePlaceholder; card.showDefPlaceholder = showDefPlaceholder; 
             saveCardsToStorage();
         }
 
@@ -1816,20 +1541,11 @@
             document.documentElement.style.setProperty('--theme-blend', getLightShade(finalColor, blend));
             
             const bVL = document.getElementById('blendValueLabel'); if (bVL) bVL.style.color = finalColor;
-            const card = document.getElementById('cardContainer'); 
-            
-            const themeColorBtn = document.getElementById('themeColorToggleBtn');
-            if (themeColorBtn) { themeColorBtn.style.color = finalColor; }
+            const themeColorBtn = document.getElementById('themeColorToggleBtn'); if (themeColorBtn) themeColorBtn.style.color = finalColor;
+            const dlBtn = document.getElementById('cardDownloadBtn'); if (dlBtn) { dlBtn.style.color = finalColor; dlBtn.style.border = `2px solid ${finalColor}`; }
+            const dlPdfBtn = document.getElementById('cardDownloadPdfBtn'); if (dlPdfBtn) { dlPdfBtn.style.color = finalColor; dlPdfBtn.style.border = `2px solid ${finalColor}`; }
 
-            const dlBtn = document.getElementById('cardDownloadBtn'); 
-            if (dlBtn) { dlBtn.style.color = finalColor; dlBtn.style.border = `2px solid ${finalColor}`; }
-            
-            const dlPdfBtn = document.getElementById('cardDownloadPdfBtn'); 
-            if (dlPdfBtn) { dlPdfBtn.style.color = finalColor; dlPdfBtn.style.border = `2px solid ${finalColor}`; }
-
-            document.querySelectorAll('.dynamic-theme-color-swatch').forEach(swatch => {
-                swatch.style.backgroundColor = finalColor;
-            });
+            document.querySelectorAll('.dynamic-theme-color-swatch').forEach(swatch => swatch.style.backgroundColor = finalColor);
 
             const word = document.getElementById('cardWord'); 
             word.style.color = textColor; word.style.fontSize = textSize + 'px'; 
@@ -1844,10 +1560,7 @@
                 type.innerText = ''; type.classList.add('hidden'); addCatBtn.classList.remove('hidden'); 
             }
             
-            // Force close any open image editors before rebuilding the DOM
-            if (edTarget.imgIdx !== -1) {
-                closeInlineEditor(false);
-            }
+            if (edTarget.imgIdx !== -1) closeInlineEditor(false);
 
             const titleS = document.getElementById('cardTitleSection'), titleR = document.getElementById('cardTitleRestore');
             const titleText = word.innerText ? word.innerText.trim() : '';
@@ -1868,223 +1581,176 @@
 
             const cardImages = document.getElementById('cardImagesContainer');
             if (cardImages) {
-                if (imageCols === 0) { 
-                    cardImages.className = `flex flex-wrap gap-4 md:gap-9 w-full justify-center mt-2`; cardImages.style.gridTemplateColumns = ''; 
-                } else { 
-                    cardImages.className = `grid gap-4 md:gap-9 w-full items-start mt-2`; cardImages.style.gridTemplateColumns = `repeat(${imageCols}, minmax(0, 1fr))`; 
-                }
+                if (imageCols === 0) { cardImages.className = `flex flex-wrap gap-4 md:gap-9 w-full justify-center mt-2`; cardImages.style.gridTemplateColumns = ''; } 
+                else { cardImages.className = `grid gap-4 md:gap-9 w-full items-start mt-2`; cardImages.style.gridTemplateColumns = `repeat(${imageCols}, minmax(0, 1fr))`; }
                 cardImages.style.paddingTop = uploadedImages.length > 0 ? '1rem' : '0px'; cardImages.innerHTML = '';
                 
                 uploadedImages.forEach((imgObj, idx) => {
                     const wrapper = document.createElement('div'); wrapper.id = `preview-wrapper-${idx}`; 
                     let alignClass = 'mx-auto'; 
-                    if (imgObj.align === 'left') alignClass = 'mr-auto ml-0';
-                    else if (imgObj.align === 'right') alignClass = 'ml-auto mr-0';
+                    if (imgObj.align === 'left') alignClass = 'mr-auto ml-0'; else if (imgObj.align === 'right') alignClass = 'ml-auto mr-0';
+                    wrapper.className = `relative group/imgwrapper block ${alignClass}`; wrapper.style.width = `${imgObj.scale}%`;
+                    if (imgObj.translateX) wrapper.style.transform = `translateX(${imgObj.translateX}px)`;
                     
-                    wrapper.className = `relative group/imgwrapper block ${alignClass}`; 
-                    wrapper.style.width = `${imgObj.scale}%`;
                     const img = document.createElement('img'); img.src = imgObj.src; img.className = "resizable-img h-auto object-cover rounded-[1.5rem] shadow-sm block w-full";
                     img.style.border = `${imgObj.border !== null ? imgObj.border : imgBorder}px solid ${finalColor}`; img.draggable = false;
                     img.onmousedown = (e) => handleImageResizeStart(e, idx, false); img.ontouchstart = (e) => handleImageResizeStart(e, idx, false);
                     img.oncontextmenu = (e) => { 
-                        e.preventDefault(); 
-                        document.getElementById('floatingPreviewMenu').classList.add('hidden');
-                        startInlineEditor(img, idx, -1);
-                        showEditorToolbar(e.clientX, e.clientY);
+                        e.preventDefault(); document.getElementById('floatingPreviewMenu').classList.add('hidden');
+                        startInlineEditor(img, idx, -1); showEditorToolbar(e.clientX, e.clientY);
                     };
                     const moveControls = document.createElement('div'); moveControls.className = "absolute -top-3 -left-3 flex gap-1.5 z-10 hidden-in-export opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all";
                     if (idx > 0) { 
                         const lB = document.createElement('button'); lB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] md:w-[32px] md:h-[32px] outline-none p-0"; lB.style.color = finalColor; lB.style.border = `2px solid ${finalColor}`; lB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 md:w-5 md:h-5"><path d="M15 18l-6-6 6-6"/></svg>`; 
-                        lB.onclick = (e) => { e.stopPropagation(); moveImageLeft(idx); }; 
-                        moveControls.appendChild(lB); 
+                        lB.onclick = (e) => { e.stopPropagation(); moveImageLeft(idx); }; moveControls.appendChild(lB); 
                     }
                     if (idx < uploadedImages.length - 1) { 
                         const rB = document.createElement('button'); rB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] md:w-[32px] md:h-[32px] outline-none p-0"; rB.style.color = finalColor; rB.style.border = `2px solid ${finalColor}`; rB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 md:w-5 md:h-5"><path d="M9 18l6-6-6-6"/></svg>`; 
-                        rB.onclick = (e) => { e.stopPropagation(); moveImageRight(idx); }; 
-                        moveControls.appendChild(rB); 
+                        rB.onclick = (e) => { e.stopPropagation(); moveImageRight(idx); }; moveControls.appendChild(rB); 
                     }
-                    
                     const delBtn = document.createElement('button'); delBtn.className = "absolute -top-3 -right-3 opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all z-10 hidden-in-export flex items-center justify-center hover:scale-110 outline-none p-0 bg-transparent border-none w-[28px] h-[28px] md:w-[32px] md:h-[32px]"; delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-full h-full drop-shadow-md"><defs><linearGradient id="delGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ff3333" /><stop offset="100%" stop-color="#cc0000" /></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#delGrad)" stroke="#990000" stroke-width="0.5" /><path d="M8 8 L16 16 M16 8 L8 16" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" /></svg>`; 
                     delBtn.onclick = (e) => { e.stopPropagation(); removeImage(idx); };
-                    wrapper.appendChild(img); 
-                    if (moveControls.children.length > 0) wrapper.appendChild(moveControls); 
-                    wrapper.appendChild(delBtn); cardImages.appendChild(wrapper);
+                    wrapper.appendChild(img); if (moveControls.children.length > 0) wrapper.appendChild(moveControls); wrapper.appendChild(delBtn); cardImages.appendChild(wrapper);
                 });
             }
 
             const blocksContainer = document.getElementById('cardBlocksContainer');
+            const primaryInlineContainer = document.getElementById('inlineExtraNotesContainer');
+
             if (blocksContainer) {
-                let needsRebuild = false;
-                if (blocksContainer.children.length !== activeBlocks.length) {
-                    needsRebuild = true;
-                } else {
-                    for (let i = 0; i < activeBlocks.length; i++) {
-                        if (blocksContainer.children[i].dataset.blockType !== activeBlocks[i].type) {
-                            needsRebuild = true;
-                            break;
-                        }
+                let blockHTML = '';
+                let primaryInlineHTML = '';
+                let currentGroupId = null;
+                let groupContent = '';
+
+                const closeGroup = () => {
+                    if (currentGroupId) {
+                        blockHTML += `<div class="flex flex-col md:flex-row gap-4 w-full mt-2">${groupContent}</div>`;
+                        groupContent = '';
+                        currentGroupId = null;
                     }
-                }
-
-                if (needsRebuild) {
-                    blocksContainer.innerHTML = activeBlocks.map((block, idx) => {
-                        if (block.type === 'text') {
-                            const contents = Array.isArray(block.content) ? block.content : [block.content];
-                            const isMulti = contents.length > 1;
-                            const outerClass = isMulti ? "flex flex-col sm:flex-row gap-2 w-full mt-1" : "w-full mt-1";
-                            
-                            return `
-                                <div class="${outerClass}" id="block-wrapper-${idx}" data-block-type="text">
-                                    ${contents.map((content, colIdx) => {
-                                        const innerClass = isMulti 
-                                            ? "group/extradef relative py-2 px-2 md:px-4 rounded-xl md:rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors flex-1 min-w-0"
-                                            : "group/extradef relative py-1 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors mt-1";
-                                        
-                                        return `
-                                <div class="${innerClass}" data-col-idx="${colIdx}">
-                                    <div class="format-toolbar absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-lg border border-[#d0ebf0] dark:border-[#333] rounded-xl flex flex-wrap justify-center items-center p-1 gap-1 w-[320px] md:w-max opacity-0 pointer-events-none group-focus-within/extradef:opacity-100 group-hover/extradef:opacity-100 group-focus-within/extradef:pointer-events-auto group-hover/extradef:pointer-events-auto transition-all z-20 translate-y-2 group-hover/extradef:translate-y-0 group-focus-within/extradef:translate-y-0">
-                                        <button onmousedown="event.preventDefault(); execFormat('undo')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
-                                        <button onmousedown="event.preventDefault(); execFormat('redo')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
-                                        <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                        <button onmousedown="event.preventDefault(); execFormat('bold')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-bold" aria-label="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
-                                        <button onmousedown="event.preventDefault(); execFormat('underline')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-underline" aria-label="Underline"><i data-lucide="underline" class="w-4 h-4"></i></button>
-                                        <button onmousedown="event.preventDefault(); execFormat('highlight')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-highlight" aria-label="Highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
-                                        
-                                        <div class="relative group/colorpicker">
-                                            <button onmousedown="event.preventDefault(); toggleTextColorMenu(event)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-color" aria-label="Text Color"><i data-lucide="palette" class="w-4 h-4"></i></button>
-                                            <div class="text-color-menu hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] p-2 flex flex-wrap gap-1.5 rounded-xl shadow-xl z-[60] w-[165px]" onmousedown="event.preventDefault(); event.stopPropagation();" onclick="event.stopPropagation();">
-                                                <div onmousedown="event.preventDefault(); applyTextColor(activeColor)" class="dynamic-theme-color-swatch w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform" style="background-color: #51b8cb; border: 1px solid rgba(0,0,0,0.1);" aria-label="Theme Color"></div>
-                                                <div onmousedown="event.preventDefault(); applyTextColor('#ef4444')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-red-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Red"></div>
-                                                <div onmousedown="event.preventDefault(); applyTextColor('#f97316')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-orange-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Orange"></div>
-                                                <div onmousedown="event.preventDefault(); applyTextColor('#f59e0b')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-yellow-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Yellow"></div>
-                                                <div onmousedown="event.preventDefault(); applyTextColor('#84cc16')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-lime-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Lime"></div>
-                                                <div onmousedown="event.preventDefault(); applyTextColor('#10b981')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-emerald-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Green"></div>
-                                                <div onmousedown="event.preventDefault(); applyTextColor('#06b6d4')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-cyan-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Cyan"></div>
-                                                <div onmousedown="event.preventDefault(); applyTextColor('#3b82f6')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-blue-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Blue"></div>
-                                                <div onmousedown="event.preventDefault(); applyTextColor('#8b5cf6')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-violet-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Purple"></div>
-                                                <div onmousedown="event.preventDefault(); applyTextColor('#222222')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-gray-900" style="border: 1px solid rgba(60,60,60,1.1);" aria-label="Black"></div>
-                                            </div>
-                                        </div>
-
-                                        <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                        <button onmousedown="event.preventDefault(); execFormat('justifyLeft')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-left" aria-label="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
-                                        <button onmousedown="event.preventDefault(); execFormat('justifyCenter')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-center" aria-label="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
-                                        <button onmousedown="event.preventDefault(); execFormat('justifyRight')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-right" aria-label="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
-                                        
-                                        <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                        <button onmousedown="event.preventDefault(); execFormat('insertUnorderedList')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-ul" aria-label="Bullet List"><i data-lucide="list" class="w-4 h-4"></i></button>
-                                        <button onmousedown="event.preventDefault(); execFormat('insertOrderedList')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-ol" aria-label="Ordered List"><i data-lucide="list-ordered" class="w-4 h-4"></i></button>
-                                        <button onmousedown="event.preventDefault(); sortSelectedTextAZ()" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Sort A-Z" title="Sort A-Z"><i data-lucide="arrow-down-a-z" class="w-4 h-4"></i></button>
-
-                                        <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                        <button onmousedown="event.preventDefault(); copyNoteText(event, ${idx}, true, ${colIdx})" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Copy Text" title="Copy Text"><i data-lucide="copy" class="w-4 h-4"></i></button>
-                                        <button onmousedown="event.preventDefault(); downloadNoteText(${idx}, true, ${colIdx})" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Download .txt" title="Download .txt"><i data-lucide="file-down" class="w-4 h-4"></i></button>
-                                        
-                                        <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                        <div class="relative">
-                                            <button id="toolbarDefSizeBtn" onmousedown="event.preventDefault();" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors flex items-center gap-1 text-[11px] font-bold min-w-[40px] justify-center" aria-label="Font Size">
-                                                <span class="toolbarExtraDefSizeLabel">${defSize}</span>
-                                                <i data-lucide="chevron-down" class="w-3 h-3"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="card-extra-def-input font-medium leading-relaxed whitespace-pre-wrap outline-none" contenteditable="true" data-placeholder="Enter note here..." style="text-decoration: none; min-height: 1.5em; font-family: 'Caveat', cursive;" data-block-idx="${idx}" data-col-idx="${colIdx}">${content}</div>
-                                    
-                                    <div class="absolute top-1/2 -translate-y-1/2 right-2 md:right-4 flex flex-col sm:flex-row items-center gap-1 opacity-100 lg:opacity-0 group-hover/extradef:opacity-100 transition-opacity z-10 hidden-in-export">
-                                        <button onclick="insertExtraNote(${idx + 1})" class="p-1 md:p-1.5 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-[var(--theme-color)] border border-gray-100 dark:border-[#333]" aria-label="Add Note Below" title="Add Note Below">
-                                            <i data-lucide="arrow-down" class="w-3 h-3 md:w-3.5 md:h-3.5"></i>
-                                        </button>
-                                        <button onclick="addBlockCol(${idx}, ${colIdx})" class="p-1 md:p-1.5 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-[var(--theme-color)] border border-gray-100 dark:border-[#333]" aria-label="Add Note Next To" title="Add Note Next To">
-                                            <i data-lucide="columns" class="w-3 h-3 md:w-3.5 md:h-3.5"></i>
-                                        </button>
-                                        <button onclick="removeBlockCol(${idx}, ${colIdx})" class="p-1 md:p-1.5 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 border border-gray-100 dark:border-[#333]" aria-label="Remove Note" title="Remove Note">
-                                            <i data-lucide="x" class="w-3 h-3 md:w-3.5 md:h-3.5"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                        `;
-                                    }).join('')}
-                                </div>
-                            `;
-                        } else if (block.type === 'imageGroup') {
-                            return `
-                                <div id="block-wrapper-${idx}" data-block-type="imageGroup" class="w-full relative group/blockimg">
-                                    <div id="image-group-${idx}" class="w-full"></div>
-                                </div>
-                            `;
-                        }
-                    }).join('');
-                    if (typeof lucide !== 'undefined') lucide.createIcons();
-                }
+                };
 
                 activeBlocks.forEach((block, idx) => {
                     if (block.type === 'text') {
-                        const contents = Array.isArray(block.content) ? block.content : [block.content];
-                        contents.forEach((text, colIdx) => {
-                            const el = blocksContainer.querySelector(`[data-block-idx="${idx}"][data-col-idx="${colIdx}"]`);
-                            if (el) {
-                                el.style.color = textColor;
-                                el.style.fontSize = defSize + 'px'; 
-                                if (el.innerHTML !== text) {
-                                    el.innerHTML = text;
-                                }
+                        const html = `
+                            <div class="group/extradef relative py-1 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors mt-1 ${(block.groupId || block.isPrimaryInline) ? 'flex-1' : ''}" id="block-wrapper-${idx}" data-block-type="text">
+                                <div class="format-toolbar absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-lg border border-[#d0ebf0] dark:border-[#333] rounded-xl flex flex-wrap justify-center items-center p-1 gap-1 w-[320px] md:w-max opacity-0 pointer-events-none group-focus-within/extradef:opacity-100 group-hover/extradef:opacity-100 group-focus-within/extradef:pointer-events-auto group-hover/extradef:pointer-events-auto transition-all z-20 translate-y-2 group-hover/extradef:translate-y-0 group-focus-within/extradef:translate-y-0">
+                                    <button onmousedown="event.preventDefault(); execFormat('undo')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors"><i data-lucide="undo" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); execFormat('redo')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors"><i data-lucide="redo" class="w-4 h-4"></i></button>
+                                    <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                    <button onmousedown="event.preventDefault(); execFormat('bold')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); execFormat('underline')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-underline"><i data-lucide="underline" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); execFormat('highlight')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
+                                    <div class="relative group/colorpicker">
+                                        <button onmousedown="event.preventDefault(); toggleTextColorMenu(event)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-color"><i data-lucide="palette" class="w-4 h-4"></i></button>
+                                        <div class="text-color-menu hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] p-2 flex flex-wrap gap-1.5 rounded-xl shadow-xl z-[60] w-[165px]" onmousedown="event.preventDefault(); event.stopPropagation();" onclick="event.stopPropagation();">
+                                            <div onmousedown="event.preventDefault(); applyTextColor(activeColor)" class="dynamic-theme-color-swatch w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform" style="background-color: #51b8cb; border: 1px solid rgba(0,0,0,0.1);"></div>
+                                            <div onmousedown="event.preventDefault(); applyTextColor('#ef4444')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-red-500" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                            <div onmousedown="event.preventDefault(); applyTextColor('#f97316')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-orange-500" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                            <div onmousedown="event.preventDefault(); applyTextColor('#f59e0b')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-yellow-500" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                            <div onmousedown="event.preventDefault(); applyTextColor('#84cc16')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-lime-500" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                            <div onmousedown="event.preventDefault(); applyTextColor('#10b981')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-emerald-500" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                            <div onmousedown="event.preventDefault(); applyTextColor('#06b6d4')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-cyan-500" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                            <div onmousedown="event.preventDefault(); applyTextColor('#3b82f6')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-blue-500" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                            <div onmousedown="event.preventDefault(); applyTextColor('#8b5cf6')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-violet-500" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                            <div onmousedown="event.preventDefault(); applyTextColor('#222222')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-gray-900" style="border: 1px solid rgba(60,60,60,1.1);"></div>
+                                        </div>
+                                    </div>
+                                    <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                    <button onmousedown="event.preventDefault(); execFormat('justifyLeft')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); execFormat('justifyCenter')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); execFormat('justifyRight')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+                                    <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                    <button onmousedown="event.preventDefault(); execFormat('insertUnorderedList')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-ul"><i data-lucide="list" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); execFormat('insertOrderedList')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-ol"><i data-lucide="list-ordered" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); sortSelectedTextAZ()" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" title="Sort A-Z"><i data-lucide="arrow-down-a-z" class="w-4 h-4"></i></button>
+                                    <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                    <button onmousedown="event.preventDefault(); copyNoteText(event, ${idx}, true)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" title="Copy Text"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); downloadNoteText(${idx}, true)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" title="Download .txt"><i data-lucide="file-down" class="w-4 h-4"></i></button>
+                                    
+                                    <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                    <button onmousedown="event.preventDefault(); toggleSpeechToText(${idx}, true, this)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" title="Dictate"><i data-lucide="mic" class="w-4 h-4"></i></button>
+                                    <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                    <button onmousedown="event.preventDefault(); addExtraNoteRelative(${idx}, 'next')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" title="Add Note Next To"><i data-lucide="panel-right" class="w-4 h-4"></i></button>
+                                    <button onmousedown="event.preventDefault(); addExtraNoteRelative(${idx}, 'below')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" title="Add Note Below"><i data-lucide="panel-bottom" class="w-4 h-4"></i></button>
+                                </div>
+                                <div class="card-extra-def-input font-medium leading-relaxed whitespace-pre-wrap outline-none" contenteditable="true" data-placeholder="Enter note here..." style="text-decoration: none; min-height: 1.5em; font-family: 'Caveat', cursive;" data-block-idx="${idx}">${block.content || ''}</div>
+                                <button onclick="removeBlock(${idx})" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 group-hover/extradef:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" aria-label="Remove Note"><i data-lucide="x" class="w-3.5 h-3.5 md:w-4 md:h-4"></i></button>
+                            </div>
+                        `;
+                        if (block.isPrimaryInline) {
+                            closeGroup();
+                            primaryInlineHTML += html;
+                        } else if (block.groupId) {
+                            if (currentGroupId !== block.groupId) {
+                                closeGroup();
+                                currentGroupId = block.groupId;
                             }
-                        });
+                            groupContent += html;
+                        } else {
+                            closeGroup();
+                            blockHTML += html;
+                        }
+                    } else if (block.type === 'imageGroup') {
+                        closeGroup();
+                        blockHTML += `
+                            <div id="block-wrapper-${idx}" data-block-type="imageGroup" class="w-full relative group/blockimg">
+                                <div id="image-group-${idx}" class="w-full"></div>
+                            </div>
+                        `;
+                    }
+                });
+                closeGroup();
+
+                blocksContainer.innerHTML = blockHTML;
+                if (primaryInlineContainer) primaryInlineContainer.innerHTML = primaryInlineHTML;
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+
+                activeBlocks.forEach((block, idx) => {
+                    if (block.type === 'text') {
+                        const el = document.querySelector(`.card-extra-def-input[data-block-idx="${idx}"]`);
+                        if (el) { el.style.color = textColor; el.style.fontSize = defSize + 'px'; }
                     } else if (block.type === 'imageGroup') {
                         const groupContainer = document.getElementById(`image-group-${idx}`);
                         if (groupContainer) {
-                            if (imageCols === 0) { 
-                                groupContainer.className = `flex flex-wrap gap-4 md:gap-9 w-full justify-center mt-2`; groupContainer.style.gridTemplateColumns = ''; 
-                            } else { 
-                                groupContainer.className = `grid gap-4 md:gap-9 w-full items-start mt-2`; groupContainer.style.gridTemplateColumns = `repeat(${imageCols}, minmax(0, 1fr))`; 
-                            }
-                            groupContainer.style.paddingTop = '1rem'; 
-                            groupContainer.innerHTML = '';
+                            if (imageCols === 0) { groupContainer.className = `flex flex-wrap gap-4 md:gap-9 w-full justify-center mt-2`; groupContainer.style.gridTemplateColumns = ''; } 
+                            else { groupContainer.className = `grid gap-4 md:gap-9 w-full items-start mt-2`; groupContainer.style.gridTemplateColumns = `repeat(${imageCols}, minmax(0, 1fr))`; }
+                            groupContainer.style.paddingTop = '1rem'; groupContainer.innerHTML = '';
                             
                             block.images.forEach((imgObj, imgIdx) => {
                                 const wrapper = document.createElement('div'); wrapper.id = `preview-wrapper-group-${idx}-${imgIdx}`; 
-                                
                                 let alignClass = 'mx-auto'; 
-                                if (imgObj.align === 'left') alignClass = 'mr-auto ml-0';
-                                else if (imgObj.align === 'right') alignClass = 'ml-auto mr-0';
+                                if (imgObj.align === 'left') alignClass = 'mr-auto ml-0'; else if (imgObj.align === 'right') alignClass = 'ml-auto mr-0';
+                                wrapper.className = `relative group/imgwrapper block ${alignClass}`; wrapper.style.width = `${imgObj.scale}%`;
+                                if (imgObj.translateX) wrapper.style.transform = `translateX(${imgObj.translateX}px)`;
                                 
-                                wrapper.className = `relative group/imgwrapper block ${alignClass}`; 
-                                wrapper.style.width = `${imgObj.scale}%`;
                                 const img = document.createElement('img'); img.src = imgObj.src; img.className = "resizable-img h-auto object-cover rounded-[1.5rem] shadow-sm block w-full";
                                 img.style.border = `${imgObj.border !== null ? imgObj.border : imgBorder}px solid ${finalColor}`; img.draggable = false;
                                 img.onmousedown = (e) => handleImageResizeStart(e, imgIdx, true, idx); img.ontouchstart = (e) => handleImageResizeStart(e, imgIdx, true, idx);
                                 img.oncontextmenu = (e) => { 
-                                    e.preventDefault(); 
-                                    document.getElementById('floatingPreviewMenu').classList.add('hidden');
-                                    startInlineEditor(img, imgIdx, idx);
-                                    showEditorToolbar(e.clientX, e.clientY);
+                                    e.preventDefault(); document.getElementById('floatingPreviewMenu').classList.add('hidden');
+                                    startInlineEditor(img, imgIdx, idx); showEditorToolbar(e.clientX, e.clientY);
                                 };
-                                
                                 const moveControls = document.createElement('div'); moveControls.className = "absolute -top-3 -left-3 flex gap-1.5 z-10 hidden-in-export opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all";
                                 if (imgIdx > 0) { 
                                     const lB = document.createElement('button'); lB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] outline-none p-0"; lB.style.color = finalColor; lB.style.border = `2px solid ${finalColor}`; lB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M15 18l-6-6 6-6"/></svg>`; 
-                                    lB.onclick = (e) => { e.stopPropagation(); moveImageLeftGroup(idx, imgIdx); }; 
-                                    moveControls.appendChild(lB); 
+                                    lB.onclick = (e) => { e.stopPropagation(); moveImageLeftGroup(idx, imgIdx); }; moveControls.appendChild(lB); 
                                 }
                                 if (imgIdx < block.images.length - 1) { 
                                     const rB = document.createElement('button'); rB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] outline-none p-0"; rB.style.color = finalColor; rB.style.border = `2px solid ${finalColor}`; rB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M9 18l6-6-6-6"/></svg>`; 
-                                    rB.onclick = (e) => { e.stopPropagation(); moveImageRightGroup(idx, imgIdx); }; 
-                                    moveControls.appendChild(rB); 
+                                    rB.onclick = (e) => { e.stopPropagation(); moveImageRightGroup(idx, imgIdx); }; moveControls.appendChild(rB); 
                                 }
-                                
                                 const delBtn = document.createElement('button'); delBtn.className = "absolute -top-3 -right-3 opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all z-10 hidden-in-export flex items-center justify-center hover:scale-110 outline-none p-0 bg-transparent border-none w-[28px] h-[28px]"; delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-full h-full drop-shadow-md"><defs><linearGradient id="delGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ff3333" /><stop offset="100%" stop-color="#cc0000" /></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#delGrad)" stroke="#990000" stroke-width="0.5" /><path d="M8 8 L16 16 M16 8 L8 16" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" /></svg>`; 
                                 delBtn.onclick = (e) => { e.stopPropagation(); removeImageFromGroup(idx, imgIdx); };
-                                
-                                wrapper.appendChild(img); 
-                                if (moveControls.children.length > 0) wrapper.appendChild(moveControls); 
-                                wrapper.appendChild(delBtn); groupContainer.appendChild(wrapper);
+                                wrapper.appendChild(img); if (moveControls.children.length > 0) wrapper.appendChild(moveControls); wrapper.appendChild(delBtn); groupContainer.appendChild(wrapper);
                             });
                         }
                     }
                 });
             }
             
-            updateFavicon(); updateBrandLogo();
+            updateFavicon(); 
             document.getElementById('dynamic-card-styles').innerHTML = `input[type=range]::-webkit-slider-thumb { background: white !important; border: 3px solid ${finalColor} !important; box-shadow: 0 0 10px ${finalColor}66 !important; } #cardWord, #cardDef, #cardType { text-decoration: none !important; }`;
             syncCardState();
         }
@@ -2092,12 +1758,11 @@
         function getDarkerShade(hex, factor = 0.7) { const rgb = hexToRgb(hex); return rgbToHex(Math.round(rgb.r * factor), Math.round(rgb.g * factor), Math.round(rgb.b * factor)); }
         
         function generateNotebookSVG() { 
-            const color = CONSTANT_ICON_COLOR, yellow = "#eed142", dark = "#222222"; 
+            const color = "#ffffff", yellow = "#ffffff", dark = "#222222"; 
             return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%"><path d="M 25 15 L 75 15 C 80.5 15 85 19.5 85 25 L 85 65 L 65 65 C 62.2 65 60 67.2 60 70 L 60 85 L 25 85 C 19.5 85 15 80.5 15 75 L 15 25 C 15 19.5 19.5 15 25 15 Z" fill="${color}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/><path d="M 85 65 L 65 85 L 65 70 C 65 67.2 67.2 65 70 65 Z" fill="${yellow}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/><g stroke="${dark}" stroke-width="4" fill="${color}"><rect x="12" y="27" width="16" height="6" rx="3" /><rect x="12" y="42" width="16" height="6" rx="3" /><rect x="12" y="57" width="16" height="6" rx="3" /><rect x="12" y="72" width="16" height="6" rx="3" /></g><g fill="${dark}"><circle cx="25" cy="30" r="3" /><circle cx="25" cy="45" r="3" /><circle cx="25" cy="60" r="3" /><circle cx="25" cy="75" r="3" /></g></svg>`.trim(); 
         }
         
         function updateFavicon() { document.getElementById('favicon').href = `data:image/svg+xml;base64,${btoa(generateNotebookSVG())}`; }
-        function updateBrandLogo() { const c = document.getElementById('brand-logo-container'); if (c) c.innerHTML = generateNotebookSVG(); }
         
         function createPNGIconFromSVG(svg, size) { 
             return new Promise((resolve) => { 
@@ -2124,8 +1789,7 @@
 
         let isDownloading = false;
         async function downloadPNG() {
-            if (isDownloading) return; 
-            isDownloading = true; 
+            if (isDownloading) return; isDownloading = true; 
             
             const cardWordEl = document.getElementById('cardWord');
             const tempDiv = document.createElement('div');
@@ -2134,29 +1798,23 @@
             
             const card = document.getElementById('cardContainer');
             try {
-                card.classList.remove('card-shadow'); 
                 const imgs = card.querySelectorAll('img'); 
                 await Promise.all(Array.from(imgs).map(img => img.complete ? Promise.resolve() : new Promise(r => { img.onload = r; img.onerror = r; })));
                 
                 const canvas = await html2canvas(card, { 
                     scale: 3, backgroundColor: null, useCORS: true, 
                     onclone: (doc) => { 
-                        const c = doc.getElementById('cardContainer'); c.style.boxShadow = 'none'; c.style.borderRadius = '48px'; 
+                        const c = doc.getElementById('cardContainer'); 
                         doc.querySelectorAll('#cardTitleRestore, #cardDefRestore, #cardExtraDefRestore, #addCategoryBtn, .format-toolbar, .clear-btn, .hidden-in-export').forEach(el => el.style.display = 'none');
                         doc.querySelectorAll('[contenteditable]').forEach(el => { if (!el.innerText.trim()) el.removeAttribute('data-placeholder'); });
                         if (!doc.getElementById('cardDef').innerText.trim()) doc.getElementById('cardNotesSection').style.display = 'none';
                         
                         if (doc.getElementById('cardBlocksContainer')) {
-                            doc.querySelectorAll('.card-extra-def-input').forEach(el => {
-                                if (!el.innerText.trim()) el.parentElement.style.display = 'none';
-                            });
+                            doc.querySelectorAll('.card-extra-def-input').forEach(el => { if (!el.innerText.trim()) el.parentElement.style.display = 'none'; });
                         }
-
                         if (!doc.getElementById('cardType').innerText.trim()) doc.getElementById('cardType').style.display = 'none';
                         if (!doc.getElementById('cardWord').innerText.trim() && !doc.getElementById('cardType').innerText.trim()) doc.getElementById('cardTitleSection').style.display = 'none';
-                        if (doc.getElementById('cardImagesContainer') && doc.getElementById('cardImagesContainer').children.length > 0) {
-                            doc.getElementById('cardImagesContainer').style.paddingTop = '1rem';
-                        }
+                        if (doc.getElementById('cardImagesContainer') && doc.getElementById('cardImagesContainer').children.length > 0) doc.getElementById('cardImagesContainer').style.paddingTop = '1rem';
                         
                         doc.querySelectorAll('#cardWord, #cardDef, .card-extra-def-input, #cardType').forEach(el => el.style.textDecoration = 'none');
                     }
@@ -2169,32 +1827,19 @@
                 canvas.toBlob(blob => {
                     const finalBlob = new Blob([blob, marker], { type: 'image/png' });
                     const url = URL.createObjectURL(finalBlob);
-                    
-                    const l = document.createElement('a'); 
-                    l.download = `${f}.png`; 
-                    l.href = url; 
-                    l.click();
-                    
+                    const l = document.createElement('a'); l.download = `${f}.png`; l.href = url; l.click();
                     URL.revokeObjectURL(url);
-                    card.classList.add('card-shadow'); 
                     isDownloading = false;
                 });
-            } catch (e) { 
-                console.error("Export failed", e); 
-                card.classList.add('card-shadow'); 
-                isDownloading = false;
-            }
+            } catch (e) { console.error("Export failed", e); isDownloading = false; }
         }
 
         let isDownloadingPDF = false;
         async function downloadPDF(openInNewTab = false) {
-            if (isDownloadingPDF) return; 
-            isDownloadingPDF = true; 
+            if (isDownloadingPDF) return; isDownloadingPDF = true; 
             
             let newTab = null;
-            if (openInNewTab) {
-                newTab = window.open('', '_blank');
-            }
+            if (openInNewTab) newTab = window.open('', '_blank');
             
             const cardWordEl = document.getElementById('cardWord');
             const tempDiv = document.createElement('div');
@@ -2203,11 +1848,7 @@
             
             const card = document.getElementById('cardContainer');
             try {
-                // Use clientWidth/Height to strictly measure the inside of the card (ignoring border thickness)
-                const w = card.clientWidth;
-                const h = card.clientHeight;
-                
-                card.classList.remove('card-shadow'); 
+                const w = card.clientWidth, h = card.clientHeight;
                 const imgs = card.querySelectorAll('img'); 
                 await Promise.all(Array.from(imgs).map(img => img.complete ? Promise.resolve() : new Promise(r => { img.onload = r; img.onerror = r; })));
                 
@@ -2216,80 +1857,46 @@
                     filename:     `${f}.pdf`,
                     image:        { type: 'jpeg', quality: 1.0 },
                     html2canvas:  { 
-                        scale: 2, 
-                        backgroundColor: '#ffffff', // Ensures transparent areas are pure white
-                        useCORS: true, 
-                        width: w,  // Force html2canvas to capture EXACTLY the border-less width (eliminates margins)
-                        height: h, // Force html2canvas to capture EXACTLY the border-less height
+                        scale: 2, backgroundColor: '#ffffff', useCORS: true, width: w, height: h, 
                         onclone: (doc) => { 
-                            // 1. Inject a bulletproof style tag to force a pure white background and invisible border
                             const style = doc.createElement('style');
                             style.innerHTML = `
                                 #cardContainer {
-                                    background-color: #ffffff !important;
-                                    background: #ffffff !important;
-                                    border: none !important;
-                                    border-width: 0 !important;
-                                    border-radius: 0px !important;
-                                    box-shadow: none !important;
-                                    margin: 0 !important;
-                                    max-width: none !important;
-                                    width: ${w}px !important;
-                                    height: ${h}px !important;
+                                    background-color: #ffffff !important; background: #ffffff !important;
+                                    border: none !important; border-width: 0 !important; border-radius: 0px !important;
+                                    box-shadow: none !important; margin: 0 !important; max-width: none !important;
+                                    width: ${w}px !important; height: ${h}px !important;
                                 }
-                                body, html {
-                                    background-color: #ffffff !important;
-                                    background: #ffffff !important;
-                                }
+                                body, html { background-color: #ffffff !important; background: #ffffff !important; }
                             `;
                             doc.head.appendChild(style);
 
                             const c = doc.getElementById('cardContainer'); 
+                            c.className = c.className.split(' ').filter(cls => !cls.includes('border') && !cls.includes('rounded') && !cls.includes('theme-blend') && !cls.includes('shadow')).join(' ');
                             
-                            // 2. Aggressively strip ALL border, background, shadow, and rounded classes
-                            c.className = c.className.split(' ').filter(cls => 
-                                !cls.includes('border') && 
-                                !cls.includes('rounded') && 
-                                !cls.includes('theme-blend') && 
-                                !cls.includes('shadow')
-                            ).join(' ');
-                            
-                            // 3. Set inline styles just to be triple sure the overrides stick
                             c.style.setProperty('background-color', '#ffffff', 'important');
-                            c.style.setProperty('background', '#ffffff', 'important');
                             c.style.setProperty('border', 'none', 'important');
-                            c.style.setProperty('border-radius', '0px', 'important');
-                            c.style.setProperty('box-shadow', 'none', 'important');
-                            c.style.setProperty('margin', '0', 'important');
                             c.style.setProperty('width', w + 'px', 'important');
                             c.style.setProperty('height', h + 'px', 'important');
                             
-                            // 4. Cleanup UI elements
                             doc.querySelectorAll('#cardTitleRestore, #cardDefRestore, #cardExtraDefRestore, #addCategoryBtn, .format-toolbar, .clear-btn, .hidden-in-export').forEach(el => el.style.display = 'none');
                             doc.querySelectorAll('[contenteditable]').forEach(el => { if (!el.innerText.trim()) el.removeAttribute('data-placeholder'); });
                             if (!doc.getElementById('cardDef').innerText.trim()) doc.getElementById('cardNotesSection').style.display = 'none';
                             
                             if (doc.getElementById('cardBlocksContainer')) {
-                                doc.querySelectorAll('.card-extra-def-input').forEach(el => {
-                                    if (!el.innerText.trim()) el.parentElement.style.display = 'none';
-                                });
+                                doc.querySelectorAll('.card-extra-def-input').forEach(el => { if (!el.innerText.trim()) el.parentElement.style.display = 'none'; });
                             }
-
                             if (!doc.getElementById('cardType').innerText.trim()) doc.getElementById('cardType').style.display = 'none';
                             if (!doc.getElementById('cardWord').innerText.trim() && !doc.getElementById('cardType').innerText.trim()) doc.getElementById('cardTitleSection').style.display = 'none';
-                            if (doc.getElementById('cardImagesContainer') && doc.getElementById('cardImagesContainer').children.length > 0) {
-                                doc.getElementById('cardImagesContainer').style.paddingTop = '1rem';
-                            }
+                            if (doc.getElementById('cardImagesContainer') && doc.getElementById('cardImagesContainer').children.length > 0) doc.getElementById('cardImagesContainer').style.paddingTop = '1rem';
                             
                             doc.querySelectorAll('#cardWord, #cardDef, .card-extra-def-input, #cardType').forEach(el => el.style.textDecoration = 'none');
                         }
                     },
-                    // Add 1px to height to firmly prevent html2pdf fraction overflow
                     jsPDF:        { unit: 'px', format: [w, h + 1], orientation: w > h ? 'landscape' : 'portrait' }
                 };
                 
                 const pdfBlob = await html2pdf().set(opt).from(card).output('blob');
-                
                 syncCardState();
                 const cardState = cards.find(c => c.id === activeCardId);
                 const marker = "\nNOTION_APP_DATA:" + JSON.stringify(cardState);
@@ -2298,26 +1905,14 @@
                 const url = URL.createObjectURL(finalBlob);
                 
                 if (openInNewTab) {
-                    if (newTab) {
-                        newTab.location.href = url;
-                    } else {
-                        window.open(url, '_blank');
-                    }
+                    if (newTab) newTab.location.href = url; else window.open(url, '_blank');
                 } else {
-                    const l = document.createElement('a');
-                    l.download = `${f}.pdf`;
-                    l.href = url;
-                    l.click();
+                    const l = document.createElement('a'); l.download = `${f}.pdf`; l.href = url; l.click();
                 }
                 setTimeout(() => URL.revokeObjectURL(url), 2000);
-                
             } catch (e) { 
-                console.error("Export failed", e); 
-                if (newTab) newTab.close();
-            } finally { 
-                card.classList.add('card-shadow'); 
-                isDownloadingPDF = false; 
-            }
+                console.error("Export failed", e); if (newTab) newTab.close();
+            } finally { isDownloadingPDF = false; }
         }
 
         let edTool = 'pen', edColor = '#ef4444', edSize = 5;
@@ -2328,120 +1923,75 @@
         function showEditorToolbar(clientX, clientY) {
             const toolbar = document.getElementById('floatingImageToolbar');
             toolbar.classList.remove('hidden');
-            
             requestAnimationFrame(() => {
                 const rect = toolbar.getBoundingClientRect();
                 let x = clientX, y = clientY;
                 if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
                 if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
-                toolbar.style.left = x + 'px'; 
-                toolbar.style.top = y + 'px';
+                toolbar.style.left = x + 'px'; toolbar.style.top = y + 'px';
             });
         }
 
         function startInlineEditor(img, imgIdx, blockIdx) {
-            // If already editing another image, safely close it first
-            if (edTarget.imgIdx !== -1) {
-                closeInlineEditor(false); 
-            }
+            if (edTarget.imgIdx !== -1) closeInlineEditor(false); 
 
             edTarget = { imgEl: img, imgIdx, blockIdx, drawC: null, tempC: null };
-            activeImageIdx = imgIdx;
-            activeBlockIdx = blockIdx;
-            activeImageIsGroup = (blockIdx !== -1);
+            activeImageIdx = imgIdx; activeBlockIdx = blockIdx; activeImageIsGroup = (blockIdx !== -1);
 
-            const wrapper = img.parentElement;
-            wrapper.classList.add('is-editing'); // Hides standard move/delete controls
-            
-            const style = window.getComputedStyle(img);
-            const br = style.borderRadius;
+            const wrapper = img.parentElement; wrapper.classList.add('is-editing'); 
+            const style = window.getComputedStyle(img), br = style.borderRadius;
 
-            // Canvas for committed strokes
             const drawC = document.createElement('canvas');
             drawC.className = "absolute top-0 left-0 w-full h-full z-20 pointer-events-none";
-            drawC.style.borderRadius = br;
-            drawC.width = img.clientWidth;
-            drawC.height = img.clientHeight;
+            drawC.style.borderRadius = br; drawC.width = img.clientWidth; drawC.height = img.clientHeight;
             
-            // Canvas for active strokes/events
             const tempC = document.createElement('canvas');
             tempC.className = "absolute top-0 left-0 w-full h-full z-30 cursor-crosshair touch-none";
-            tempC.style.borderRadius = br;
-            tempC.width = img.clientWidth;
-            tempC.height = img.clientHeight;
+            tempC.style.borderRadius = br; tempC.width = img.clientWidth; tempC.height = img.clientHeight;
             
-            // Allow moving the toolbar if right clicked again while editing
-            tempC.oncontextmenu = (e) => {
-                e.preventDefault();
-                showEditorToolbar(e.clientX, e.clientY);
-            };
+            tempC.oncontextmenu = (e) => { e.preventDefault(); showEditorToolbar(e.clientX, e.clientY); };
 
-            wrapper.appendChild(drawC);
-            wrapper.appendChild(tempC);
-
-            edTarget.drawC = drawC;
-            edTarget.tempC = tempC;
-
-            edUndoStack = []; edRedoStack = [];
-            saveEdState();
-
+            wrapper.appendChild(drawC); wrapper.appendChild(tempC);
+            edTarget.drawC = drawC; edTarget.tempC = tempC;
+            edUndoStack = []; edRedoStack = []; saveEdState();
             initEdEvents(tempC);
         }
 
         function closeInlineEditor(save = false) {
             if (edTarget.imgIdx === -1) return;
-            
             const wrapper = edTarget.imgEl ? edTarget.imgEl.parentElement : null;
             if (wrapper) {
                 wrapper.classList.remove('is-editing');
                 if (edTarget.drawC && wrapper.contains(edTarget.drawC)) wrapper.removeChild(edTarget.drawC);
                 if (edTarget.tempC && wrapper.contains(edTarget.tempC)) wrapper.removeChild(edTarget.tempC);
             }
-
-            document.getElementById('floatingImageToolbar').classList.add('hidden');
-            closeEdMenus();
-            
+            document.getElementById('floatingImageToolbar').classList.add('hidden'); closeEdMenus();
             edTarget = { imgIdx: -1, blockIdx: -1, imgEl: null, drawC: null, tempC: null };
-            activeImageIdx = -1;
-            activeBlockIdx = -1;
+            activeImageIdx = -1; activeBlockIdx = -1;
         }
 
         function saveInlineEditor() {
             if (edTarget.imgIdx === -1) return;
             const imgObj = edTarget.blockIdx === -1 ? uploadedImages[edTarget.imgIdx] : activeBlocks[edTarget.blockIdx].images[edTarget.imgIdx];
-
-            const imgEl = edTarget.imgEl;
-            const drawC = edTarget.drawC;
+            const imgEl = edTarget.imgEl, drawC = edTarget.drawC;
 
             const resultC = document.createElement('canvas');
-            resultC.width = imgEl.naturalWidth;
-            resultC.height = imgEl.naturalHeight;
+            resultC.width = imgEl.naturalWidth; resultC.height = imgEl.naturalHeight;
             const ctx = resultC.getContext('2d');
             
-            // Draw original image at full resolution
             ctx.drawImage(imgEl, 0, 0, resultC.width, resultC.height);
-            
-            // Draw the strokes scaled up to match the natural resolution
             ctx.drawImage(drawC, 0, 0, resultC.width, resultC.height);
             
             const newSrc = resultC.toDataURL('image/png');
+            pushImageHistory(); imgObj.src = newSrc;
             
-            pushImageHistory();
-            imgObj.src = newSrc;
-            
-            closeInlineEditor(true);
-            updatePreview();
-            syncCardState();
+            closeInlineEditor(true); updatePreview(); syncCardState();
         }
 
         document.querySelectorAll('.ed-tool-btn').forEach(btn => {
             btn.onclick = (e) => {
-                document.querySelectorAll('.ed-tool-btn').forEach(b => {
-                    b.classList.remove('active'); b.classList.remove('text-[var(--theme-color)]');
-                });
-                const tBtn = e.currentTarget;
-                tBtn.classList.add('active');
-                tBtn.style.color = 'var(--theme-color)';
+                document.querySelectorAll('.ed-tool-btn').forEach(b => { b.classList.remove('active'); b.classList.remove('text-[var(--theme-color)]'); });
+                const tBtn = e.currentTarget; tBtn.classList.add('active'); tBtn.style.color = 'var(--theme-color)';
                 edTool = tBtn.dataset.tool;
             };
         });
@@ -2450,8 +2000,7 @@
             btn.onclick = (e) => {
                 document.querySelectorAll('.ed-color-btn').forEach(b => b.classList.remove('scale-110', 'border-white'));
                 e.currentTarget.classList.add('scale-110', 'border-white');
-                edColor = e.currentTarget.dataset.color;
-                document.getElementById('edCurrentColor').style.backgroundColor = edColor;
+                edColor = e.currentTarget.dataset.color; document.getElementById('edCurrentColor').style.backgroundColor = edColor;
             };
         });
         
@@ -2462,7 +2011,6 @@
                 const rect = canvas.getBoundingClientRect();
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                 const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                // Internal coords match exact client bounds for our inline canvas
                 return { x: clientX - rect.left, y: clientY - rect.top };
             };
             
@@ -2476,117 +2024,70 @@
         }
 
         function edStart(pos) {
-            edIsDrawing = true;
-            edStartX = pos.x; edStartY = pos.y;
-            
+            edIsDrawing = true; edStartX = pos.x; edStartY = pos.y;
             const drawCtx = edTarget.drawC.getContext('2d');
-            drawCtx.lineCap = 'round';
-            drawCtx.lineJoin = 'round';
-            drawCtx.lineWidth = edSize;
-            
-            if (edTool === 'eraser') {
-                drawCtx.globalCompositeOperation = 'destination-out';
-                drawCtx.strokeStyle = 'rgba(0,0,0,1)';
-            } else {
-                drawCtx.globalCompositeOperation = 'source-over';
-                drawCtx.strokeStyle = edTool === 'highlighter' ? hexToRgba(edColor, 0.005) : edColor;
-            }
-            
-            if (edTool === 'pen' || edTool === 'highlighter' || edTool === 'eraser') {
-                drawCtx.beginPath();
-                drawCtx.moveTo(pos.x, pos.y);
-            }
+            drawCtx.lineCap = 'round'; drawCtx.lineJoin = 'round'; drawCtx.lineWidth = edSize;
+            if (edTool === 'eraser') { drawCtx.globalCompositeOperation = 'destination-out'; drawCtx.strokeStyle = 'rgba(0,0,0,1)'; } 
+            else { drawCtx.globalCompositeOperation = 'source-over'; drawCtx.strokeStyle = edTool === 'highlighter' ? hexToRgba(edColor, 0.005) : edColor; }
+            if (edTool === 'pen' || edTool === 'highlighter' || edTool === 'eraser') { drawCtx.beginPath(); drawCtx.moveTo(pos.x, pos.y); }
         }
 
         function edMove(pos) {
             if (!edIsDrawing) return;
-            const drawCtx = edTarget.drawC.getContext('2d');
-            const tempCtx = edTarget.tempC.getContext('2d');
-            const tempC = edTarget.tempC;
+            const drawCtx = edTarget.drawC.getContext('2d'), tempCtx = edTarget.tempC.getContext('2d'), tempC = edTarget.tempC;
             
             if (edTool === 'pen' || edTool === 'highlighter' || edTool === 'eraser') {
-                drawCtx.lineTo(pos.x, pos.y);
-                drawCtx.stroke();
+                drawCtx.lineTo(pos.x, pos.y); drawCtx.stroke();
             } else {
                 tempCtx.clearRect(0, 0, tempC.width, tempC.height);
-                tempCtx.lineCap = 'round'; tempCtx.lineJoin = 'round';
-                tempCtx.lineWidth = edSize;
+                tempCtx.lineCap = 'round'; tempCtx.lineJoin = 'round'; tempCtx.lineWidth = edSize;
                 tempCtx.strokeStyle = edTool === 'highlighter' ? hexToRgba(edColor, 0.2) : edColor;
                 tempCtx.beginPath();
-                
-                if (edTool === 'rect') {
-                    tempCtx.rect(edStartX, edStartY, pos.x - edStartX, pos.y - edStartY);
-                } else if (edTool === 'circle') {
-                    const radius = Math.sqrt(Math.pow(pos.x - edStartX, 2) + Math.pow(pos.y - edStartY, 2));
-                    tempCtx.arc(edStartX, edStartY, radius, 0, 2 * Math.PI);
-                } else if (edTool === 'arrow') {
-                    drawEdArrow(tempCtx, edStartX, edStartY, pos.x, pos.y);
-                }
-                
+                if (edTool === 'rect') tempCtx.rect(edStartX, edStartY, pos.x - edStartX, pos.y - edStartY);
+                else if (edTool === 'circle') { const radius = Math.sqrt(Math.pow(pos.x - edStartX, 2) + Math.pow(pos.y - edStartY, 2)); tempCtx.arc(edStartX, edStartY, radius, 0, 2 * Math.PI); } 
+                else if (edTool === 'arrow') drawEdArrow(tempCtx, edStartX, edStartY, pos.x, pos.y);
                 if (edTool !== 'arrow') tempCtx.stroke();
             }
         }
 
         function edEnd() {
-            if (!edIsDrawing) return;
-            edIsDrawing = false;
-            
+            if (!edIsDrawing) return; edIsDrawing = false;
             if (edTool === 'rect' || edTool === 'circle' || edTool === 'arrow') {
-                const drawCtx = edTarget.drawC.getContext('2d');
-                const tempC = edTarget.tempC;
-                const tempCtx = tempC.getContext('2d');
-                
-                drawCtx.globalCompositeOperation = 'source-over';
-                drawCtx.drawImage(tempC, 0, 0);
+                const drawCtx = edTarget.drawC.getContext('2d'), tempC = edTarget.tempC, tempCtx = tempC.getContext('2d');
+                drawCtx.globalCompositeOperation = 'source-over'; drawCtx.drawImage(tempC, 0, 0);
                 tempCtx.clearRect(0, 0, tempC.width, tempC.height);
             }
-            
             saveEdState();
         }
 
         function drawEdArrow(ctx, fromX, fromY, toX, toY) {
-            const headlen = Math.max(10, edSize * 2);
-            const dx = toX - fromX;
-            const dy = toY - fromY;
-            const angle = Math.atan2(dy, dx);
-            ctx.moveTo(fromX, fromY);
-            ctx.lineTo(toX, toY);
+            const headlen = Math.max(10, edSize * 2), dx = toX - fromX, dy = toY - fromY, angle = Math.atan2(dy, dx);
+            ctx.moveTo(fromX, fromY); ctx.lineTo(toX, toY);
             ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
-            ctx.moveTo(toX, toY);
-            ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
+            ctx.moveTo(toX, toY); ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
             ctx.stroke();
         }
 
         function saveEdState() {
             if (!edTarget.drawC) return;
             edUndoStack.push(edTarget.drawC.toDataURL());
-            if (edUndoStack.length > 20) edUndoStack.shift();
-            edRedoStack = [];
+            if (edUndoStack.length > 20) edUndoStack.shift(); edRedoStack = [];
         }
 
         function edUndo() {
-            if (edUndoStack.length > 1) {
-                edRedoStack.push(edUndoStack.pop());
-                restoreEdState(edUndoStack[edUndoStack.length - 1]);
-            }
+            if (edUndoStack.length > 1) { edRedoStack.push(edUndoStack.pop()); restoreEdState(edUndoStack[edUndoStack.length - 1]); }
         }
 
         function edRedo() {
-            if (edRedoStack.length > 0) {
-                const state = edRedoStack.pop();
-                edUndoStack.push(state);
-                restoreEdState(state);
-            }
+            if (edRedoStack.length > 0) { const state = edRedoStack.pop(); edUndoStack.push(state); restoreEdState(state); }
         }
 
         function restoreEdState(dataUrl) {
             if (!edTarget.drawC) return;
-            const ctx = edTarget.drawC.getContext('2d');
-            const img = new Image();
+            const ctx = edTarget.drawC.getContext('2d'), img = new Image();
             img.onload = () => {
                 ctx.clearRect(0, 0, edTarget.drawC.width, edTarget.drawC.height);
-                ctx.globalCompositeOperation = 'source-over';
-                ctx.drawImage(img, 0, 0);
+                ctx.globalCompositeOperation = 'source-over'; ctx.drawImage(img, 0, 0);
             };
             img.src = dataUrl;
         }
