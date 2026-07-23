@@ -197,6 +197,11 @@
                                 <button onmousedown="event.preventDefault(); execFormat('justifyLeft')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-left" aria-label="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
                                 <button onmousedown="event.preventDefault(); execFormat('justifyCenter')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-center" aria-label="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
                                 <button onmousedown="event.preventDefault(); execFormat('justifyRight')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-right" aria-label="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+                                <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                <div class="flex items-center gap-1 text-gray-400 px-1" title="Word Count">
+                                    <i data-lucide="whole-word" class="w-3.5 h-3.5"></i>
+                                    <span class="text-[10px] font-bold toolbar-word-count">0</span>
+                                </div>
                             </div>
 
                             <h2 id="cardWord" contenteditable="true" data-placeholder="Enter Term / Title..." class="font-bold tracking-tight leading-tight outline-none flex-1 min-w-[50%]" style="text-decoration: none;"></h2>
@@ -270,6 +275,12 @@
                                                 <i data-lucide="chevron-down" class="w-3 h-3"></i>
                                             </button>
                                             <div id="toolbarDefSizeDropdownMenu" onmousedown="event.preventDefault();" class="hidden absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[60] overflow-hidden w-16 max-h-48 overflow-y-auto custom-scrollbar"></div>
+                                        </div>
+                                        
+                                        <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                        <div class="flex items-center gap-1 text-gray-400 px-1" title="Word Count">
+                                            <i data-lucide="whole-word" class="w-3.5 h-3.5"></i>
+                                            <span class="text-[10px] font-bold toolbar-word-count">0</span>
                                         </div>
                                     </div>
                                     <div id="cardDef" contenteditable="true" data-placeholder="Enter definition or notes..." class="font-medium leading-relaxed whitespace-pre-wrap outline-none" style="text-decoration: none; min-height: 1.5em;"></div>
@@ -401,6 +412,26 @@
             </div>
         </div>
         <div id="floatingLayoutOptions" class="hidden py-1 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mt-1 mb-1"></div>
+        
+        <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex justify-between items-center mb-1">
+                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Card Border</span>
+                <span id="cardBorderValueLabel" class="text-[10px] font-bold text-[var(--theme-color)]">12px</span>
+            </div>
+            <input type="range" id="inputCardBorder" min="0" max="40" value="12" class="w-full cursor-pointer">
+        </div>
+
+        <div class="py-1 border-b border-gray-100 dark:border-gray-800">
+            <div id="fontFamilyToggleBtn" class="dropdown-item flex items-center justify-between gap-2 transition-colors">
+                <div class="flex items-center gap-2"><i data-lucide="type" class="w-4 h-4"></i> Font Style</div>
+                <div class="flex items-center gap-1">
+                    <span id="fontFamilyLabel" class="text-[10px] font-bold text-[var(--theme-color)] uppercase tracking-widest">Caveat</span>
+                    <i data-lucide="chevron-down" class="w-3 h-3 transition-transform text-gray-400" id="fontFamilyChevron"></i>
+                </div>
+            </div>
+            <div id="floatingFontFamilyOptions" class="hidden py-1 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mt-1 mb-1"></div>
+        </div>
+
         <div class="py-1">
             <div id="themeColorToggleBtn" class="dropdown-item flex items-center justify-between gap-2 transition-colors">
                 <div class="flex items-center gap-2"><i data-lucide="palette" class="w-4 h-4"></i> Theme Color</div>
@@ -455,13 +486,19 @@
         };
         const CONSTANT_ICON_COLOR = "#51b8cb"; 
         
-        // ------------------ GLOBAL STATE VARIABLES ------------------
+        const fontMap = {
+            'Caveat': "'Caveat', cursive",
+            'Poppins': "'Poppins', sans-serif",
+            'Helvetica': "Helvetica, Arial, sans-serif"
+        };
+
         let activeColor = "#51b8cb", hue = 189, saturation = 60, brightness = 80;
         let uploadedImages = [], activeBlocks = []; 
         let cards = [], activeCardId = null, isSwitching = false;
         
         let currentSelectedCategory = "-", currentSelectedSize = 32, currentSelectedDefSize = 24, currentSelectedExtraDefSize = 24;
-        let currentImageBorder = 2, currentImageCols = 0, currentBlendPercentage = 20, deferredPrompt = null;
+        let currentImageBorder = 2, currentImageCols = 0, currentBlendPercentage = 20, currentCardBorder = 12, deferredPrompt = null;
+        let currentFontFamily = 'Caveat';
         let showTitlePlaceholder = true, showDefPlaceholder = true;
         
         let activeImageIdx = -1, activeBlockIdx = -1, activeImageIsGroup = false;
@@ -653,7 +690,6 @@
             }
         }
 
-        // ------------------ MENU & CARD LIST RENDERERS ------------------
         window.populateHeaderCardsList = function() {
             const list = document.getElementById('headerCardsList');
             if (!list) return;
@@ -770,7 +806,6 @@
         };
 
         window.addNote = function(layoutType) {
-            // layoutType can be 'inline' (next to) or 'block' (below)
             activeBlocks.push({ type: 'text', inline: (layoutType === 'inline'), content: '' });
             updatePreview();
             setTimeout(() => {
@@ -854,6 +889,17 @@
             
             if (typeof lucide !== 'undefined') lucide.createIcons();
             initPWA();
+        };
+
+        window.updateWordCount = function(element) {
+            if(!element) return;
+            const text = element.innerText || '';
+            const count = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            const container = element.closest('.group\\/title, .group\\/def, .group\\/extradef');
+            if(container) {
+                const countSpan = container.querySelector('.toolbar-word-count');
+                if(countSpan) countSpan.innerText = count;
+            }
         };
 
         window.getNoteTextElement = function(target, isBlock) {
@@ -980,13 +1026,17 @@
             
             const prevM = document.getElementById('floatingPreviewMenu'); 
             if(prevM && !prevM.classList.contains('hidden')) {
-                // Ignore clicks that happen inside the right-click menu itself so options can be selected
                 if (!prevM.contains(e.target)) {
                     prevM.classList.add('hidden');
                     const layoutOptions = document.getElementById('floatingLayoutOptions');
                     if (layoutOptions) layoutOptions.classList.add('hidden');
                     const themeColorOptions = document.getElementById('floatingThemeColorOptions');
                     if (themeColorOptions) themeColorOptions.classList.add('hidden');
+                    const fontOptions = document.getElementById('floatingFontFamilyOptions');
+                    if (fontOptions) fontOptions.classList.add('hidden');
+                    
+                    const themeChev = document.getElementById('themeColorChevron'); if(themeChev) themeChev.classList.remove('rotate-180');
+                    const fontChev = document.getElementById('fontFamilyChevron'); if(fontChev) fontChev.classList.remove('rotate-180');
                 }
             }
         });
@@ -1086,6 +1136,35 @@
                 };
             }
 
+            const fontOptionsContainer = document.getElementById('floatingFontFamilyOptions');
+            if (fontOptionsContainer) {
+                fontOptionsContainer.innerHTML = '';
+                ['Caveat', 'Poppins', 'Helvetica'].forEach(f => {
+                    const item = document.createElement('div');
+                    item.className = 'dropdown-item text-gray-700 dark:text-gray-300';
+                    item.innerText = f;
+                    item.style.fontFamily = fontMap[f] || 'inherit';
+                    item.onclick = (e) => { 
+                        e.stopPropagation(); 
+                        selectFontFamily(f); 
+                        fontOptionsContainer.classList.add('hidden');
+                        const chevron = document.getElementById('fontFamilyChevron');
+                        if (chevron) chevron.classList.remove('rotate-180');
+                    };
+                    fontOptionsContainer.appendChild(item);
+                });
+            }
+
+            const fontToggleBtn = document.getElementById('fontFamilyToggleBtn');
+            if (fontToggleBtn) {
+                fontToggleBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    if (fontOptionsContainer) fontOptionsContainer.classList.toggle('hidden');
+                    const chevron = document.getElementById('fontFamilyChevron');
+                    if (chevron) chevron.classList.toggle('rotate-180');
+                };
+            }
+
             const themeColorOptions = document.getElementById('floatingThemeColorOptions');
             if (themeColorOptions) {
                 themeColorOptions.onmousedown = (e) => e.stopPropagation();
@@ -1109,6 +1188,12 @@
             currentSelectedCategory = cat; 
             if (cat !== '-' && categoryColors[cat]) setManualColor(categoryColors[cat]); 
             updatePreview(); 
+        }
+        function selectFontFamily(font) {
+            currentFontFamily = font;
+            const label = document.getElementById('fontFamilyLabel');
+            if (label) label.innerText = font;
+            updatePreview();
         }
         function selectTextSize(size) { 
             currentSelectedSize = size; 
@@ -1262,6 +1347,7 @@
                         activeBlocks[idx].content = e.target.innerHTML; syncCardState();
                     }
                 }
+                if (e.target.isContentEditable) updateWordCount(e.target);
             });
             document.getElementById('cardContainer').addEventListener('keydown', (e) => {
                 if (e.target.classList.contains('card-extra-def-input') && e.key === 'Tab') {
@@ -1312,6 +1398,15 @@
                     const b = document.getElementById('btnInstallApp'); b.classList.add('hidden'); b.classList.remove('flex'); 
                 } 
             });
+
+            const cardBorderSlider = document.getElementById('inputCardBorder');
+            if(cardBorderSlider) {
+                cardBorderSlider.addEventListener('input', (e) => {
+                    currentCardBorder = parseInt(e.target.value);
+                    document.getElementById('cardBorderValueLabel').innerText = currentCardBorder + 'px';
+                    updatePreview();
+                });
+            }
         }
 
         function handleImageResizeStart(e, imgIdx, isGroup = false, blockIdx = -1) { 
@@ -1487,7 +1582,8 @@
                 id: 'card_' + Date.now() + Math.random().toString(36).substr(2, 9), 
                 title: '', category: '-', definition: '', blocks: [], images: [],
                 color: { hex: genColor, hue: genHue, sat: genSat, bri: genBri }, 
-                textSize: 32, defSize: 24, imageBorder: 2, imageCols: 0, blend: 20, 
+                textSize: 32, defSize: 24, imageBorder: 2, imageCols: 0, blend: 20, cardBorder: 12,
+                fontFamily: 'Caveat',
                 showTitlePlaceholder: true, showDefPlaceholder: false 
             }; 
             cards.push(newCard); saveCardsToStorage(); switchCard(newCard.id); 
@@ -1509,6 +1605,10 @@
 
             document.getElementById('inputTitle').value = card.title; 
             showTitlePlaceholder = card.showTitlePlaceholder !== false; showDefPlaceholder = card.showDefPlaceholder !== false; 
+            
+            currentFontFamily = card.fontFamily || 'Caveat';
+            const fLabel = document.getElementById('fontFamilyLabel'); if (fLabel) fLabel.innerText = currentFontFamily;
+
             selectCategory(card.category || "-"); selectTextSize(card.textSize || 32); selectDefSize(card.defSize || 24); 
             
             currentImageBorder = card.imageBorder || 2; selectImageCols(card.imageCols || 0); 
@@ -1516,6 +1616,10 @@
             const tL = document.getElementById('toolbarTitleSizeLabel'); if (tL) tL.innerText = card.textSize || 32; 
             
             currentBlendPercentage = card.blend !== undefined ? card.blend : 20; document.getElementById('blendValueLabel').innerText = currentBlendPercentage + '%'; 
+            currentCardBorder = card.cardBorder !== undefined ? card.cardBorder : 12;
+            const borderSlider = document.getElementById('inputCardBorder'); if(borderSlider) borderSlider.value = currentCardBorder;
+            const borderLabel = document.getElementById('cardBorderValueLabel'); if(borderLabel) borderLabel.innerText = currentCardBorder + 'px';
+
             document.getElementById('inputDef').value = card.definition; 
             uploadedImages = [...(card.images || [])]; activeBlocks = JSON.parse(JSON.stringify(card.blocks || []));
             activeColor = card.color.hex; hue = card.color.hue; saturation = card.color.sat; brightness = card.color.bri; 
@@ -1529,7 +1633,8 @@
             card.images = [...uploadedImages]; card.blocks = JSON.parse(JSON.stringify(activeBlocks)); 
             card.color = { hex: activeColor, hue: hue, sat: saturation, bri: brightness }; 
             card.textSize = currentSelectedSize; card.defSize = currentSelectedDefSize; card.extraDefSize = currentSelectedExtraDefSize; 
-            card.imageBorder = currentImageBorder; card.imageCols = currentImageCols; card.blend = currentBlendPercentage; 
+            card.imageBorder = currentImageBorder; card.imageCols = currentImageCols; card.blend = currentBlendPercentage; card.cardBorder = currentCardBorder;
+            card.fontFamily = currentFontFamily;
             card.showTitlePlaceholder = showTitlePlaceholder; card.showDefPlaceholder = showDefPlaceholder; 
             saveCardsToStorage();
         }
@@ -1540,6 +1645,8 @@
             document.documentElement.style.setProperty('--theme-color', finalColor);
             document.documentElement.style.setProperty('--theme-blend', getLightShade(finalColor, blend));
             
+            document.getElementById('cardContainer').style.borderWidth = currentCardBorder + 'px';
+
             const bVL = document.getElementById('blendValueLabel'); if (bVL) bVL.style.color = finalColor;
             const themeColorBtn = document.getElementById('themeColorToggleBtn'); if (themeColorBtn) themeColorBtn.style.color = finalColor;
             const dlBtn = document.getElementById('cardDownloadBtn'); if (dlBtn) { dlBtn.style.color = finalColor; dlBtn.style.border = `2px solid ${finalColor}`; }
@@ -1674,6 +1781,11 @@
                                     <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
                                     <button onmousedown="event.preventDefault(); addExtraNoteRelative(${idx}, 'next')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" title="Add Note Next To"><i data-lucide="panel-right" class="w-4 h-4"></i></button>
                                     <button onmousedown="event.preventDefault(); addExtraNoteRelative(${idx}, 'below')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" title="Add Note Below"><i data-lucide="panel-bottom" class="w-4 h-4"></i></button>
+                                    <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                    <div class="flex items-center gap-1 text-gray-400 px-1" title="Word Count">
+                                        <i data-lucide="whole-word" class="w-3.5 h-3.5"></i>
+                                        <span class="text-[10px] font-bold toolbar-word-count">0</span>
+                                    </div>
                                 </div>
                                 <div class="card-extra-def-input font-medium leading-relaxed whitespace-pre-wrap outline-none" contenteditable="true" data-placeholder="Enter note here..." style="text-decoration: none; min-height: 1.5em; font-family: 'Caveat', cursive;" data-block-idx="${idx}">${block.content || ''}</div>
                                 <button onclick="removeBlock(${idx})" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 group-hover/extradef:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" aria-label="Remove Note"><i data-lucide="x" class="w-3.5 h-3.5 md:w-4 md:h-4"></i></button>
@@ -1751,7 +1863,21 @@
             }
             
             updateFavicon(); 
-            document.getElementById('dynamic-card-styles').innerHTML = `input[type=range]::-webkit-slider-thumb { background: white !important; border: 3px solid ${finalColor} !important; box-shadow: 0 0 10px ${finalColor}66 !important; } #cardWord, #cardDef, #cardType { text-decoration: none !important; }`;
+            
+            const activeFontCss = fontMap[currentFontFamily] || fontMap['Caveat'];
+            
+            document.getElementById('dynamic-card-styles').innerHTML = `
+                input[type=range]::-webkit-slider-thumb { background: white !important; border: 3px solid ${finalColor} !important; box-shadow: 0 0 10px ${finalColor}66 !important; } 
+                #cardWord, #cardDef, #cardType, .card-extra-def-input { 
+                    text-decoration: none !important; 
+                    font-family: ${activeFontCss} !important;
+                }
+            `;
+            
+            updateWordCount(document.getElementById('cardWord'));
+            updateWordCount(document.getElementById('cardDef'));
+            document.querySelectorAll('.card-extra-def-input').forEach(el => updateWordCount(el));
+
             syncCardState();
         }
 
