@@ -2,11 +2,12 @@
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Notion">
     
@@ -20,7 +21,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700;900&family=DM+Serif+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/webfontworld/harmonyos/HarmonyOS_Sans.css">
+
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
@@ -67,7 +73,7 @@
             box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05) !important; 
         }
         
-        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--theme-color); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { opacity: 0.8; }
@@ -139,14 +145,21 @@
         }
 
         /* Image Editor Toolbar Styles */
-        .ed-tool-btn.active {
+        .ed-tool-btn.active, .sa-tool-btn.active {
             color: var(--theme-color) !important;
-            background-color: rgba(255,255,255,0.1);
+            background-color: rgba(255,255,255,0.15) !important;
+            border-color: var(--theme-color) !important;
         }
         
         .is-editing > div[class*="absolute"], .is-editing > button { 
-            /* Hide hover controls (move/delete) while actively editing */
             display: none !important; 
+        }
+
+        /* No-scroll & Touch optimization for Editor Canvas */
+        .editor-canvas-layer {
+            touch-action: none !important;
+            user-select: none;
+            -webkit-user-select: none;
         }
     </style>
     <style id="dynamic-card-styles"></style>
@@ -159,33 +172,27 @@
     <input type="file" id="fileImportInput" class="hidden" accept=".png, .pdf">
     <button id="btnInstallApp" class="hidden"></button>
 
-    <div id="mainLayout" class="relative z-10 w-full flex flex-col items-center h-screen overflow-y-auto custom-scrollbar">
+    <!-- Mobile FAB for Context Menu -->
+    <button id="mobileFab" onclick="toggleMobileMenu(event)" class="lg:hidden fixed bottom-6 right-6 z-[150] bg-[var(--theme-color)] text-white p-3.5 rounded-full shadow-2xl flex items-center justify-center outline-none" aria-label="Open Menu" style="padding-bottom: max(0.875rem, env(safe-area-inset-bottom)); right: max(1.5rem, env(safe-area-inset-right));">
+        <i data-lucide="menu" class="w-6 h-6"></i>
+    </button>
+
+    <div id="mainLayout" class="relative z-10 w-full flex flex-col items-center h-screen overflow-y-auto custom-scrollbar" style="padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right);">
         
         <main class="w-full flex justify-center flex-1">
             
-            <div id="cardContainer" class="border-[8px] md:border-[12px] border-[var(--theme-color)] relative transition-all duration-500 w-full min-h-screen group/maincard theme-blend-bg-card">
-
-                    <!-- Export Tools -->
-                    <div class="absolute top-4 right-4 md:top-6 md:right-6 z-[30] hidden-in-export opacity-100 lg:opacity-0 group-hover/maincard:opacity-100 transition-all group/dl flex flex-col items-center">
-                        <button id="cardDownloadBtn" onclick="downloadPNG()" class="bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[36px] h-[36px] md:w-[44px] md:h-[44px] outline-none text-[var(--theme-color)] border-2 border-[var(--theme-color)] relative z-10" aria-label="Download Card PNG">
-                            <i data-lucide="download" class="w-4 h-4 md:w-5 md:h-5"></i>
-                        </button>
-                        <div class="absolute top-full pt-2 opacity-0 pointer-events-none group-hover/dl:opacity-100 group-hover/dl:pointer-events-auto transition-all duration-300 z-0 -translate-y-2 group-hover/dl:translate-y-0">
-                            <button id="cardDownloadPdfBtn" onclick="downloadPDF()" oncontextmenu="event.preventDefault(); downloadPDF(true)" class="bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[36px] h-[36px] md:w-[44px] md:h-[44px] outline-none text-[var(--theme-color)] border-2 border-[var(--theme-color)]" aria-label="Download Card PDF">
-                                <i data-lucide="file-down" class="w-4 h-4 md:w-5 md:h-5"></i>
-                            </button>
-                        </div>
-                    </div>
+            <div id="cardContainer" class="border-[4px] md:border-[4px] border-[var(--theme-color)] relative transition-all duration-500 w-full min-h-screen group/maincard theme-blend-bg-card">
 
                     <div class="pt-6 md:pt-10 px-6 md:px-20 pb-8 md:pb-20 group/card flex flex-col h-full max-w-[1400px] mx-auto">
                         
-                        <div id="cardTitleRestore" onclick="restoreTitle()" class="hidden cursor-pointer py-2 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl border-2 border-dashed border-transparent hover:border-[var(--theme-color)] dark:hover:border-[#333] text-center text-gray-400 hover:text-[var(--theme-color)] opacity-100 lg:opacity-0 group-hover/card:opacity-100 transition-all flex items-center justify-center gap-2">
+                        <div id="cardTitleRestore" onclick="restoreTitle()" class="hidden cursor-pointer py-2 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl border-2 border-dashed border-transparent hover:border-[var(--theme-color)] dark:hover:border-[#333] text-center text-gray-400 hover:text-[var(--theme-color)] opacity-100 lg:opacity-0 lg:group-hover/card:opacity-100 transition-all flex items-center justify-center gap-2">
                             <i data-lucide="plus" class="w-4 h-4"></i> <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Add Title / Category</span>
                         </div>
 
                         <div id="cardTitleSection" class="group/title relative flex items-center flex-wrap gap-2 md:gap-4 py-1 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                             
-                            <div class="format-toolbar absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-lg border border-[#d0ebf0] dark:border-[#333] rounded-xl flex flex-wrap justify-center items-center p-1 gap-1 w-max max-w-[280px] md:max-w-none opacity-0 pointer-events-none group-focus-within/title:opacity-100 group-focus-within/title:pointer-events-auto transition-all z-20 translate-y-2 group-focus-within/title:translate-y-0">
+                            <!-- Fixed toolbar to prevent covering text -->
+                            <div class="format-toolbar fixed top-4 md:top-6 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-2xl border border-[#d0ebf0] dark:border-[#333] rounded-xl flex flex-wrap justify-center items-center p-1 gap-1 w-[90vw] sm:w-[280px] md:w-max md:max-w-none opacity-0 pointer-events-none group-focus-within/title:opacity-100 group-focus-within/title:pointer-events-auto transition-all z-[150] -translate-y-4 group-focus-within/title:translate-y-0" style="top: max(1.5rem, env(safe-area-inset-top));">
                                 <div class="relative">
                                     <button id="toolbarTitleSizeBtn" onmousedown="event.preventDefault();" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors flex items-center gap-1 text-[11px] font-bold min-w-[40px] justify-center" aria-label="Font Size">
                                         <span id="toolbarTitleSizeLabel">32</span>
@@ -193,6 +200,8 @@
                                     </button>
                                     <div id="toolbarTitleSizeDropdownMenu" onmousedown="event.preventDefault();" class="hidden absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[60] overflow-hidden w-16 max-h-48 overflow-y-auto custom-scrollbar"></div>
                                 </div>
+                                <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                <button onmousedown="event.preventDefault(); execFormat('selectAll')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-selectall" aria-label="Select All" title="Select All"><i data-lucide="scan-text" class="w-4 h-4"></i></button>
                                 <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
                                 <button onmousedown="event.preventDefault(); execFormat('justifyLeft')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-left" aria-label="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
                                 <button onmousedown="event.preventDefault(); execFormat('justifyCenter')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-center" aria-label="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
@@ -207,25 +216,23 @@
                             <h2 id="cardWord" contenteditable="true" data-placeholder="Enter Term / Title..." class="font-bold tracking-tight leading-tight outline-none flex-1 min-w-[50%]" style="text-decoration: none;"></h2>
                             <span id="cardType" contenteditable="true" data-placeholder="Category..." class="text-sm md:text-xl font-bold px-3 py-1 md:px-4 md:py-1 rounded-none outline-none min-w-[80px] empty:min-w-[100px]"></span>
                             
-                            <button id="addCategoryBtn" onclick="showCategoryDropdown(event)" class="hidden text-[9px] md:text-[10px] font-bold uppercase tracking-widest px-2 py-1 md:px-3 md:py-1 rounded-lg border-2 border-dashed border-gray-300 dark:border-[#333] text-gray-400 hover:border-[var(--theme-color)] hover:text-[var(--theme-color)] transition-all flex items-center gap-1 opacity-100 lg:opacity-0 group-hover/title:opacity-100 outline-none" aria-label="Add Category">
-                                <i data-lucide="plus" class="w-3 h-3"></i> Add Category
-                            </button>
-
-                            <button onclick="clearTitle()" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 group-hover/title:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" aria-label="Remove Title Section">
+                            <button onmousedown="event.preventDefault(); clearTitle()" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 lg:group-hover/title:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" aria-label="Remove Title Section">
                                 <i data-lucide="x" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
                             </button>
                         </div>
                         
                         <div id="cardContent" class="space-y-0 mt-1 flex-1">
-                            <div id="cardDefRestore" onclick="restoreDef()" class="hidden cursor-pointer py-2 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl border-2 border-dashed border-transparent hover:border-[var(--theme-color)] dark:hover:border-[#333] text-center text-gray-400 hover:text-[var(--theme-color)] opacity-100 lg:opacity-0 group-hover/card:opacity-100 transition-all flex items-center justify-center gap-2">
+                            <div id="cardDefRestore" onclick="restoreDef()" class="hidden cursor-pointer py-2 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl border-2 border-dashed border-transparent hover:border-[var(--theme-color)] dark:hover:border-[#333] text-center text-gray-400 hover:text-[var(--theme-color)] opacity-100 lg:opacity-0 lg:group-hover/card:opacity-100 transition-all flex items-center justify-center gap-2">
                                 <i data-lucide="plus" class="w-4 h-4"></i> <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Add Notes</span>
                             </div>
 
                             <div class="flex flex-col md:flex-row gap-4 w-full" id="inlineNotesRow">
                                 <div id="cardNotesSection" class="flex-1 group/def relative py-1 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                                    <div class="format-toolbar absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-lg border border-[#d0ebf0] dark:border-[#333] rounded-xl flex flex-wrap justify-center items-center p-1 gap-1 w-[320px] md:w-max opacity-0 pointer-events-none group-focus-within/def:opacity-100 group-hover/def:opacity-100 group-focus-within/def:pointer-events-auto group-hover/def:pointer-events-auto transition-all z-20 translate-y-2 group-hover/def:translate-y-0 group-focus-within/def:translate-y-0">
+                                    <div class="format-toolbar fixed top-4 md:top-6 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-2xl border border-[#d0ebf0] dark:border-[#333] rounded-xl flex flex-wrap justify-center items-center p-1 gap-1 w-[90vw] sm:w-[320px] md:w-max opacity-0 pointer-events-none group-focus-within/def:opacity-100 group-focus-within/def:pointer-events-auto transition-all z-[150] -translate-y-4 group-focus-within/def:translate-y-0" style="top: max(1.5rem, env(safe-area-inset-top));">
                                         <button onmousedown="event.preventDefault(); execFormat('undo')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
                                         <button onmousedown="event.preventDefault(); execFormat('redo')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
+                                        <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                        <button onmousedown="event.preventDefault(); execFormat('selectAll')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-selectall" aria-label="Select All" title="Select All"><i data-lucide="scan-text" class="w-4 h-4"></i></button>
                                         <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
                                         <button onmousedown="event.preventDefault(); execFormat('bold')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-bold" aria-label="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
                                         <button onmousedown="event.preventDefault(); execFormat('underline')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-underline" aria-label="Underline"><i data-lucide="underline" class="w-4 h-4"></i></button>
@@ -234,16 +241,16 @@
                                         <div class="relative group/colorpicker">
                                             <button onmousedown="event.preventDefault(); toggleTextColorMenu(event)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-color" aria-label="Text Color"><i data-lucide="palette" class="w-4 h-4"></i></button>
                                             <div class="text-color-menu hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] p-2 flex flex-wrap gap-1.5 rounded-xl shadow-xl z-[60] w-[165px]" onmousedown="event.preventDefault(); event.stopPropagation();" onclick="event.stopPropagation();">
-                                                <div onmousedown="event.preventDefault(); applyTextColor(activeColor)" class="dynamic-theme-color-swatch w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform" style="background-color: #51b8cb; border: 1px solid rgba(0,0,0,0.1);" aria-label="Theme Color"></div>
-                                                <div onmousedown="event.preventDefault(); applyTextColor('#ef4444')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-red-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Red"></div>
-                                                <div onmousedown="event.preventDefault(); applyTextColor('#f97316')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-orange-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Orange"></div>
-                                                <div onmousedown="event.preventDefault(); applyTextColor('#f59e0b')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-yellow-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Yellow"></div>
-                                                <div onmousedown="event.preventDefault(); applyTextColor('#84cc16')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-lime-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Lime"></div>
-                                                <div onmousedown="event.preventDefault(); applyTextColor('#10b981')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-emerald-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Green"></div>
-                                                <div onmousedown="event.preventDefault(); applyTextColor('#06b6d4')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-cyan-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Cyan"></div>
-                                                <div onmousedown="event.preventDefault(); applyTextColor('#3b82f6')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-blue-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Blue"></div>
-                                                <div onmousedown="event.preventDefault(); applyTextColor('#8b5cf6')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-violet-500" style="border: 1px solid rgba(0,0,0,0.1);" aria-label="Purple"></div>
-                                                <div onmousedown="event.preventDefault(); applyTextColor('#222222')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-gray-900" style="border: 1px solid rgba(60,60,60,1.1);" aria-label="Black"></div>
+                                                <div onmousedown="event.preventDefault(); applyTextColor(activeColor)" class="dynamic-theme-color-swatch w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform" style="background-color: #51b8cb; border: 1px solid rgba(0,0,0,0.1);"></div>
+                                                <div onmousedown="event.preventDefault(); applyTextColor('#ef4444')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-red-500" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                                <div onmousedown="event.preventDefault(); applyTextColor('#f97316')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-orange-500" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                                <div onmousedown="event.preventDefault(); applyTextColor('#f59e0b')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-yellow-500" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                                <div onmousedown="event.preventDefault(); applyTextColor('#84cc16')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-lime-500" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                                <div onmousedown="event.preventDefault(); applyTextColor('#10b981')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-emerald-500" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                                <div onmousedown="event.preventDefault(); applyTextColor('#06b6d4')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-cyan-500" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                                <div onmousedown="event.preventDefault(); applyTextColor('#3b82f6')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-blue-500" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                                <div onmousedown="event.preventDefault(); applyTextColor('#8b5cf6')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-violet-500" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                                <div onmousedown="event.preventDefault(); applyTextColor('#222222')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-gray-900" style="border: 1px solid rgba(60,60,60,1.1);"></div>
                                             </div>
                                         </div>
 
@@ -262,7 +269,7 @@
                                         <button onmousedown="event.preventDefault(); downloadNoteText('cardDef')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Download .txt" title="Download .txt"><i data-lucide="file-down" class="w-4 h-4"></i></button>
                                         
                                         <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                        <button onmousedown="event.preventDefault(); toggleSpeechToText('cardDef', false, this)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Dictate" title="Dictate"><i data-lucide="mic" class="w-4 h-4"></i></button>
+                                        <button onclick="event.preventDefault(); toggleSpeechToText('cardDef', false, this)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Dictate" title="Dictate"><i data-lucide="mic" class="w-4 h-4"></i></button>
                                         
                                         <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
                                         <button onmousedown="event.preventDefault(); addPrimaryNote('next')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" aria-label="Add Note Next To" title="Add Note Next To"><i data-lucide="panel-right" class="w-4 h-4"></i></button>
@@ -284,7 +291,7 @@
                                         </div>
                                     </div>
                                     <div id="cardDef" contenteditable="true" data-placeholder="Enter definition or notes..." class="font-medium leading-relaxed whitespace-pre-wrap outline-none" style="text-decoration: none; min-height: 1.5em;"></div>
-                                    <button onclick="clearDef()" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 group-hover/def:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" aria-label="Remove Notes Section">
+                                    <button onmousedown="event.preventDefault(); clearDef()" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 lg:group-hover/def:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" aria-label="Remove Notes Section">
                                         <i data-lucide="x" class="w-3.5 h-3.5 md:w-4 md:h-4"></i>
                                     </button>
                                 </div>
@@ -294,7 +301,7 @@
                             <div id="cardImagesContainer" class="flex flex-wrap gap-4 md:gap-9 w-full justify-center mt-2" style="padding-top: 0px;"></div>
                             <div id="cardBlocksContainer" class="w-full flex flex-col gap-2 mt-2"></div>
                             
-                            <div class="flex flex-col sm:flex-row gap-2 mt-3 w-full hidden-in-export opacity-100 lg:opacity-0 group-hover/card:opacity-100 transition-all">
+                            <div class="flex flex-col sm:flex-row gap-2 mt-3 w-full hidden-in-export opacity-100 lg:opacity-0 lg:group-hover/card:opacity-100 transition-all">
                                 <div onclick="addExtraNote()" class="flex-1 cursor-pointer py-2 px-2 md:px-4 rounded-xl md:rounded-2xl border-2 border-dashed border-transparent hover:border-[var(--theme-color)] dark:hover:border-[#333] text-center text-gray-400 hover:text-[var(--theme-color)] transition-all flex items-center justify-center gap-2">
                                     <i data-lucide="plus" class="w-4 h-4"></i> <span class="text-[10px] font-bold uppercase tracking-[0.2em]">Add Extra Note</span>
                                 </div>
@@ -306,48 +313,41 @@
             </main>
         </div>
 
-    <div id="floatingCategoryMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-48 py-1">
-        <div class="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 mb-1">Set Category</div>
-        <div id="floatingCategoryOptions" class="max-h-60 overflow-y-auto custom-scrollbar"></div>
-    </div>
-
-    <!-- Compact Right-Click Editor Toolbar -->
-    <div id="floatingImageToolbar" class="hidden fixed bg-[#1e1e1e] text-gray-300 border border-gray-700 rounded-xl shadow-2xl z-[200] flex items-center p-1.5 gap-1" onmousedown="event.stopPropagation()">
+    <!-- Inline Editor Floating Toolbar -->
+    <div id="floatingImageToolbar" class="hidden fixed bg-[#1e1e1e] text-gray-300 border border-gray-700 rounded-xl shadow-2xl z-[200] flex flex-wrap justify-center items-center p-1.5 gap-1 w-[92vw] sm:w-[360px] md:w-max md:max-w-none" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
         
         <!-- Align Tools -->
-        <button onclick="cardImgAlign('left')" class="p-1.5 hover:bg-white/10 rounded-lg transition-colors" aria-label="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
-        <button onclick="cardImgAlign('center')" class="p-1.5 hover:bg-white/10 rounded-lg transition-colors" aria-label="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
-        <button onclick="cardImgAlign('right')" class="p-1.5 hover:bg-white/10 rounded-lg transition-colors" aria-label="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+        <button onclick="cardImgAlign('left')" class="p-2 md:p-1.5 hover:bg-white/10 rounded-lg transition-colors" aria-label="Align Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
+        <button onclick="cardImgAlign('center')" class="p-2 md:p-1.5 hover:bg-white/10 rounded-lg transition-colors" aria-label="Align Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+        <button onclick="cardImgAlign('right')" class="p-2 md:p-1.5 hover:bg-white/10 rounded-lg transition-colors" aria-label="Align Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
         
         <div class="w-px h-5 bg-gray-700 mx-1"></div>
         
         <!-- Border Dropdown -->
         <div class="relative">
-            <button onclick="toggleEdMenu('borderMenu')" class="p-1.5 hover:bg-white/10 rounded-lg flex items-center gap-1 transition-colors outline-none"><i data-lucide="square" class="w-4 h-4"></i> <i data-lucide="chevron-down" class="w-3 h-3"></i></button>
-            <div id="borderMenu" class="hidden absolute top-full left-0 mt-2 bg-[#1e1e1e] border border-gray-700 rounded-lg shadow-xl w-24 p-1 max-h-40 overflow-y-auto custom-scrollbar z-[210]">
-               <!-- Populated dynamically via JS -->
-            </div>
+            <button onclick="toggleEdMenu('borderMenu')" class="p-2 md:p-1.5 hover:bg-white/10 rounded-lg flex items-center gap-1 transition-colors outline-none"><i data-lucide="square" class="w-4 h-4"></i> <i data-lucide="chevron-down" class="w-3 h-3"></i></button>
+            <div id="borderMenu" class="hidden absolute top-full left-0 mt-2 bg-[#1e1e1e] border border-gray-700 rounded-lg shadow-xl w-24 p-1 max-h-40 overflow-y-auto custom-scrollbar z-[210]"></div>
         </div>
 
         <div class="w-px h-5 bg-gray-700 mx-1"></div>
 
         <!-- Draw Tools -->
-        <button class="ed-tool-btn active p-1.5 hover:bg-white/10 rounded-lg transition-colors" data-tool="pen" title="Pen"><i data-lucide="pen-tool" class="w-4 h-4"></i></button>
-        <button class="ed-tool-btn p-1.5 hover:bg-white/10 rounded-lg transition-colors" data-tool="highlighter" title="Highlighter"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
-        <button class="ed-tool-btn p-1.5 hover:bg-white/10 rounded-lg transition-colors" data-tool="eraser" title="Eraser"><i data-lucide="eraser" class="w-4 h-4"></i></button>
-        <button class="ed-tool-btn p-1.5 hover:bg-white/10 rounded-lg transition-colors" data-tool="rect" title="Rectangle"><i data-lucide="square" class="w-4 h-4"></i></button>
-        <button class="ed-tool-btn p-1.5 hover:bg-white/10 rounded-lg transition-colors" data-tool="circle" title="Circle"><i data-lucide="circle" class="w-4 h-4"></i></button>
-        <button class="ed-tool-btn p-1.5 hover:bg-white/10 rounded-lg transition-colors" data-tool="arrow" title="Arrow"><i data-lucide="move-up-right" class="w-4 h-4"></i></button>
+        <button class="ed-tool-btn active p-2 md:p-1.5 hover:bg-white/10 rounded-lg transition-colors" data-tool="pen" title="Pen"><i data-lucide="pen-tool" class="w-4 h-4"></i></button>
+        <button class="ed-tool-btn p-2 md:p-1.5 hover:bg-white/10 rounded-lg transition-colors" data-tool="highlighter" title="Highlighter"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
+        <button class="ed-tool-btn p-2 md:p-1.5 hover:bg-white/10 rounded-lg transition-colors" data-tool="eraser" title="Eraser"><i data-lucide="eraser" class="w-4 h-4"></i></button>
+        <button class="ed-tool-btn p-2 md:p-1.5 hover:bg-white/10 rounded-lg transition-colors" data-tool="rect" title="Rectangle"><i data-lucide="square" class="w-4 h-4"></i></button>
+        <button class="ed-tool-btn p-2 md:p-1.5 hover:bg-white/10 rounded-lg transition-colors" data-tool="circle" title="Circle"><i data-lucide="circle" class="w-4 h-4"></i></button>
+        <button class="ed-tool-btn p-2 md:p-1.5 hover:bg-white/10 rounded-lg transition-colors" data-tool="arrow" title="Arrow"><i data-lucide="move-up-right" class="w-4 h-4"></i></button>
 
         <div class="w-px h-5 bg-gray-700 mx-1"></div>
 
         <!-- Color & Size -->
         <div class="relative">
-            <button onclick="toggleEdMenu('colorMenu')" class="p-1.5 hover:bg-white/10 rounded-lg flex items-center gap-1 transition-colors outline-none">
+            <button onclick="toggleEdMenu('colorMenu')" class="p-2 md:p-1.5 hover:bg-white/10 rounded-lg flex items-center gap-1 transition-colors outline-none">
                 <div id="edCurrentColor" class="w-3.5 h-3.5 rounded-full border border-gray-500 shadow-sm" style="background-color: #ef4444;"></div>
                 <i data-lucide="chevron-down" class="w-3 h-3"></i>
             </button>
-            <div id="colorMenu" class="hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-[#252525] border border-gray-700 rounded-xl shadow-xl w-[200px] p-3 z-[210] cursor-default" onmousedown="event.stopPropagation()">
+            <div id="colorMenu" class="hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-[#252525] border border-gray-700 rounded-xl shadow-xl w-[200px] p-3 z-[210] cursor-default" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
                 <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Colors</div>
                 <div class="flex flex-wrap gap-2 mb-3">
                     <button class="ed-color-btn w-6 h-6 rounded-full border-2 border-transparent hover:scale-110 transition scale-110 border-white" style="background-color: #ef4444;" data-color="#ef4444"></button>
@@ -368,24 +368,139 @@
 
         <div class="w-px h-5 bg-gray-700 mx-1"></div>
         
-        <button onclick="edUndo()" class="p-1.5 hover:bg-white/10 rounded-lg transition-colors" title="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
-        <button onclick="edRedo()" class="p-1.5 hover:bg-white/10 rounded-lg transition-colors" title="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
+        <button onclick="edUndo()" class="p-2 md:p-1.5 hover:bg-white/10 rounded-lg transition-colors" title="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
+        <button onclick="edRedo()" class="p-2 md:p-1.5 hover:bg-white/10 rounded-lg transition-colors" title="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
 
         <div class="w-px h-5 bg-gray-700 mx-1"></div>
 
-        <button onclick="closeInlineEditor(false)" class="p-1.5 text-gray-400 hover:text-rose-400 hover:bg-white/10 rounded-lg transition-colors" title="Cancel"><i data-lucide="x" class="w-4 h-4"></i></button>
-        <button onclick="saveInlineEditor()" class="p-1.5 text-gray-400 hover:text-emerald-400 hover:bg-white/10 rounded-lg transition-colors" title="Save"><i data-lucide="check" class="w-4 h-4"></i></button>
+        <button onclick="closeInlineEditor(false)" class="p-2 md:p-1.5 text-gray-400 hover:text-rose-400 hover:bg-white/10 rounded-lg transition-colors" title="Cancel"><i data-lucide="x" class="w-4 h-4"></i></button>
+        <button onclick="saveInlineEditor()" class="p-2 md:p-1.5 text-gray-400 hover:text-emerald-400 hover:bg-white/10 rounded-lg transition-colors" title="Save"><i data-lucide="check" class="w-4 h-4"></i></button>
     </div>
 
+    <!-- Enhanced Responsive Standalone Image Editor Modal -->
+    <div id="standaloneImageEditor" class="hidden fixed inset-0 z-[300] bg-black/95 flex flex-col items-center justify-between touch-none select-none backdrop-blur-sm" style="padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);">
+        
+        <!-- Header Bar -->
+        <header class="w-full px-4 py-3 bg-[#181818]/90 border-b border-gray-800/80 flex items-center justify-between z-30 shrink-0">
+            <div class="flex items-center gap-2">
+                <button onclick="closeStandaloneEditor()" class="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl transition flex items-center gap-1.5 text-xs font-semibold">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Back</span>
+                </button>
+                <div class="w-px h-4 bg-gray-800 mx-1"></div>
+                <span class="text-xs font-bold uppercase tracking-wider text-gray-300 flex items-center gap-1.5">
+                    <i data-lucide="image-play" class="w-4 h-4 text-[var(--theme-color)]"></i>
+                    <span>Image Studio</span>
+                </span>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button onclick="document.getElementById('standaloneImageInput').click()" class="px-3 py-1.5 text-xs font-medium text-gray-300 bg-white/5 hover:bg-white/10 border border-gray-700/60 rounded-xl transition flex items-center gap-1.5 shadow-sm">
+                    <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                    <span class="hidden sm:inline">Upload</span>
+                </button>
+                <button onclick="saRotate()" id="saRotateBtn" class="p-2 text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 border border-gray-700/60 rounded-xl transition shadow-sm" title="Rotate 90°">
+                    <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+                </button>
+                <button onclick="saClearCanvas()" id="saClearBtn" class="p-2 text-rose-400 hover:text-rose-300 bg-white/5 hover:bg-rose-500/10 border border-gray-700/60 rounded-xl transition shadow-sm" title="Reset Image">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+                <button onclick="insertStandaloneToCard()" id="saInsertCardBtn" class="px-3 py-1.5 text-xs font-medium text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 rounded-xl transition flex items-center gap-1.5 shadow-sm">
+                    <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+                    <span class="hidden md:inline">Add to Card</span>
+                </button>
+                <button onclick="downloadStandaloneImage()" id="saDownloadBtn" class="px-3.5 py-1.5 text-xs font-bold text-black bg-[var(--theme-color)] hover:brightness-110 rounded-xl transition flex items-center gap-1.5 shadow-lg">
+                    <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                    <span>Export</span>
+                </button>
+            </div>
+        </header>
+
+        <input type="file" id="standaloneImageInput" class="hidden" accept="image/*">
+        
+        <!-- Canvas Stage / Viewport -->
+        <main id="saCanvasContainer" class="relative flex-1 w-full h-full flex items-center justify-center p-3 md:p-6 overflow-hidden">
+            <div id="saPlaceholder" class="flex flex-col items-center justify-center gap-3 p-8 border-2 border-dashed border-gray-700/80 rounded-3xl cursor-pointer hover:border-[var(--theme-color)] text-gray-400 hover:text-white transition group bg-white/5 max-w-sm w-full" onclick="document.getElementById('standaloneImageInput').click()">
+                <div class="w-16 h-16 rounded-2xl bg-black/40 border border-gray-700/50 flex items-center justify-center group-hover:scale-110 transition text-[var(--theme-color)] shadow-xl">
+                    <i data-lucide="image-plus" class="w-8 h-8"></i>
+                </div>
+                <div class="text-center">
+                    <p class="text-sm font-bold">Upload an image to start</p>
+                    <p class="text-[11px] text-gray-500 mt-0.5">JPG, PNG, WebP supported</p>
+                </div>
+            </div>
+
+            <div id="saCanvasWrapper" class="relative hidden max-w-full max-h-full flex items-center justify-center shadow-2xl rounded-2xl overflow-hidden border border-gray-800">
+                <canvas id="saCanvas" class="block max-w-full max-h-full object-contain pointer-events-none"></canvas>
+                <canvas id="saTempCanvas" class="editor-canvas-layer absolute top-0 left-0 w-full h-full cursor-crosshair z-10"></canvas>
+            </div>
+        </main>
+
+        <!-- Bottom Responsive Floating Toolbar -->
+        <footer class="w-full px-3 py-2.5 bg-[#181818]/95 border-t border-gray-800/80 flex flex-col md:flex-row items-center justify-between gap-2.5 z-30 shrink-0">
+            
+            <!-- Left / Main Tools -->
+            <div class="flex items-center gap-1 overflow-x-auto custom-scrollbar w-full md:w-auto pb-1 md:pb-0 justify-between md:justify-start">
+                <div class="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-gray-800">
+                    <button class="sa-tool-btn active p-2 text-gray-300 hover:text-white rounded-lg transition" data-tool="pen" title="Pen"><i data-lucide="pen-tool" class="w-4 h-4"></i></button>
+                    <button class="sa-tool-btn p-2 text-gray-300 hover:text-white rounded-lg transition" data-tool="highlighter" title="Highlighter"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
+                    <button class="sa-tool-btn p-2 text-gray-300 hover:text-white rounded-lg transition" data-tool="eraser" title="Eraser"><i data-lucide="eraser" class="w-4 h-4"></i></button>
+                </div>
+                
+                <div class="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-gray-800">
+                    <button class="sa-tool-btn p-2 text-gray-300 hover:text-white rounded-lg transition" data-tool="rect" title="Rectangle"><i data-lucide="square" class="w-4 h-4"></i></button>
+                    <button class="sa-tool-btn p-2 text-gray-300 hover:text-white rounded-lg transition" data-tool="circle" title="Circle"><i data-lucide="circle" class="w-4 h-4"></i></button>
+                    <button class="sa-tool-btn p-2 text-gray-300 hover:text-white rounded-lg transition" data-tool="arrow" title="Arrow"><i data-lucide="move-up-right" class="w-4 h-4"></i></button>
+                </div>
+
+                <div class="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-gray-800">
+                    <button onclick="saUndo()" class="p-2 text-gray-400 hover:text-white rounded-lg transition" title="Undo"><i data-lucide="undo" class="w-4 h-4"></i></button>
+                    <button onclick="saRedo()" class="p-2 text-gray-400 hover:text-white rounded-lg transition" title="Redo"><i data-lucide="redo" class="w-4 h-4"></i></button>
+                </div>
+            </div>
+
+            <!-- Right Controls (Colors & Brush Slider) -->
+            <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+                <!-- Color Bubbles Palette -->
+                <div class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar py-1">
+                    <button class="sa-color-btn w-6 h-6 rounded-full border-2 border-white scale-110 transition shrink-0" style="background-color: #ef4444;" data-color="#ef4444"></button>
+                    <button class="sa-color-btn w-6 h-6 rounded-full border-2 border-transparent hover:scale-110 transition shrink-0" style="background-color: #f59e0b;" data-color="#f59e0b"></button>
+                    <button class="sa-color-btn w-6 h-6 rounded-full border-2 border-transparent hover:scale-110 transition shrink-0" style="background-color: #22c55e;" data-color="#22c55e"></button>
+                    <button class="sa-color-btn w-6 h-6 rounded-full border-2 border-transparent hover:scale-110 transition shrink-0" style="background-color: #06b6d4;" data-color="#06b6d4"></button>
+                    <button class="sa-color-btn w-6 h-6 rounded-full border-2 border-transparent hover:scale-110 transition shrink-0" style="background-color: #3b82f6;" data-color="#3b82f6"></button>
+                    <button class="sa-color-btn w-6 h-6 rounded-full border-2 border-transparent hover:scale-110 transition shrink-0" style="background-color: #a855f7;" data-color="#a855f7"></button>
+                    <button class="sa-color-btn w-6 h-6 rounded-full border-2 border-transparent hover:scale-110 transition shrink-0" style="background-color: #ffffff;" data-color="#ffffff"></button>
+                    <button class="sa-color-btn w-6 h-6 rounded-full border-2 border-transparent hover:scale-110 transition shrink-0" style="background-color: #000000;" data-color="#000000"></button>
+                    
+                    <label class="relative w-6 h-6 rounded-full border border-gray-600 flex items-center justify-center cursor-pointer hover:scale-110 transition shrink-0 bg-gradient-to-tr from-pink-500 via-amber-400 to-cyan-400" title="Custom Color">
+                        <input type="color" id="saColor" value="#ef4444" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer">
+                    </label>
+                </div>
+
+                <!-- Size Slider -->
+                <div class="flex items-center gap-2 bg-black/40 px-2.5 py-1.5 rounded-xl border border-gray-800 shrink-0">
+                    <div id="saSizePreview" class="w-3.5 h-3.5 rounded-full bg-red-500 transition-all"></div>
+                    <input type="range" id="saSize" min="1" max="60" value="6" class="w-16 sm:w-24 cursor-pointer">
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Context / Floating Menu -->
     <div id="floatingPreviewMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-64 py-1">
         
-        <!-- Cards List integrated into context menu -->
         <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center gap-2">
-            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex-1">Your Cards</span>
-            <button onclick="document.getElementById('fileImportInput').click()" class="cursor-pointer transition-all hover:scale-110 outline-none flex items-center justify-center text-gray-400 hover:text-[var(--theme-color)] drop-shadow-sm" aria-label="Import PNG/PDF">
+            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex-1">Cards & Export</span>
+            <button id="cardDownloadBtnCtx" onclick="downloadPNG()" class="cursor-pointer transition-all hover:scale-110 outline-none flex items-center justify-center text-gray-400 hover:text-[var(--theme-color)] drop-shadow-sm" aria-label="Download PNG" title="Download Image">
+                <i data-lucide="download" class="w-4 h-4"></i>
+            </button>
+            <button id="cardDownloadPdfBtnCtx" onclick="downloadPDF()" oncontextmenu="event.preventDefault(); downloadPDF(true)" class="cursor-pointer transition-all hover:scale-110 outline-none flex items-center justify-center text-gray-400 hover:text-[var(--theme-color)] drop-shadow-sm" aria-label="Download PDF" title="Download PDF">
+                <i data-lucide="file-down" class="w-4 h-4"></i>
+            </button>
+            <button onclick="document.getElementById('fileImportInput').click()" class="cursor-pointer transition-all hover:scale-110 outline-none flex items-center justify-center text-gray-400 hover:text-[var(--theme-color)] drop-shadow-sm" aria-label="Import PNG/PDF" title="Import">
                 <i data-lucide="upload" class="w-4 h-4"></i>
             </button>
-            <button onclick="createCard()" oncontextmenu="event.preventDefault(); createCard(true);" class="cursor-pointer transition-all hover:scale-110 hover:rotate-90 duration-300 outline-none flex items-center justify-center text-[#e7f135] hover:text-[#51b8cb] drop-shadow-sm" aria-label="New Card">
+            <button onclick="createCard()" oncontextmenu="event.preventDefault(); createCard(true);" class="cursor-pointer transition-all hover:scale-110 hover:rotate-90 duration-300 outline-none flex items-center justify-center text-[#e7f135] hover:text-[#51b8cb] drop-shadow-sm" aria-label="New Card" title="New Card">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 md:w-5 md:h-5">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -416,9 +531,27 @@
         <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800">
             <div class="flex justify-between items-center mb-1">
                 <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Card Border</span>
-                <span id="cardBorderValueLabel" class="text-[10px] font-bold text-[var(--theme-color)]">12px</span>
+                <span id="cardBorderValueLabel" class="text-[10px] font-bold text-[var(--theme-color)]">4px</span>
             </div>
-            <input type="range" id="inputCardBorder" min="0" max="40" value="12" class="w-full cursor-pointer">
+            <input type="range" id="inputCardBorder" min="0" max="40" value="4" class="w-full cursor-pointer">
+        </div>
+
+        <div class="py-1 border-b border-gray-100 dark:border-gray-800">
+            <div onclick="openStandaloneImageEditor()" class="dropdown-item flex items-center justify-between gap-2 transition-colors">
+                <div class="flex items-center gap-2"><i data-lucide="image-play" class="w-4 h-4"></i> Image Editor Studio</div>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-400"></i>
+            </div>
+        </div>
+
+        <div class="py-1 border-b border-gray-100 dark:border-gray-800">
+            <div id="categoryMenuBtn" class="dropdown-item flex items-center justify-between gap-2 transition-colors">
+                <div class="flex items-center gap-2"><i data-lucide="tag" class="w-4 h-4"></i> Category</div>
+                <div class="flex items-center gap-1">
+                    <span id="categoryLabel" class="text-[10px] font-bold text-[var(--theme-color)] uppercase tracking-widest">-</span>
+                    <i data-lucide="chevron-down" class="w-3 h-3 transition-transform text-gray-400" id="categoryChevron"></i>
+                </div>
+            </div>
+            <div id="floatingCategoryOptions" class="hidden py-1 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mt-1 mb-1 max-h-40 overflow-y-auto custom-scrollbar"></div>
         </div>
 
         <div class="py-1 border-b border-gray-100 dark:border-gray-800">
@@ -489,7 +622,7 @@
         const fontMap = {
             'Caveat': "'Caveat', cursive",
             'Poppins': "'Poppins', sans-serif",
-            'Helvetica': "Helvetica, Arial, sans-serif"
+            'DM Serif Display': "'DM Serif Display', serif"
         };
 
         let activeColor = "#51b8cb", hue = 189, saturation = 60, brightness = 80;
@@ -497,20 +630,29 @@
         let cards = [], activeCardId = null, isSwitching = false;
         
         let currentSelectedCategory = "-", currentSelectedSize = 32, currentSelectedDefSize = 24, currentSelectedExtraDefSize = 24;
-        let currentImageBorder = 2, currentImageCols = 0, currentBlendPercentage = 20, currentCardBorder = 12, deferredPrompt = null;
+        let currentImageBorder = 2, currentImageCols = 0, currentBlendPercentage = 20, currentCardBorder = 4, deferredPrompt = null;
         let currentFontFamily = 'Caveat';
         let showTitlePlaceholder = true, showDefPlaceholder = true;
         
         let activeImageIdx = -1, activeBlockIdx = -1, activeImageIsGroup = false;
-        
         let isDraggingImage = false, dragStartX = 0, dragImageIdx = -1, dragIsGroup = false, dragBlockIdx = -1, dragStartScale = 100;
         let dragWithCtrl = false, dragStartXOffset = 0;
         
         let imageUndoStack = [], imageRedoStack = [], isImageUndoingRedoing = false, stateBeforeDrag = null;
+        let recognition = null, isRecording = false, activeMicBtn = null;
 
-        let recognition = null;
-        let isRecording = false;
-        let activeMicBtn = null;
+        window.toggleMobileMenu = function(e) {
+            e.preventDefault(); e.stopPropagation();
+            const menu = document.getElementById('floatingPreviewMenu');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                menu.style.left = '50%';
+                menu.style.top = '50%';
+                menu.style.transform = 'translate(-50%, -50%)';
+            } else {
+                menu.classList.add('hidden');
+            }
+        };
 
         window.toggleSpeechToText = function(targetIdx, isBlock, btnEl) {
             if (isRecording) {
@@ -532,6 +674,8 @@
             recognition.continuous = true;
             recognition.interimResults = true;
 
+            let handledResults = new Set();
+
             recognition.onstart = function() {
                 isRecording = true;
                 activeMicBtn = btnEl;
@@ -541,20 +685,25 @@
             };
 
             recognition.onresult = function(event) {
-                let finalTranscript = '';
+                let newText = '';
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
                     if (event.results[i].isFinal) {
-                        finalTranscript += event.results[i][0].transcript;
+                        const transcript = event.results[i][0].transcript;
+                        const uniqueId = i + '-' + transcript;
+                        if (!handledResults.has(uniqueId)) {
+                            handledResults.add(uniqueId);
+                            newText += transcript;
+                        }
                     }
                 }
-                if (finalTranscript) {
+                if (newText) {
                     if (document.activeElement !== el) {
                         el.focus();
                         const selection = window.getSelection();
                         selection.selectAllChildren(el);
                         selection.collapseToEnd();
                     }
-                    document.execCommand('insertText', false, finalTranscript + ' ');
+                    document.execCommand('insertText', false, newText + ' ');
                     syncCardState();
                 }
             };
@@ -710,45 +859,17 @@
                     else itemClass += 'hover:bg-black/5 dark:hover:bg-white/5';
                     item.className = itemClass;
                     
-                    item.draggable = true;
-                    item.addEventListener('dragstart', (e) => {
-                        e.dataTransfer.effectAllowed = 'move';
-                        e.dataTransfer.setData('text/plain', cards.indexOf(c));
-                        setTimeout(() => item.classList.add('opacity-40'), 0);
-                    });
-                    item.addEventListener('dragover', (e) => {
-                        e.preventDefault();
-                        e.dataTransfer.dropEffect = 'move';
-                        item.classList.add('bg-black/10', 'dark:bg-white/10', 'scale-[1.02]');
-                    });
-                    item.addEventListener('dragleave', () => item.classList.remove('bg-black/10', 'dark:bg-white/10', 'scale-[1.02]'));
-                    item.addEventListener('drop', (e) => {
-                        e.preventDefault(); e.stopPropagation();
-                        item.classList.remove('bg-black/10', 'dark:bg-white/10', 'scale-[1.02]');
-                        const fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
-                        const toIdx = cards.indexOf(c);
-                        if (fromIdx !== toIdx && !isNaN(fromIdx)) {
-                            const moved = cards.splice(fromIdx, 1)[0];
-                            cards.splice(toIdx, 0, moved);
-                            saveCardsToStorage();
-                            populateHeaderCardsList();
-                        }
-                    });
-                    item.addEventListener('dragend', () => {
-                        item.classList.remove('opacity-40');
-                        document.querySelectorAll('#headerCardsList .dropdown-item').forEach(el => el.classList.remove('bg-black/10', 'dark:bg-white/10', 'scale-[1.02]'));
-                    });
-
                     const cardColor = c.color && c.color.hex ? c.color.hex : '#51b8cb';
                     item.style.color = cardColor;
                     
                     const leftPart = document.createElement('div');
                     leftPart.className = 'flex items-center gap-2 overflow-hidden flex-1';
-                    leftPart.innerHTML = `<i data-lucide="grip-vertical" class="w-3 h-3 opacity-0 group-hover/carditem:opacity-50 hover:!opacity-100 cursor-grab active:cursor-grabbing shrink-0 transition-opacity text-gray-400 dark:text-gray-500"></i><i data-lucide="${isActive ? 'check-circle' : 'layout-template'}" class="w-4 h-4 shrink-0"></i> <span class="truncate ${isActive ? 'font-bold' : ''}">${c.title.trim() || 'Card ' + (cards.indexOf(c) + 1)}</span>`;
+                    
+                    leftPart.innerHTML = `<i data-lucide="grip-vertical" class="w-3 h-3 opacity-100 lg:opacity-0 lg:group-hover/carditem:opacity-50 hover:!opacity-100 cursor-grab active:cursor-grabbing shrink-0 transition-opacity text-gray-400 dark:text-gray-500"></i><i data-lucide="${isActive ? 'check-circle' : 'layout-template'}" class="w-4 h-4 shrink-0"></i> <span class="truncate ${isActive ? 'font-bold' : ''}">${c.title.trim() || 'Card ' + (cards.indexOf(c) + 1)}</span>`;
                     
                     const delBtn = document.createElement('button');
-                    delBtn.className = 'text-gray-400 hover:text-rose-500 transition-colors p-1 rounded-md opacity-0 group-hover/carditem:opacity-100 outline-none shrink-0';
-                    delBtn.innerHTML = '<i data-lucide="trash-2" class="w-3.5 h-3.5"></i>';
+                    delBtn.className = 'text-gray-400 hover:text-rose-500 transition-colors p-1.5 md:p-1 rounded-md opacity-100 lg:opacity-0 lg:group-hover/carditem:opacity-100 outline-none shrink-0';
+                    delBtn.innerHTML = '<i data-lucide="trash-2" class="w-4 h-4 md:w-3.5 md:h-3.5"></i>';
                     delBtn.setAttribute('aria-label', 'Delete Card');
                     if (cards.length <= 1) delBtn.style.display = 'none';
 
@@ -773,6 +894,22 @@
                     item.appendChild(delBtn);
                     list.appendChild(item);
                 });
+                
+                if (window.cardSortable) window.cardSortable.destroy();
+                window.cardSortable = new Sortable(list, {
+                    animation: 150,
+                    handle: '.cursor-grab',
+                    onEnd: function (evt) {
+                        const fromIdx = evt.oldIndex;
+                        const toIdx = evt.newIndex;
+                        if (fromIdx !== toIdx && fromIdx !== undefined && toIdx !== undefined) {
+                            const moved = cards.splice(fromIdx, 1)[0];
+                            cards.splice(toIdx, 0, moved);
+                            saveCardsToStorage();
+                            populateHeaderCardsList();
+                        }
+                    }
+                });
             }
             if (typeof lucide !== 'undefined') lucide.createIcons();
         };
@@ -796,6 +933,7 @@
 
             const menu = document.getElementById('floatingPreviewMenu');
             menu.classList.remove('hidden');
+            menu.style.transform = 'none'; 
             requestAnimationFrame(() => {
                 const rect = menu.getBoundingClientRect();
                 let x = e.clientX, y = e.clientY;
@@ -1003,8 +1141,10 @@
         };
         
         function closeEdMenus() {
-            document.getElementById('borderMenu').classList.add('hidden');
-            document.getElementById('colorMenu').classList.add('hidden');
+            const bMenu = document.getElementById('borderMenu');
+            if (bMenu) bMenu.classList.add('hidden');
+            const cMenu = document.getElementById('colorMenu');
+            if (cMenu) cMenu.classList.add('hidden');
         }
 
         function closeAllDropdowns() { 
@@ -1017,15 +1157,12 @@
             if (!e.target.closest('.btn-format-color') && !e.target.closest('.text-color-menu')) {
                 document.querySelectorAll('.text-color-menu').forEach(el => el.classList.add('hidden'));
             }
-            if (!e.target.closest('[id$="Btn"]') && !e.target.closest('.format-toolbar')) {
+            if (!e.target.closest('[id$="Btn"]') && !e.target.closest('.format-toolbar') && e.target.id !== 'mobileFab' && !e.target.closest('#mobileFab')) {
                 document.querySelectorAll('[id$="DropdownMenu"]').forEach(el => el.classList.add('hidden')); 
             }
             
-            const catMenu = document.getElementById('floatingCategoryMenu');
-            if(catMenu) catMenu.classList.add('hidden'); 
-            
             const prevM = document.getElementById('floatingPreviewMenu'); 
-            if(prevM && !prevM.classList.contains('hidden')) {
+            if(prevM && !prevM.classList.contains('hidden') && e.target.id !== 'mobileFab' && !e.target.closest('#mobileFab')) {
                 if (!prevM.contains(e.target)) {
                     prevM.classList.add('hidden');
                     const layoutOptions = document.getElementById('floatingLayoutOptions');
@@ -1034,29 +1171,15 @@
                     if (themeColorOptions) themeColorOptions.classList.add('hidden');
                     const fontOptions = document.getElementById('floatingFontFamilyOptions');
                     if (fontOptions) fontOptions.classList.add('hidden');
+                    const catOptions = document.getElementById('floatingCategoryOptions');
+                    if (catOptions) catOptions.classList.add('hidden');
                     
                     const themeChev = document.getElementById('themeColorChevron'); if(themeChev) themeChev.classList.remove('rotate-180');
                     const fontChev = document.getElementById('fontFamilyChevron'); if(fontChev) fontChev.classList.remove('rotate-180');
+                    const catChev = document.getElementById('categoryChevron'); if(catChev) catChev.classList.remove('rotate-180');
                 }
             }
         });
-
-        function showFloatingCategoryMenu(x, y) {
-            const menu = document.getElementById('floatingCategoryMenu');
-            menu.classList.remove('hidden');
-            requestAnimationFrame(() => {
-                const rect = menu.getBoundingClientRect();
-                if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
-                if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
-                menu.style.left = x + 'px'; menu.style.top = y + 'px';
-            });
-        }
-
-        window.showCategoryDropdown = function(e) {
-            e.stopPropagation();
-            const rect = e.currentTarget.getBoundingClientRect();
-            showFloatingCategoryMenu(rect.left, rect.bottom + 5);
-        };
 
         function initFloatingMenu() {
             const defSizes = [24, 28, 32, 36, 40, 48, 64, 80];
@@ -1082,22 +1205,32 @@
                 if (titleMenu) titleMenu.appendChild(item);
             });
 
-            const catMenu = document.getElementById('floatingCategoryMenu'), catContainer = document.getElementById('floatingCategoryOptions');
+            const catContainer = document.getElementById('floatingCategoryOptions');
             if (catContainer) {
                 catContainer.innerHTML = '';
                 const manualItem = document.createElement('div');
                 manualItem.className = 'dropdown-item text-[#51b8cb] flex items-center gap-2 italic';
                 manualItem.innerHTML = `<i data-lucide="edit-3" class="w-3 h-3"></i> Custom Entry...`;
-                manualItem.onclick = (e) => { e.stopPropagation(); restoreCategory(); catMenu.classList.add('hidden'); };
+                manualItem.onclick = (e) => { e.stopPropagation(); restoreCategory(); catContainer.classList.add('hidden'); document.getElementById('categoryChevron').classList.remove('rotate-180'); };
                 catContainer.appendChild(manualItem);
 
                 ["-", ...Object.keys(categoryColors)].forEach(cat => {
                     const item = document.createElement('div');
                     item.className = 'dropdown-item text-gray-700 dark:text-gray-300';
                     item.innerText = cat;
-                    item.onclick = (e) => { e.stopPropagation(); selectCategory(cat); catMenu.classList.add('hidden'); };
+                    item.onclick = (e) => { e.stopPropagation(); selectCategory(cat); catContainer.classList.add('hidden'); document.getElementById('categoryChevron').classList.remove('rotate-180'); };
                     catContainer.appendChild(item);
                 });
+            }
+            
+            const catMenuBtn = document.getElementById('categoryMenuBtn');
+            if (catMenuBtn) {
+                catMenuBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    if (catContainer) catContainer.classList.toggle('hidden');
+                    const chevron = document.getElementById('categoryChevron');
+                    if (chevron) chevron.classList.toggle('rotate-180');
+                };
             }
 
             const borderMenu = document.getElementById('borderMenu');
@@ -1139,7 +1272,7 @@
             const fontOptionsContainer = document.getElementById('floatingFontFamilyOptions');
             if (fontOptionsContainer) {
                 fontOptionsContainer.innerHTML = '';
-                ['Caveat', 'Poppins', 'Helvetica'].forEach(f => {
+                ['Caveat', 'Poppins', 'DM Serif Display'].forEach(f => {
                     const item = document.createElement('div');
                     item.className = 'dropdown-item text-gray-700 dark:text-gray-300';
                     item.innerText = f;
@@ -1161,7 +1294,7 @@
                     e.stopPropagation();
                     if (fontOptionsContainer) fontOptionsContainer.classList.toggle('hidden');
                     const chevron = document.getElementById('fontFamilyChevron');
-                    if (chevron) chevron.classList.toggle('rotate-180');
+                    if (chevron) chevron.classList.remove('rotate-180');
                 };
             }
 
@@ -1186,6 +1319,8 @@
 
         function selectCategory(cat) { 
             currentSelectedCategory = cat; 
+            const catLabel = document.getElementById('categoryLabel');
+            if (catLabel) catLabel.innerText = cat;
             if (cat !== '-' && categoryColors[cat]) setManualColor(categoryColors[cat]); 
             updatePreview(); 
         }
@@ -1223,7 +1358,13 @@
         window.clearDef = function() { document.getElementById('inputDef').value = ''; showDefPlaceholder = false; updatePreview(); };
         window.restoreTitle = function() { showTitlePlaceholder = true; updatePreview(); setTimeout(() => document.getElementById('cardWord').focus(), 50); };
         window.restoreDef = function() { showDefPlaceholder = true; updatePreview(); setTimeout(() => document.getElementById('cardDef').focus(), 50); };
-        window.restoreCategory = function() { currentSelectedCategory = ''; updatePreview(); setTimeout(() => document.getElementById('cardType').focus(), 50); };
+        window.restoreCategory = function() { 
+            currentSelectedCategory = ''; 
+            const catLabel = document.getElementById('categoryLabel');
+            if (catLabel) catLabel.innerText = 'Custom';
+            updatePreview(); 
+            setTimeout(() => document.getElementById('cardType').focus(), 50); 
+        };
 
         function getSelectionStyle(styleName) {
             const sel = window.getSelection(); if (!sel.rangeCount) return null;
@@ -1379,8 +1520,21 @@
             window.addEventListener('touchmove', (e) => handleImageResizeMove(e), { passive: false });
             window.addEventListener('touchend', handleImageResizeEnd);
             
-            window.addEventListener('resize', () => { if (edTarget.imgIdx !== -1) closeInlineEditor(false); });
+            window.addEventListener('resize', () => { 
+                if (edTarget.imgIdx !== -1) closeInlineEditor(false); 
+                if (saImg && !document.getElementById('standaloneImageEditor').classList.contains('hidden')) {
+                    recalculateSaCanvasScale();
+                }
+            });
+
             window.addEventListener('mousedown', (e) => {
+                if (edTarget.imgIdx !== -1) {
+                    const toolbar = document.getElementById('floatingImageToolbar');
+                    const wrapper = edTarget.imgEl ? edTarget.imgEl.parentElement : null;
+                    if (toolbar && !toolbar.contains(e.target) && wrapper && !wrapper.contains(e.target)) closeInlineEditor(false);
+                }
+            });
+            window.addEventListener('touchstart', (e) => {
                 if (edTarget.imgIdx !== -1) {
                     const toolbar = document.getElementById('floatingImageToolbar');
                     const wrapper = edTarget.imgEl ? edTarget.imgEl.parentElement : null;
@@ -1414,7 +1568,6 @@
             isDraggingImage = true; dragIsGroup = isGroup; dragBlockIdx = blockIdx; dragImageIdx = imgIdx; 
             dragStartX = (e.type === 'touchstart') ? e.touches[0].clientX : e.clientX; 
             
-            // Accept Shift, Alt, or Ctrl for drag translations
             dragWithCtrl = e.shiftKey || e.altKey || e.ctrlKey || e.metaKey;
             
             if (dragWithCtrl) {
@@ -1493,6 +1646,12 @@
                 const onMouseUp = () => { document.removeEventListener('mousemove', onMouseMove); document.removeEventListener('mouseup', onMouseUp); }; 
                 document.addEventListener('mousemove', onMouseMove); document.addEventListener('mouseup', onMouseUp); 
             });
+            map.addEventListener('touchstart', (e) => { 
+                handleMapSelection(e); 
+                const onTouchMove = (moveEvent) => handleMapSelection(moveEvent);
+                const onTouchEnd = () => { document.removeEventListener('touchmove', onTouchMove); document.removeEventListener('touchend', onTouchEnd); }; 
+                document.addEventListener('touchmove', onTouchMove, {passive: false}); document.addEventListener('touchend', onTouchEnd); 
+            }, {passive: false});
         }
 
         function calculateActiveColor() {
@@ -1582,7 +1741,7 @@
                 id: 'card_' + Date.now() + Math.random().toString(36).substr(2, 9), 
                 title: '', category: '-', definition: '', blocks: [], images: [],
                 color: { hex: genColor, hue: genHue, sat: genSat, bri: genBri }, 
-                textSize: 32, defSize: 24, imageBorder: 2, imageCols: 0, blend: 20, cardBorder: 12,
+                textSize: 32, defSize: 24, imageBorder: 2, imageCols: 0, blend: 20, cardBorder: 4,
                 fontFamily: 'Caveat',
                 showTitlePlaceholder: true, showDefPlaceholder: false 
             }; 
@@ -1616,7 +1775,7 @@
             const tL = document.getElementById('toolbarTitleSizeLabel'); if (tL) tL.innerText = card.textSize || 32; 
             
             currentBlendPercentage = card.blend !== undefined ? card.blend : 20; document.getElementById('blendValueLabel').innerText = currentBlendPercentage + '%'; 
-            currentCardBorder = card.cardBorder !== undefined ? card.cardBorder : 12;
+            currentCardBorder = card.cardBorder !== undefined ? card.cardBorder : 4;
             const borderSlider = document.getElementById('inputCardBorder'); if(borderSlider) borderSlider.value = currentCardBorder;
             const borderLabel = document.getElementById('cardBorderValueLabel'); if(borderLabel) borderLabel.innerText = currentCardBorder + 'px';
 
@@ -1649,8 +1808,9 @@
 
             const bVL = document.getElementById('blendValueLabel'); if (bVL) bVL.style.color = finalColor;
             const themeColorBtn = document.getElementById('themeColorToggleBtn'); if (themeColorBtn) themeColorBtn.style.color = finalColor;
-            const dlBtn = document.getElementById('cardDownloadBtn'); if (dlBtn) { dlBtn.style.color = finalColor; dlBtn.style.border = `2px solid ${finalColor}`; }
-            const dlPdfBtn = document.getElementById('cardDownloadPdfBtn'); if (dlPdfBtn) { dlPdfBtn.style.color = finalColor; dlPdfBtn.style.border = `2px solid ${finalColor}`; }
+            
+            const dlBtnCtx = document.getElementById('cardDownloadBtnCtx'); if (dlBtnCtx) { dlBtnCtx.style.color = finalColor; }
+            const dlPdfBtnCtx = document.getElementById('cardDownloadPdfBtnCtx'); if (dlPdfBtnCtx) { dlPdfBtnCtx.style.color = finalColor; }
 
             document.querySelectorAll('.dynamic-theme-color-swatch').forEach(swatch => swatch.style.backgroundColor = finalColor);
 
@@ -1658,13 +1818,16 @@
             word.style.color = textColor; word.style.fontSize = textSize + 'px'; 
             if (word.innerHTML !== document.getElementById('inputTitle').value) word.innerHTML = document.getElementById('inputTitle').value;
             
-            const type = document.getElementById('cardType'), addCatBtn = document.getElementById('addCategoryBtn');
+            const type = document.getElementById('cardType');
+            const catLabel = document.getElementById('categoryLabel');
+            if (catLabel) { catLabel.style.color = finalColor; catLabel.innerText = currentSelectedCategory; }
+            
             if (currentSelectedCategory !== '-') { 
                 type.style.backgroundColor = hexToRgba(finalColor, 0.15); type.style.color = textColor; 
                 if (type.innerText !== currentSelectedCategory) type.innerText = currentSelectedCategory; 
-                type.classList.remove('hidden'); addCatBtn.classList.add('hidden'); 
+                type.classList.remove('hidden'); 
             } else { 
-                type.innerText = ''; type.classList.add('hidden'); addCatBtn.classList.remove('hidden'); 
+                type.innerText = ''; type.classList.add('hidden');
             }
             
             if (edTarget.imgIdx !== -1) closeInlineEditor(false);
@@ -1706,7 +1869,8 @@
                         e.preventDefault(); document.getElementById('floatingPreviewMenu').classList.add('hidden');
                         startInlineEditor(img, idx, -1); showEditorToolbar(e.clientX, e.clientY);
                     };
-                    const moveControls = document.createElement('div'); moveControls.className = "absolute -top-3 -left-3 flex gap-1.5 z-10 hidden-in-export opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all";
+                    
+                    const moveControls = document.createElement('div'); moveControls.className = "absolute -top-3 -left-3 flex gap-1.5 z-10 hidden-in-export opacity-100 lg:opacity-0 lg:group-hover/imgwrapper:opacity-100 transition-all";
                     if (idx > 0) { 
                         const lB = document.createElement('button'); lB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] md:w-[32px] md:h-[32px] outline-none p-0"; lB.style.color = finalColor; lB.style.border = `2px solid ${finalColor}`; lB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 md:w-5 md:h-5"><path d="M15 18l-6-6 6-6"/></svg>`; 
                         lB.onclick = (e) => { e.stopPropagation(); moveImageLeft(idx); }; moveControls.appendChild(lB); 
@@ -1715,8 +1879,22 @@
                         const rB = document.createElement('button'); rB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] md:w-[32px] md:h-[32px] outline-none p-0"; rB.style.color = finalColor; rB.style.border = `2px solid ${finalColor}`; rB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 md:w-5 md:h-5"><path d="M9 18l6-6-6-6"/></svg>`; 
                         rB.onclick = (e) => { e.stopPropagation(); moveImageRight(idx); }; moveControls.appendChild(rB); 
                     }
-                    const delBtn = document.createElement('button'); delBtn.className = "absolute -top-3 -right-3 opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all z-10 hidden-in-export flex items-center justify-center hover:scale-110 outline-none p-0 bg-transparent border-none w-[28px] h-[28px] md:w-[32px] md:h-[32px]"; delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-full h-full drop-shadow-md"><defs><linearGradient id="delGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ff3333" /><stop offset="100%" stop-color="#cc0000" /></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#delGrad)" stroke="#990000" stroke-width="0.5" /><path d="M8 8 L16 16 M16 8 L8 16" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" /></svg>`; 
+                    
+                    const editB = document.createElement('button');
+                    editB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] md:w-[32px] md:h-[32px] outline-none p-0";
+                    editB.style.color = finalColor; editB.style.border = `2px solid ${finalColor}`;
+                    editB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5 md:w-4 md:h-4"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>`;
+                    editB.onclick = (e) => {
+                        e.preventDefault(); e.stopPropagation();
+                        document.getElementById('floatingPreviewMenu').classList.add('hidden');
+                        startInlineEditor(img, idx, -1);
+                        showEditorToolbar(e.clientX || (e.touches && e.touches[0].clientX), e.clientY || (e.touches && e.touches[0].clientY));
+                    };
+                    moveControls.appendChild(editB);
+
+                    const delBtn = document.createElement('button'); delBtn.className = "absolute -top-3 -right-3 opacity-100 lg:opacity-0 lg:group-hover/imgwrapper:opacity-100 transition-all z-10 hidden-in-export flex items-center justify-center hover:scale-110 outline-none p-0 bg-transparent border-none w-[28px] h-[28px] md:w-[32px] md:h-[32px]"; delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-full h-full drop-shadow-md"><defs><linearGradient id="delGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ff3333" /><stop offset="100%" stop-color="#cc0000" /></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#delGrad)" stroke="#990000" stroke-width="0.5" /><path d="M8 8 L16 16 M16 8 L8 16" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" /></svg>`; 
                     delBtn.onclick = (e) => { e.stopPropagation(); removeImage(idx); };
+                    
                     wrapper.appendChild(img); if (moveControls.children.length > 0) wrapper.appendChild(moveControls); wrapper.appendChild(delBtn); cardImages.appendChild(wrapper);
                 });
             }
@@ -1742,9 +1920,11 @@
                     if (block.type === 'text') {
                         const html = `
                             <div class="group/extradef relative py-1 px-2 md:px-4 -mx-2 md:-mx-4 rounded-xl md:rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors mt-1 ${(block.groupId || block.isPrimaryInline) ? 'flex-1' : ''}" id="block-wrapper-${idx}" data-block-type="text">
-                                <div class="format-toolbar absolute -top-10 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-lg border border-[#d0ebf0] dark:border-[#333] rounded-xl flex flex-wrap justify-center items-center p-1 gap-1 w-[320px] md:w-max opacity-0 pointer-events-none group-focus-within/extradef:opacity-100 group-hover/extradef:opacity-100 group-focus-within/extradef:pointer-events-auto group-hover/extradef:pointer-events-auto transition-all z-20 translate-y-2 group-hover/extradef:translate-y-0 group-focus-within/extradef:translate-y-0">
+                                <div class="format-toolbar fixed top-4 md:top-6 left-1/2 -translate-x-1/2 bg-white dark:bg-[#1a1a1a] shadow-2xl border border-[#d0ebf0] dark:border-[#333] rounded-xl flex flex-wrap justify-center items-center p-1 gap-1 w-[90vw] sm:w-[320px] md:w-max opacity-0 pointer-events-none group-focus-within/extradef:opacity-100 group-focus-within/extradef:pointer-events-auto transition-all z-[150] -translate-y-4 group-focus-within/extradef:translate-y-0" style="top: max(1.5rem, env(safe-area-inset-top));">
                                     <button onmousedown="event.preventDefault(); execFormat('undo')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors"><i data-lucide="undo" class="w-4 h-4"></i></button>
                                     <button onmousedown="event.preventDefault(); execFormat('redo')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors"><i data-lucide="redo" class="w-4 h-4"></i></button>
+                                    <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                                    <button onmousedown="event.preventDefault(); execFormat('selectAll')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-selectall" aria-label="Select All" title="Select All"><i data-lucide="scan-text" class="w-4 h-4"></i></button>
                                     <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
                                     <button onmousedown="event.preventDefault(); execFormat('bold')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
                                     <button onmousedown="event.preventDefault(); execFormat('underline')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-underline"><i data-lucide="underline" class="w-4 h-4"></i></button>
@@ -1777,7 +1957,7 @@
                                     <button onmousedown="event.preventDefault(); downloadNoteText(${idx}, true)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" title="Download .txt"><i data-lucide="file-down" class="w-4 h-4"></i></button>
                                     
                                     <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                                    <button onmousedown="event.preventDefault(); toggleSpeechToText(${idx}, true, this)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" title="Dictate"><i data-lucide="mic" class="w-4 h-4"></i></button>
+                                    <button onclick="event.preventDefault(); toggleSpeechToText(${idx}, true, this)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" title="Dictate"><i data-lucide="mic" class="w-4 h-4"></i></button>
                                     <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
                                     <button onmousedown="event.preventDefault(); addExtraNoteRelative(${idx}, 'next')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" title="Add Note Next To"><i data-lucide="panel-right" class="w-4 h-4"></i></button>
                                     <button onmousedown="event.preventDefault(); addExtraNoteRelative(${idx}, 'below')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors" title="Add Note Below"><i data-lucide="panel-bottom" class="w-4 h-4"></i></button>
@@ -1788,7 +1968,7 @@
                                     </div>
                                 </div>
                                 <div class="card-extra-def-input font-medium leading-relaxed whitespace-pre-wrap outline-none" contenteditable="true" data-placeholder="Enter note here..." style="text-decoration: none; min-height: 1.5em; font-family: 'Caveat', cursive;" data-block-idx="${idx}">${block.content || ''}</div>
-                                <button onclick="removeBlock(${idx})" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 group-hover/extradef:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" aria-label="Remove Note"><i data-lucide="x" class="w-3.5 h-3.5 md:w-4 md:h-4"></i></button>
+                                <button onmousedown="event.preventDefault(); removeBlock(${idx})" class="clear-btn absolute top-1/2 -translate-y-1/2 right-2 md:right-4 p-1.5 md:p-2 bg-white dark:bg-[#1a1a1a] shadow-sm rounded-full text-gray-400 hover:text-red-500 opacity-100 lg:opacity-0 lg:group-hover/extradef:opacity-100 transition-opacity z-10 border border-gray-100 dark:border-[#333]" aria-label="Remove Note"><i data-lucide="x" class="w-3.5 h-3.5 md:w-4 md:h-4"></i></button>
                             </div>
                         `;
                         if (block.isPrimaryInline) {
@@ -1844,7 +2024,8 @@
                                     e.preventDefault(); document.getElementById('floatingPreviewMenu').classList.add('hidden');
                                     startInlineEditor(img, imgIdx, idx); showEditorToolbar(e.clientX, e.clientY);
                                 };
-                                const moveControls = document.createElement('div'); moveControls.className = "absolute -top-3 -left-3 flex gap-1.5 z-10 hidden-in-export opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all";
+                                
+                                const moveControls = document.createElement('div'); moveControls.className = "absolute -top-3 -left-3 flex gap-1.5 z-10 hidden-in-export opacity-100 lg:opacity-0 lg:group-hover/imgwrapper:opacity-100 transition-all";
                                 if (imgIdx > 0) { 
                                     const lB = document.createElement('button'); lB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] outline-none p-0"; lB.style.color = finalColor; lB.style.border = `2px solid ${finalColor}`; lB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M15 18l-6-6 6-6"/></svg>`; 
                                     lB.onclick = (e) => { e.stopPropagation(); moveImageLeftGroup(idx, imgIdx); }; moveControls.appendChild(lB); 
@@ -1853,8 +2034,22 @@
                                     const rB = document.createElement('button'); rB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] outline-none p-0"; rB.style.color = finalColor; rB.style.border = `2px solid ${finalColor}`; rB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M9 18l6-6-6-6"/></svg>`; 
                                     rB.onclick = (e) => { e.stopPropagation(); moveImageRightGroup(idx, imgIdx); }; moveControls.appendChild(rB); 
                                 }
-                                const delBtn = document.createElement('button'); delBtn.className = "absolute -top-3 -right-3 opacity-100 lg:opacity-0 group-hover/imgwrapper:opacity-100 transition-all z-10 hidden-in-export flex items-center justify-center hover:scale-110 outline-none p-0 bg-transparent border-none w-[28px] h-[28px]"; delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-full h-full drop-shadow-md"><defs><linearGradient id="delGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ff3333" /><stop offset="100%" stop-color="#cc0000" /></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#delGrad)" stroke="#990000" stroke-width="0.5" /><path d="M8 8 L16 16 M16 8 L8 16" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" /></svg>`; 
+                                
+                                const editB = document.createElement('button');
+                                editB.className = "bg-white dark:bg-[#1a1a1a] rounded-full cursor-pointer shadow-md flex items-center justify-center hover:scale-110 w-[28px] h-[28px] outline-none p-0";
+                                editB.style.color = finalColor; editB.style.border = `2px solid ${finalColor}`;
+                                editB.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>`;
+                                editB.onclick = (e) => {
+                                    e.preventDefault(); e.stopPropagation();
+                                    document.getElementById('floatingPreviewMenu').classList.add('hidden');
+                                    startInlineEditor(img, imgIdx, idx);
+                                    showEditorToolbar(e.clientX || (e.touches && e.touches[0].clientX), e.clientY || (e.touches && e.touches[0].clientY));
+                                };
+                                moveControls.appendChild(editB);
+
+                                const delBtn = document.createElement('button'); delBtn.className = "absolute -top-3 -right-3 opacity-100 lg:opacity-0 lg:group-hover/imgwrapper:opacity-100 transition-all z-10 hidden-in-export flex items-center justify-center hover:scale-110 outline-none p-0 bg-transparent border-none w-[28px] h-[28px]"; delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-full h-full drop-shadow-md"><defs><linearGradient id="delGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ff3333" /><stop offset="100%" stop-color="#cc0000" /></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#delGrad)" stroke="#990000" stroke-width="0.5" /><path d="M8 8 L16 16 M16 8 L8 16" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" /></svg>`; 
                                 delBtn.onclick = (e) => { e.stopPropagation(); removeImageFromGroup(idx, imgIdx); };
+                                
                                 wrapper.appendChild(img); if (moveControls.children.length > 0) wrapper.appendChild(moveControls); wrapper.appendChild(delBtn); groupContainer.appendChild(wrapper);
                             });
                         }
@@ -1905,7 +2100,7 @@
                 const svg = generateNotebookSVG(), i192 = await createPNGIconFromSVG(svg, 192), i512 = await createPNGIconFromSVG(svg, 512); 
                 document.getElementById('apple-touch-icon').href = i192; 
                 const manifest = { 
-                    name: "Notion", short_name: "Notion", start_url: window.location.href.split('?')[0], display: "standalone", 
+                    name: "Notion", short_name: "Notion", start_url: window.location.href.split('?')[0], display: "fullscreen", 
                     background_color: "#000000", theme_color: "#000000", 
                     icons: [{ src: i192, sizes: "192x192", type: "image/png", purpose: "any maskable" }, { src: i512, sizes: "512x512", type: "image/png", purpose: "any maskable" }] 
                 }; 
@@ -1931,7 +2126,7 @@
                     scale: 3, backgroundColor: null, useCORS: true, 
                     onclone: (doc) => { 
                         const c = doc.getElementById('cardContainer'); 
-                        doc.querySelectorAll('#cardTitleRestore, #cardDefRestore, #cardExtraDefRestore, #addCategoryBtn, .format-toolbar, .clear-btn, .hidden-in-export').forEach(el => el.style.display = 'none');
+                        doc.querySelectorAll('#cardTitleRestore, #cardDefRestore, #cardExtraDefRestore, .format-toolbar, .clear-btn, .hidden-in-export').forEach(el => el.style.display = 'none');
                         doc.querySelectorAll('[contenteditable]').forEach(el => { if (!el.innerText.trim()) el.removeAttribute('data-placeholder'); });
                         if (!doc.getElementById('cardDef').innerText.trim()) doc.getElementById('cardNotesSection').style.display = 'none';
                         
@@ -2005,7 +2200,7 @@
                             c.style.setProperty('width', w + 'px', 'important');
                             c.style.setProperty('height', h + 'px', 'important');
                             
-                            doc.querySelectorAll('#cardTitleRestore, #cardDefRestore, #cardExtraDefRestore, #addCategoryBtn, .format-toolbar, .clear-btn, .hidden-in-export').forEach(el => el.style.display = 'none');
+                            doc.querySelectorAll('#cardTitleRestore, #cardDefRestore, #cardExtraDefRestore, .format-toolbar, .clear-btn, .hidden-in-export').forEach(el => el.style.display = 'none');
                             doc.querySelectorAll('[contenteditable]').forEach(el => { if (!el.innerText.trim()) el.removeAttribute('data-placeholder'); });
                             if (!doc.getElementById('cardDef').innerText.trim()) doc.getElementById('cardNotesSection').style.display = 'none';
                             
@@ -2054,6 +2249,10 @@
                 let x = clientX, y = clientY;
                 if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
                 if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
+                
+                if (y < 10) y = 10;
+                if (x < 10) x = 10;
+                
                 toolbar.style.left = x + 'px'; toolbar.style.top = y + 'px';
             });
         }
@@ -2072,7 +2271,7 @@
             drawC.style.borderRadius = br; drawC.width = img.clientWidth; drawC.height = img.clientHeight;
             
             const tempC = document.createElement('canvas');
-            tempC.className = "absolute top-0 left-0 w-full h-full z-30 cursor-crosshair touch-none";
+            tempC.className = "editor-canvas-layer absolute top-0 left-0 w-full h-full z-30 cursor-crosshair";
             tempC.style.borderRadius = br; tempC.width = img.clientWidth; tempC.height = img.clientHeight;
             
             tempC.oncontextmenu = (e) => { e.preventDefault(); showEditorToolbar(e.clientX, e.clientY); };
@@ -2217,6 +2416,318 @@
             };
             img.src = dataUrl;
         }
+
+        /* --- Standalone Image Editor Logic (Enhanced & Mobile Friendly) --- */
+        let saCanvas, saCtx, saTempCanvas, saTempCtx;
+        let saIsDrawing = false, saTool = 'pen', saImg = null, saStartX = 0, saStartY = 0;
+        let saUndoStack = [], saRedoStack = [], saCurrentColor = '#ef4444', saCurrentSize = 6;
+
+        window.openStandaloneImageEditor = function() {
+            document.getElementById('floatingPreviewMenu').classList.add('hidden');
+            document.getElementById('standaloneImageEditor').classList.remove('hidden');
+            if(!saCanvas) initStandaloneEditor();
+            setTimeout(recalculateSaCanvasScale, 50);
+        };
+
+        window.closeStandaloneEditor = function() {
+            document.getElementById('standaloneImageEditor').classList.add('hidden');
+        };
+
+        function initStandaloneEditor() {
+            saCanvas = document.getElementById('saCanvas');
+            saCtx = saCanvas.getContext('2d', { willReadFrequently: true });
+            saTempCanvas = document.getElementById('saTempCanvas');
+            saTempCtx = saTempCanvas.getContext('2d');
+            
+            const fileInput = document.getElementById('standaloneImageInput');
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    saImg = new Image();
+                    saImg.onload = function() {
+                        loadSaImageIntoCanvas(saImg);
+                    };
+                    saImg.src = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+                e.target.value = '';
+            });
+
+            document.querySelectorAll('.sa-tool-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.sa-tool-btn').forEach(b => b.classList.remove('active'));
+                    const tBtn = e.currentTarget;
+                    tBtn.classList.add('active');
+                    saTool = tBtn.dataset.tool;
+                });
+            });
+
+            document.querySelectorAll('.sa-color-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.sa-color-btn').forEach(b => {
+                        b.classList.remove('scale-110', 'border-white');
+                        b.classList.add('border-transparent');
+                    });
+                    const tBtn = e.currentTarget;
+                    tBtn.classList.remove('border-transparent');
+                    tBtn.classList.add('scale-110', 'border-white');
+                    saCurrentColor = tBtn.dataset.color;
+                    document.getElementById('saColor').value = saCurrentColor;
+                    document.getElementById('saSizePreview').style.backgroundColor = saCurrentColor;
+                });
+            });
+
+            const colorInput = document.getElementById('saColor');
+            colorInput.addEventListener('input', (e) => {
+                saCurrentColor = e.target.value;
+                document.querySelectorAll('.sa-color-btn').forEach(b => b.classList.remove('scale-110', 'border-white'));
+                document.getElementById('saSizePreview').style.backgroundColor = saCurrentColor;
+            });
+
+            const sizeSlider = document.getElementById('saSize');
+            sizeSlider.addEventListener('input', (e) => {
+                saCurrentSize = parseInt(e.target.value);
+                const preview = document.getElementById('saSizePreview');
+                const sizePx = Math.min(24, Math.max(6, saCurrentSize * 0.5));
+                preview.style.width = sizePx + 'px';
+                preview.style.height = sizePx + 'px';
+            });
+
+            function getSaPos(e) {
+                const rect = saTempCanvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                
+                const scaleX = saCanvas.width / rect.width;
+                const scaleY = saCanvas.height / rect.height;
+                
+                return {
+                    x: (clientX - rect.left) * scaleX,
+                    y: (clientY - rect.top) * scaleY
+                };
+            }
+
+            function start(e) {
+                if (!saImg) return;
+                saIsDrawing = true;
+                const pos = getSaPos(e);
+                saStartX = pos.x; saStartY = pos.y;
+                
+                // Scale line width proportionally with actual image resolution
+                const baseScale = Math.max(1, saCanvas.width / 1000);
+                const actualWidth = saCurrentSize * baseScale;
+
+                saCtx.lineCap = 'round';
+                saCtx.lineJoin = 'round';
+                saCtx.lineWidth = actualWidth;
+                
+                if (saTool === 'eraser') {
+                    saCtx.globalCompositeOperation = 'destination-out';
+                    saCtx.strokeStyle = 'rgba(0,0,0,1)';
+                } else {
+                    saCtx.globalCompositeOperation = 'source-over';
+                    saCtx.strokeStyle = saTool === 'highlighter' ? hexToRgba(saCurrentColor, 0.015) : saCurrentColor;
+                }
+
+                if (saTool === 'pen' || saTool === 'highlighter' || saTool === 'eraser') {
+                    saCtx.beginPath();
+                    saCtx.moveTo(saStartX, saStartY);
+                }
+            }
+
+            function move(e) {
+                if (!saIsDrawing) return;
+                const pos = getSaPos(e);
+                const baseScale = Math.max(1, saCanvas.width / 1000);
+                const actualWidth = saCurrentSize * baseScale;
+                
+                if (saTool === 'pen' || saTool === 'highlighter' || saTool === 'eraser') {
+                    saCtx.lineTo(pos.x, pos.y);
+                    saCtx.stroke();
+                } else {
+                    saTempCtx.clearRect(0, 0, saTempCanvas.width, saTempCanvas.height);
+                    saTempCtx.lineCap = 'round';
+                    saTempCtx.lineJoin = 'round';
+                    saTempCtx.lineWidth = actualWidth;
+                    saTempCtx.strokeStyle = saTool === 'highlighter' ? hexToRgba(saCurrentColor, 0.35) : saCurrentColor;
+                    saTempCtx.beginPath();
+                    
+                    if (saTool === 'rect') {
+                        saTempCtx.rect(saStartX, saStartY, pos.x - saStartX, pos.y - saStartY);
+                    } else if (saTool === 'circle') { 
+                        const radius = Math.sqrt(Math.pow(pos.x - saStartX, 2) + Math.pow(pos.y - saStartY, 2)); 
+                        saTempCtx.arc(saStartX, saStartY, radius, 0, 2 * Math.PI); 
+                    } else if (saTool === 'arrow') {
+                        drawSaArrow(saTempCtx, saStartX, saStartY, pos.x, pos.y, actualWidth);
+                    }
+                    
+                    if (saTool !== 'arrow') saTempCtx.stroke();
+                }
+            }
+
+            function end() {
+                if (!saIsDrawing) return;
+                saIsDrawing = false;
+                
+                if (saTool === 'rect' || saTool === 'circle' || saTool === 'arrow') {
+                    saCtx.globalCompositeOperation = 'source-over';
+                    saCtx.drawImage(saTempCanvas, 0, 0);
+                    saTempCtx.clearRect(0, 0, saTempCanvas.width, saTempCanvas.height);
+                }
+                saveSaState();
+            }
+
+            saTempCanvas.addEventListener('mousedown', (e) => { if (e.button === 0) start(e); });
+            saTempCanvas.addEventListener('mousemove', move);
+            saTempCanvas.addEventListener('mouseup', (e) => { if (e.button === 0) end(); });
+            saTempCanvas.addEventListener('mouseout', end);
+            
+            saTempCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); start(e); }, { passive: false });
+            saTempCanvas.addEventListener('touchmove', (e) => { e.preventDefault(); move(e); }, { passive: false });
+            saTempCanvas.addEventListener('touchend', end);
+        }
+
+        function loadSaImageIntoCanvas(imgElement) {
+            saCanvas.width = imgElement.naturalWidth || imgElement.width;
+            saCanvas.height = imgElement.naturalHeight || imgElement.height;
+            saTempCanvas.width = saCanvas.width;
+            saTempCanvas.height = saCanvas.height;
+            
+            saCtx.clearRect(0, 0, saCanvas.width, saCanvas.height);
+            saCtx.drawImage(imgElement, 0, 0);
+            
+            document.getElementById('saPlaceholder').classList.add('hidden');
+            document.getElementById('saCanvasWrapper').classList.remove('hidden');
+            
+            recalculateSaCanvasScale();
+            saUndoStack = []; saRedoStack = [];
+            saveSaState();
+        }
+
+        function recalculateSaCanvasScale() {
+            const container = document.getElementById('saCanvasContainer');
+            const wrapper = document.getElementById('saCanvasWrapper');
+            if (!container || !wrapper || !saImg || !saCanvas.width) return;
+
+            const padding = 24;
+            const availW = container.clientWidth - padding;
+            const availH = container.clientHeight - padding;
+            
+            const aspect = saCanvas.width / saCanvas.height;
+            let displayW = availW;
+            let displayH = availW / aspect;
+
+            if (displayH > availH) {
+                displayH = availH;
+                displayW = availH * aspect;
+            }
+
+            wrapper.style.width = `${Math.round(displayW)}px`;
+            wrapper.style.height = `${Math.round(displayH)}px`;
+        }
+
+        function drawSaArrow(ctx, fromX, fromY, toX, toY, width) {
+            const headlen = Math.max(16, width * 3.5);
+            const dx = toX - fromX, dy = toY - fromY;
+            const angle = Math.atan2(dy, dx);
+            
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
+            ctx.stroke();
+        }
+
+        function saveSaState() {
+            if (!saCanvas) return;
+            saUndoStack.push(saCanvas.toDataURL());
+            if (saUndoStack.length > 25) saUndoStack.shift(); 
+            saRedoStack = [];
+        }
+
+        window.saUndo = function() {
+            if (saUndoStack.length > 1) { 
+                saRedoStack.push(saUndoStack.pop()); 
+                restoreSaState(saUndoStack[saUndoStack.length - 1]); 
+            }
+        };
+
+        window.saRedo = function() {
+            if (saRedoStack.length > 0) { 
+                const state = saRedoStack.pop(); 
+                saUndoStack.push(state); 
+                restoreSaState(state); 
+            }
+        };
+
+        function restoreSaState(dataUrl) {
+            if (!saCanvas) return;
+            const img = new Image();
+            img.onload = () => {
+                saCtx.clearRect(0, 0, saCanvas.width, saCanvas.height);
+                saCtx.globalCompositeOperation = 'source-over'; 
+                saCtx.drawImage(img, 0, 0);
+            };
+            img.src = dataUrl;
+        }
+
+        window.saRotate = function() {
+            if (!saImg || !saCanvas) return;
+            const offscreen = document.createElement('canvas');
+            offscreen.width = saCanvas.height;
+            offscreen.height = saCanvas.width;
+            const offCtx = offscreen.getContext('2d');
+            
+            offCtx.translate(offscreen.width / 2, offscreen.height / 2);
+            offCtx.rotate((90 * Math.PI) / 180);
+            offCtx.drawImage(saCanvas, -saCanvas.width / 2, -saCanvas.height / 2);
+            
+            saCanvas.width = offscreen.width;
+            saCanvas.height = offscreen.height;
+            saTempCanvas.width = offscreen.width;
+            saTempCanvas.height = offscreen.height;
+            
+            saCtx.clearRect(0, 0, saCanvas.width, saCanvas.height);
+            saCtx.drawImage(offscreen, 0, 0);
+            
+            recalculateSaCanvasScale();
+            saveSaState();
+        };
+
+        window.saClearCanvas = function() {
+            if (!saImg) return;
+            if (confirm("Reset all drawing changes?")) {
+                loadSaImageIntoCanvas(saImg);
+            }
+        };
+
+        window.insertStandaloneToCard = function() {
+            if (!saImg) {
+                showToast("Please upload an image first.");
+                return;
+            }
+            const dataURL = saCanvas.toDataURL('image/png');
+            pushImageHistory();
+            uploadedImages.push({ src: dataURL, scale: 100, border: null, align: 'center', translateX: 0 });
+            updatePreview();
+            closeStandaloneEditor();
+            showToast("Edited image added to card!");
+        };
+
+        window.downloadStandaloneImage = function() {
+            if (!saImg) {
+                showToast("Please upload an image first.");
+                return;
+            }
+            const link = document.createElement('a');
+            link.download = `edited-image-${Date.now()}.png`;
+            link.href = saCanvas.toDataURL('image/png');
+            link.click();
+            showToast("Image exported successfully!");
+        };
 
     </script>
 </body>
