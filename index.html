@@ -236,7 +236,22 @@
                                         <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
                                         <button onmousedown="event.preventDefault(); execFormat('bold')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-bold" aria-label="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
                                         <button onmousedown="event.preventDefault(); execFormat('underline')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-underline" aria-label="Underline"><i data-lucide="underline" class="w-4 h-4"></i></button>
-                                        <button onmousedown="event.preventDefault(); execFormat('highlight')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-highlight" aria-label="Highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
+                                        
+                                        <div class="relative group/highlightpicker">
+                                            <button onmousedown="event.preventDefault(); toggleHighlightColorMenu(event)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-highlight" aria-label="Highlight Color"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
+                                            <div class="highlight-color-menu hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] p-2 flex flex-wrap gap-1.5 rounded-xl shadow-xl z-[60] w-[165px]" onmousedown="event.preventDefault(); event.stopPropagation();" onclick="event.stopPropagation();">
+                                                <div onmousedown="event.preventDefault(); applyHighlightColor('transparent')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform flex items-center justify-center bg-gray-100 dark:bg-gray-800" style="border: 1px solid rgba(0,0,0,0.1);"><i data-lucide="x" class="w-3 h-3 text-gray-500"></i></div>
+                                                <div onmousedown="event.preventDefault(); applyHighlightColor(activeColor)" class="dynamic-theme-color-swatch w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform opacity-60" style="background-color: #51b8cb; border: 1px solid rgba(0,0,0,0.1);"></div>
+                                                <div onmousedown="event.preventDefault(); applyHighlightColor('#ef4444')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-red-500 opacity-60" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                                <div onmousedown="event.preventDefault(); applyHighlightColor('#f97316')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-orange-500 opacity-60" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                                <div onmousedown="event.preventDefault(); applyHighlightColor('#f59e0b')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-yellow-500 opacity-60" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                                <div onmousedown="event.preventDefault(); applyHighlightColor('#84cc16')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-lime-500 opacity-60" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                                <div onmousedown="event.preventDefault(); applyHighlightColor('#10b981')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-emerald-500 opacity-60" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                                <div onmousedown="event.preventDefault(); applyHighlightColor('#06b6d4')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-cyan-500 opacity-60" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                                <div onmousedown="event.preventDefault(); applyHighlightColor('#3b82f6')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-blue-500 opacity-60" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                                <div onmousedown="event.preventDefault(); applyHighlightColor('#8b5cf6')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-violet-500 opacity-60" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                            </div>
+                                        </div>
                                         
                                         <div class="relative group/colorpicker">
                                             <button onmousedown="event.preventDefault(); toggleTextColorMenu(event)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-color" aria-label="Text Color"><i data-lucide="palette" class="w-4 h-4"></i></button>
@@ -650,6 +665,27 @@
             }
         };
 
+        window.toggleHighlightColorMenu = function(e) {
+            e.stopPropagation();
+            const targetMenu = e.currentTarget.nextElementSibling;
+            const isHidden = targetMenu.classList.contains('hidden');
+            document.querySelectorAll('.text-color-menu, .highlight-color-menu').forEach(m => m.classList.add('hidden'));
+            if (isHidden) targetMenu.classList.remove('hidden');
+        };
+
+        window.applyHighlightColor = function(color) {
+            document.execCommand('styleWithCSS', false, true);
+            if (color === 'transparent') {
+                document.execCommand('hiliteColor', false, 'transparent');
+                removeStyleFromSelection('backgroundColor');
+            } else {
+                document.execCommand('hiliteColor', false, hexToRgba(color, 0.4));
+            }
+            document.querySelectorAll('.highlight-color-menu').forEach(m => m.classList.add('hidden'));
+            syncCardState();
+            checkFormatState();
+        };
+
         window.toggleSpeechToText = function(targetIdx, isBlock, btnEl) {
             if (isRecording) {
                 if (recognition) recognition.stop();
@@ -778,7 +814,7 @@
             e.stopPropagation();
             const targetMenu = e.currentTarget.nextElementSibling;
             const isHidden = targetMenu.classList.contains('hidden');
-            document.querySelectorAll('.text-color-menu').forEach(m => m.classList.add('hidden'));
+            document.querySelectorAll('.text-color-menu, .highlight-color-menu').forEach(m => m.classList.add('hidden'));
             if (isHidden) targetMenu.classList.remove('hidden');
         };
 
@@ -1149,13 +1185,16 @@
 
         function closeAllDropdowns() { 
             document.querySelectorAll('[id$="DropdownMenu"]').forEach(el => el.classList.add('hidden')); 
-            document.querySelectorAll('.text-color-menu').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.text-color-menu, .highlight-color-menu').forEach(el => el.classList.add('hidden'));
             closeEdMenus();
         }
         
         window.addEventListener('click', (e) => {
             if (!e.target.closest('.btn-format-color') && !e.target.closest('.text-color-menu')) {
                 document.querySelectorAll('.text-color-menu').forEach(el => el.classList.add('hidden'));
+            }
+            if (!e.target.closest('.btn-format-highlight') && !e.target.closest('.highlight-color-menu')) {
+                document.querySelectorAll('.highlight-color-menu').forEach(el => el.classList.add('hidden'));
             }
             if (!e.target.closest('[id$="Btn"]') && !e.target.closest('.format-toolbar') && e.target.id !== 'mobileFab' && !e.target.closest('#mobileFab')) {
                 document.querySelectorAll('[id$="DropdownMenu"]').forEach(el => el.classList.add('hidden')); 
@@ -1957,7 +1996,23 @@
                                     <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
                                     <button onmousedown="event.preventDefault(); execFormat('bold')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
                                     <button onmousedown="event.preventDefault(); execFormat('underline')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-underline"><i data-lucide="underline" class="w-4 h-4"></i></button>
-                                    <button onmousedown="event.preventDefault(); execFormat('highlight')" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-highlight"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
+                                    
+                                    <div class="relative group/highlightpicker">
+                                        <button onmousedown="event.preventDefault(); toggleHighlightColorMenu(event)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-highlight" aria-label="Highlight Color"><i data-lucide="highlighter" class="w-4 h-4"></i></button>
+                                        <div class="highlight-color-menu hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] p-2 flex flex-wrap gap-1.5 rounded-xl shadow-xl z-[60] w-[165px]" onmousedown="event.preventDefault(); event.stopPropagation();" onclick="event.stopPropagation();">
+                                            <div onmousedown="event.preventDefault(); applyHighlightColor('transparent')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform flex items-center justify-center bg-gray-100 dark:bg-gray-800" style="border: 1px solid rgba(0,0,0,0.1);"><i data-lucide="x" class="w-3 h-3 text-gray-500"></i></div>
+                                            <div onmousedown="event.preventDefault(); applyHighlightColor(activeColor)" class="dynamic-theme-color-swatch w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform opacity-60" style="background-color: #51b8cb; border: 1px solid rgba(0,0,0,0.1);"></div>
+                                            <div onmousedown="event.preventDefault(); applyHighlightColor('#ef4444')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-red-500 opacity-60" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                            <div onmousedown="event.preventDefault(); applyHighlightColor('#f97316')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-orange-500 opacity-60" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                            <div onmousedown="event.preventDefault(); applyHighlightColor('#f59e0b')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-yellow-500 opacity-60" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                            <div onmousedown="event.preventDefault(); applyHighlightColor('#84cc16')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-lime-500 opacity-60" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                            <div onmousedown="event.preventDefault(); applyHighlightColor('#10b981')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-emerald-500 opacity-60" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                            <div onmousedown="event.preventDefault(); applyHighlightColor('#06b6d4')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-cyan-500 opacity-60" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                            <div onmousedown="event.preventDefault(); applyHighlightColor('#3b82f6')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-blue-500 opacity-60" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                            <div onmousedown="event.preventDefault(); applyHighlightColor('#8b5cf6')" class="w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform bg-violet-500 opacity-60" style="border: 1px solid rgba(0,0,0,0.1);"></div>
+                                        </div>
+                                    </div>
+                                    
                                     <div class="relative group/colorpicker">
                                         <button onmousedown="event.preventDefault(); toggleTextColorMenu(event)" class="p-1.5 hover:bg-black/5 dark:hover:bg-[#333] rounded-lg text-gray-500 hover:text-[var(--theme-color)] transition-colors btn-format-color"><i data-lucide="palette" class="w-4 h-4"></i></button>
                                         <div class="text-color-menu hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] p-2 flex flex-wrap gap-1.5 rounded-xl shadow-xl z-[60] w-[165px]" onmousedown="event.preventDefault(); event.stopPropagation();" onclick="event.stopPropagation();">
