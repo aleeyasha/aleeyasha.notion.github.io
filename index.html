@@ -173,7 +173,7 @@
     <button id="btnInstallApp" class="hidden"></button>
 
     <!-- Mobile FAB for Context Menu -->
-    <button id="mobileFab" onclick="toggleMobileMenu(event)" class="lg:hidden fixed bottom-6 right-6 z-[150] bg-[var(--theme-color)] text-white p-3.5 rounded-full shadow-2xl flex items-center justify-center outline-none" aria-label="Open Menu" style="padding-bottom: max(0.875rem, env(safe-area-inset-bottom)); right: max(1.5rem, env(safe-area-inset-right));">
+    <button id="mobileFab" onclick="toggleMobileMenu(event)" class="fixed bottom-6 right-6 z-[150] bg-[var(--theme-color)] text-white p-3.5 rounded-full shadow-2xl flex items-center justify-center outline-none hover:scale-110 transition-transform duration-300" aria-label="Open Menu" style="padding-bottom: max(0.875rem, env(safe-area-inset-bottom)); right: max(1.5rem, env(safe-area-inset-right));">
         <i data-lucide="menu" class="w-6 h-6"></i>
     </button>
 
@@ -448,6 +448,7 @@
                 </div>
                 
                 <div class="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-gray-800">
+                    <button class="sa-tool-btn p-2 text-gray-300 hover:text-white rounded-lg transition" data-tool="crop" title="Crop"><i data-lucide="crop" class="w-4 h-4"></i></button>
                     <button class="sa-tool-btn p-2 text-gray-300 hover:text-white rounded-lg transition" data-tool="rect" title="Rectangle"><i data-lucide="square" class="w-4 h-4"></i></button>
                     <button class="sa-tool-btn p-2 text-gray-300 hover:text-white rounded-lg transition" data-tool="circle" title="Circle"><i data-lucide="circle" class="w-4 h-4"></i></button>
                     <button class="sa-tool-btn p-2 text-gray-300 hover:text-white rounded-lg transition" data-tool="arrow" title="Arrow"><i data-lucide="move-up-right" class="w-4 h-4"></i></button>
@@ -486,116 +487,94 @@
         </footer>
     </div>
 
-    <!-- Context / Floating Menu -->
-    <div id="floatingPreviewMenu" class="hidden fixed bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-2xl z-[100] overflow-hidden w-64 py-1">
+    <!-- Context / Floating Menu (Redesigned & Compact) -->
+    <div id="floatingPreviewMenu" class="hidden flex fixed flex-col bg-white/95 dark:bg-[#181818]/95 backdrop-blur-md border border-[#d0ebf0] dark:border-[#333] rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.5)] z-[200] overflow-hidden w-[280px] p-2 gap-1.5 transition-all origin-bottom-right">
         
-        <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center gap-2">
-            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex-1">Cards & Export</span>
-            <button id="cardDownloadBtnCtx" onclick="downloadPNG()" class="cursor-pointer transition-all hover:scale-110 outline-none flex items-center justify-center text-gray-400 hover:text-[var(--theme-color)] drop-shadow-sm" aria-label="Download PNG" title="Download Image">
-                <i data-lucide="download" class="w-4 h-4"></i>
+        <!-- Top Toolbar (Export & Core Actions) -->
+        <div class="flex items-center justify-between bg-[#f4fbfc] dark:bg-[#222] rounded-xl p-1 border border-gray-100 dark:border-[#333]">
+            <button onclick="createCard()" oncontextmenu="event.preventDefault(); createCard(true);" class="p-1.5 hover:bg-white dark:hover:bg-[#333] rounded-lg transition-transform hover:scale-105 text-[#e7f135] hover:text-[#51b8cb] shadow-sm" aria-label="New Card" title="New Card">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             </button>
-            <button id="cardDownloadPdfBtnCtx" onclick="downloadPDF()" oncontextmenu="event.preventDefault(); downloadPDF(true)" class="cursor-pointer transition-all hover:scale-110 outline-none flex items-center justify-center text-gray-400 hover:text-[var(--theme-color)] drop-shadow-sm" aria-label="Download PDF" title="Download PDF">
-                <i data-lucide="file-down" class="w-4 h-4"></i>
-            </button>
-            <button onclick="document.getElementById('fileImportInput').click()" class="cursor-pointer transition-all hover:scale-110 outline-none flex items-center justify-center text-gray-400 hover:text-[var(--theme-color)] drop-shadow-sm" aria-label="Import PNG/PDF" title="Import">
-                <i data-lucide="upload" class="w-4 h-4"></i>
-            </button>
-            <button onclick="createCard()" oncontextmenu="event.preventDefault(); createCard(true);" class="cursor-pointer transition-all hover:scale-110 hover:rotate-90 duration-300 outline-none flex items-center justify-center text-[#e7f135] hover:text-[#51b8cb] drop-shadow-sm" aria-label="New Card" title="New Card">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 md:w-5 md:h-5">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-            </button>
-        </div>
-        <div id="headerCardsList" class="max-h-40 overflow-y-auto custom-scrollbar pb-1 border-b border-gray-100 dark:border-gray-800"></div>
-
-        <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between mt-1">
-            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Controls</span>
-            <div class="flex items-center gap-1">
-                <button id="imageLayoutToggleBtn" class="text-gray-400 hover:text-[#51b8cb] transition-colors outline-none cursor-pointer p-1" aria-label="Image Layout">
-                    <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
-                </button>
-                <button onclick="document.getElementById('imageInput').click()" class="text-gray-400 hover:text-[var(--theme-color)] transition-colors outline-none cursor-pointer p-1" aria-label="Upload Image">
-                    <i data-lucide="image-plus" class="w-3.5 h-3.5"></i>
-                </button>
-                <button id="contextUndoImageBtn" onclick="event.stopPropagation(); undoImageAction(); document.getElementById('floatingPreviewMenu').classList.add('hidden');" class="text-gray-400 hover:text-[var(--theme-color)] transition-colors outline-none cursor-pointer p-1" aria-label="Undo Image Action">
-                    <i data-lucide="undo" class="w-3.5 h-3.5"></i>
-                </button>
-                <button id="contextRedoImageBtn" onclick="event.stopPropagation(); redoImageAction(); document.getElementById('floatingPreviewMenu').classList.add('hidden');" class="text-gray-400 hover:text-[var(--theme-color)] transition-colors outline-none cursor-pointer p-1" aria-label="Redo Image Action">
-                    <i data-lucide="redo" class="w-3.5 h-3.5"></i>
-                </button>
-            </div>
-        </div>
-        <div id="floatingLayoutOptions" class="hidden py-1 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mt-1 mb-1"></div>
-        
-        <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800">
-            <div class="flex justify-between items-center mb-1">
-                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Card Border</span>
-                <span id="cardBorderValueLabel" class="text-[10px] font-bold text-[var(--theme-color)]">4px</span>
-            </div>
-            <input type="range" id="inputCardBorder" min="0" max="40" value="4" class="w-full cursor-pointer">
+            <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-0.5"></div>
+            <button onclick="document.getElementById('fileImportInput').click()" class="p-1.5 hover:bg-white dark:hover:bg-[#333] rounded-lg transition-transform hover:scale-105 text-gray-500 hover:text-[var(--theme-color)]" title="Import File"><i data-lucide="upload" class="w-4 h-4"></i></button>
+            <button id="cardDownloadBtnCtx" onclick="downloadPNG()" class="p-1.5 hover:bg-white dark:hover:bg-[#333] rounded-lg transition-transform hover:scale-105 text-gray-500 hover:text-[var(--theme-color)]" title="Download Image"><i data-lucide="image" class="w-4 h-4"></i></button>
+            <button id="cardDownloadPdfBtnCtx" onclick="downloadPDF()" oncontextmenu="event.preventDefault(); downloadPDF(true)" class="p-1.5 hover:bg-white dark:hover:bg-[#333] rounded-lg transition-transform hover:scale-105 text-gray-500 hover:text-[var(--theme-color)]" title="Download PDF"><i data-lucide="file-text" class="w-4 h-4"></i></button>
+            <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-0.5"></div>
+            <button onclick="openStandaloneImageEditor()" class="p-1.5 hover:bg-white dark:hover:bg-[#333] rounded-lg transition-transform hover:scale-105 text-gray-500 hover:text-[var(--theme-color)] shadow-sm" title="Image Studio"><i data-lucide="image-play" class="w-4 h-4"></i></button>
         </div>
 
-        <div class="py-1 border-b border-gray-100 dark:border-gray-800">
-            <div onclick="openStandaloneImageEditor()" class="dropdown-item flex items-center justify-between gap-2 transition-colors">
-                <div class="flex items-center gap-2"><i data-lucide="image-play" class="w-4 h-4"></i> Image Editor Studio</div>
-                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-400"></i>
+        <!-- Cards List -->
+        <div id="headerCardsList" class="max-h-32 overflow-y-auto custom-scrollbar border border-gray-100 dark:border-[#333] rounded-xl bg-white dark:bg-[#1a1a1a]"></div>
+
+        <!-- Image Controls Row -->
+        <div class="flex items-center justify-between px-2 py-0.5">
+            <span class="text-[9px] font-extrabold text-gray-400 uppercase tracking-widest">Images</span>
+            <div class="flex items-center gap-0.5">
+                <button onclick="document.getElementById('imageInput').click()" class="p-1.5 text-gray-500 hover:text-[var(--theme-color)] hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors" title="Add Image"><i data-lucide="image-plus" class="w-3.5 h-3.5"></i></button>
+                <button id="imageLayoutToggleBtn" class="p-1.5 text-gray-500 hover:text-[var(--theme-color)] hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors" title="Layout"><i data-lucide="layout-grid" class="w-3.5 h-3.5"></i></button>
+                <div class="w-px h-3 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                <button id="contextUndoImageBtn" onclick="event.stopPropagation(); undoImageAction(); document.getElementById('floatingPreviewMenu').classList.add('hidden');" class="p-1.5 text-gray-500 hover:text-[var(--theme-color)] hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors" title="Undo Image"><i data-lucide="undo" class="w-3.5 h-3.5"></i></button>
+                <button id="contextRedoImageBtn" onclick="event.stopPropagation(); redoImageAction(); document.getElementById('floatingPreviewMenu').classList.add('hidden');" class="p-1.5 text-gray-500 hover:text-[var(--theme-color)] hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors" title="Redo Image"><i data-lucide="redo" class="w-3.5 h-3.5"></i></button>
             </div>
         </div>
+        <div id="floatingLayoutOptions" class="hidden py-1 px-1 bg-black/5 dark:bg-white/5 rounded-lg border border-gray-100 dark:border-[#333]"></div>
 
-        <div class="py-1 border-b border-gray-100 dark:border-gray-800">
-            <div id="categoryMenuBtn" class="dropdown-item flex items-center justify-between gap-2 transition-colors">
-                <div class="flex items-center gap-2"><i data-lucide="tag" class="w-4 h-4"></i> Category</div>
-                <div class="flex items-center gap-1">
-                    <span id="categoryLabel" class="text-[10px] font-bold text-[var(--theme-color)] uppercase tracking-widest">-</span>
-                    <i data-lucide="chevron-down" class="w-3 h-3 transition-transform text-gray-400" id="categoryChevron"></i>
+        <!-- Sliders & Dropdowns Group -->
+        <div class="flex flex-col border border-gray-100 dark:border-[#333] rounded-xl bg-white dark:bg-[#1a1a1a] shadow-sm">
+            
+            <div class="px-3 py-2 flex justify-between items-center group">
+                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex-shrink-0">Border</span>
+                <div class="flex items-center gap-3 flex-1 ml-4">
+                    <input type="range" id="inputCardBorder" min="0" max="40" value="4" class="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                    <span id="cardBorderValueLabel" class="text-[10px] font-bold text-[var(--theme-color)] w-6 text-right">4px</span>
                 </div>
             </div>
-            <div id="floatingCategoryOptions" class="hidden py-1 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mt-1 mb-1 max-h-40 overflow-y-auto custom-scrollbar"></div>
-        </div>
 
-        <div class="py-1 border-b border-gray-100 dark:border-gray-800">
-            <div id="fontFamilyToggleBtn" class="dropdown-item flex items-center justify-between gap-2 transition-colors">
-                <div class="flex items-center gap-2"><i data-lucide="type" class="w-4 h-4"></i> Font Style</div>
-                <div class="flex items-center gap-1">
-                    <span id="fontFamilyLabel" class="text-[10px] font-bold text-[var(--theme-color)] uppercase tracking-widest">Caveat</span>
-                    <i data-lucide="chevron-down" class="w-3 h-3 transition-transform text-gray-400" id="fontFamilyChevron"></i>
+            <div class="h-px bg-gray-100 dark:bg-[#333] mx-2"></div>
+
+            <div id="categoryMenuBtn" class="px-3 py-2 flex items-center justify-between cursor-pointer hover:bg-[#f4fbfc] dark:hover:bg-[#222] transition-colors rounded-lg mx-0.5">
+                <div class="flex items-center gap-2 text-[11px] font-semibold text-gray-600 dark:text-gray-300"><i data-lucide="tag" class="w-3.5 h-3.5"></i> Category</div>
+                <div class="flex items-center gap-1.5">
+                    <span id="categoryLabel" class="text-[10px] font-bold text-[var(--theme-color)] uppercase tracking-wider truncate max-w-[90px] text-right">-</span>
+                    <i data-lucide="chevron-down" class="w-3 h-3 text-gray-400 transition-transform" id="categoryChevron"></i>
                 </div>
             </div>
-            <div id="floatingFontFamilyOptions" class="hidden py-1 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mt-1 mb-1"></div>
-        </div>
+            <div id="floatingCategoryOptions" class="hidden py-1 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mb-1 max-h-32 overflow-y-auto custom-scrollbar border border-gray-100 dark:border-[#333]"></div>
 
-        <div class="py-1">
-            <div id="themeColorToggleBtn" class="dropdown-item flex items-center justify-between gap-2 transition-colors">
-                <div class="flex items-center gap-2"><i data-lucide="palette" class="w-4 h-4"></i> Theme Color</div>
-                <i data-lucide="chevron-down" class="w-3 h-3 transition-transform" id="themeColorChevron"></i>
+            <div class="h-px bg-gray-100 dark:bg-[#333] mx-2"></div>
+
+            <div id="fontFamilyToggleBtn" class="px-3 py-2 flex items-center justify-between cursor-pointer hover:bg-[#f4fbfc] dark:hover:bg-[#222] transition-colors rounded-lg mx-0.5">
+                <div class="flex items-center gap-2 text-[11px] font-semibold text-gray-600 dark:text-gray-300"><i data-lucide="type" class="w-3.5 h-3.5"></i> Font</div>
+                <div class="flex items-center gap-1.5">
+                    <span id="fontFamilyLabel" class="text-[10px] font-bold text-[var(--theme-color)] uppercase tracking-wider truncate max-w-[90px] text-right">Caveat</span>
+                    <i data-lucide="chevron-down" class="w-3 h-3 text-gray-400 transition-transform" id="fontFamilyChevron"></i>
+                </div>
             </div>
-            <div id="floatingThemeColorOptions" class="hidden py-2 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mt-1 px-3">
-                <div class="flex flex-wrap items-center justify-end gap-2 mb-3">
-                    <div class="flex items-center gap-1">
-                        <button id="btnRandomColor" class="p-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-gray-400 hover:text-[var(--theme-color)] rounded-lg transition-all shadow-sm hover:border-gray-300 dark:hover:border-gray-600 outline-none" aria-label="Generate Random Palette">
-                            <i data-lucide="shuffle" class="w-3 h-3"></i>
+            <div id="floatingFontFamilyOptions" class="hidden py-1 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mb-1 border border-gray-100 dark:border-[#333]"></div>
+
+            <div class="h-px bg-gray-100 dark:bg-[#333] mx-2"></div>
+
+            <div id="themeColorToggleBtn" class="px-3 py-2 flex items-center justify-between cursor-pointer hover:bg-[#f4fbfc] dark:hover:bg-[#222] transition-colors rounded-lg mx-0.5">
+                <div class="flex items-center gap-2 text-[11px] font-semibold text-gray-600 dark:text-gray-300"><i data-lucide="palette" class="w-3.5 h-3.5"></i> Theme Color</div>
+                <i data-lucide="chevron-down" class="w-3 h-3 text-gray-400 transition-transform" id="themeColorChevron"></i>
+            </div>
+            <div id="floatingThemeColorOptions" class="hidden p-2.5 bg-black/5 dark:bg-white/5 mx-2 rounded-lg mb-2 border border-gray-100 dark:border-[#333]">
+                <div class="flex justify-between items-center mb-2.5">
+                    <button id="btnRandomColor" class="p-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-gray-400 hover:text-[var(--theme-color)] rounded-lg transition-all shadow-sm"><i data-lucide="shuffle" class="w-3.5 h-3.5"></i></button>
+                    <div class="relative shrink-0 w-24">
+                        <button id="blendBtn" class="w-full px-2 py-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-[var(--theme-color)] text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 group">
+                            <span class="text-gray-400">Blend</span> <span id="blendValueLabel">20%</span>
+                            <i data-lucide="chevron-down" class="w-3 h-3 text-gray-400 group-hover:translate-y-0.5 transition-transform"></i>
                         </button>
-                        <div class="relative shrink-0 w-20">
-                            <button id="blendBtn" class="w-full px-2 py-1.5 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#333] text-[var(--theme-color)] text-[9px] font-bold uppercase tracking-widest rounded-lg transition-all shadow-sm flex items-center justify-between gap-1 outline-none group hover:border-gray-300 dark:hover:border-gray-600">
-                                <span class="text-gray-400">Blend</span>
-                                <span id="blendValueLabel">20%</span>
-                                <i data-lucide="chevron-down" class="w-3 h-3 text-gray-400 transition-transform group-hover:translate-y-0.5 shrink-0"></i>
-                            </button>
-                            <div id="blendDropdownMenu" class="hidden absolute right-0 mt-2 w-full bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[70] overflow-hidden">
-                                <div id="blendOptions" class="py-1"></div>
-                            </div>
-                        </div>
+                        <div id="blendDropdownMenu" class="hidden absolute right-0 mt-2 w-full bg-white dark:bg-[#1a1a1a] border border-[#d0ebf0] dark:border-[#333] rounded-xl shadow-xl z-[70] overflow-hidden max-h-32 overflow-y-auto custom-scrollbar"><div id="blendOptions" class="py-1"></div></div>
                     </div>
                 </div>
-                <div id="colorMap" class="mb-3 h-24 w-full relative cursor-crosshair border border-gray-200 dark:border-[#333] rounded-xl overflow-hidden bg-red-500">
+                <div id="colorMap" class="h-24 w-full relative cursor-crosshair border border-gray-200 dark:border-[#333] rounded-xl overflow-hidden bg-red-500 mb-2.5">
                     <div class="color-map-white absolute inset-0 bg-gradient-to-r from-white to-transparent"></div>
                     <div class="color-map-black absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
-                    <div id="colorMarker" class="absolute w-4 h-4 border-2 border-white rounded-full shadow-sm pointer-events-none transform -translate-x-1/2 -translate-y-1/2" style="top: 20%; left: 80%;"></div>
+                    <div id="colorMarker" class="absolute w-3 h-3 border-[2px] border-white rounded-full shadow-sm pointer-events-none transform -translate-x-1/2 -translate-y-1/2" style="top: 20%; left: 80%;"></div>
                 </div>
-                <div class="px-1 mb-1">
-                    <input type="range" id="inputHue" min="0" max="360" value="189" class="w-full cursor-pointer">
-                </div>
+                <input type="range" id="inputHue" min="0" max="360" value="189" class="w-full h-1.5 rounded-lg appearance-none cursor-pointer mb-1" style="background: linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);">
             </div>
         </div>
     </div>
@@ -644,13 +623,30 @@
         window.toggleMobileMenu = function(e) {
             e.preventDefault(); e.stopPropagation();
             const menu = document.getElementById('floatingPreviewMenu');
+            const fab = document.getElementById('mobileFab');
+            
             if (menu.classList.contains('hidden')) {
+                menu.style.visibility = 'hidden';
                 menu.classList.remove('hidden');
-                menu.style.left = '50%';
-                menu.style.top = '50%';
-                menu.style.transform = 'translate(-50%, -50%)';
+                
+                const fabRect = fab.getBoundingClientRect();
+                const menuRect = menu.getBoundingClientRect();
+                
+                let topPos = fabRect.top - menuRect.height - 12;
+                let leftPos = fabRect.right - menuRect.width;
+                
+                if (topPos < 10) topPos = 10;
+                if (leftPos < 10) leftPos = 10;
+                
+                menu.style.top = topPos + 'px';
+                menu.style.left = leftPos + 'px';
+                menu.style.transform = 'none';
+                
+                menu.style.visibility = 'visible';
+                menu.classList.add('animate-fade-in');
             } else {
                 menu.classList.add('hidden');
+                menu.classList.remove('animate-fade-in');
             }
         };
 
@@ -934,12 +930,16 @@
             const menu = document.getElementById('floatingPreviewMenu');
             menu.classList.remove('hidden');
             menu.style.transform = 'none'; 
+            menu.classList.add('animate-fade-in');
+            
+            menu.style.visibility = 'hidden';
             requestAnimationFrame(() => {
                 const rect = menu.getBoundingClientRect();
                 let x = e.clientX, y = e.clientY;
                 if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
                 if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
                 menu.style.left = x + 'px'; menu.style.top = y + 'px';
+                menu.style.visibility = 'visible';
             });
         };
 
@@ -2448,7 +2448,7 @@
 
         /* --- Standalone Image Editor Logic (Enhanced & Mobile Friendly) --- */
         let saCanvas, saCtx, saTempCanvas, saTempCtx;
-        let saIsDrawing = false, saTool = 'pen', saImg = null, saStartX = 0, saStartY = 0;
+        let saIsDrawing = false, saTool = 'pen', saImg = null, saStartX = 0, saStartY = 0, saCurrentX = 0, saCurrentY = 0;
         let saUndoStack = [], saRedoStack = [], saCurrentColor = '#ef4444', saCurrentSize = 6;
 
         window.openStandaloneImageEditor = function() {
@@ -2543,32 +2543,31 @@
                 saIsDrawing = true;
                 const pos = getSaPos(e);
                 saStartX = pos.x; saStartY = pos.y;
+                saCurrentX = pos.x; saCurrentY = pos.y;
                 
-                // Scale line width proportionally with actual image resolution
                 const baseScale = Math.max(1, saCanvas.width / 1000);
                 const actualWidth = saCurrentSize * baseScale;
 
-                saCtx.lineCap = 'round';
-                saCtx.lineJoin = 'round';
-                saCtx.lineWidth = actualWidth;
+                saCtx.lineCap = 'round'; saCtx.lineJoin = 'round'; saCtx.lineWidth = actualWidth;
                 
                 if (saTool === 'eraser') {
                     saCtx.globalCompositeOperation = 'destination-out';
                     saCtx.strokeStyle = 'rgba(0,0,0,1)';
-                } else {
+                } else if (saTool !== 'crop') {
                     saCtx.globalCompositeOperation = 'source-over';
                     saCtx.strokeStyle = saTool === 'highlighter' ? hexToRgba(saCurrentColor, 0.015) : saCurrentColor;
                 }
 
                 if (saTool === 'pen' || saTool === 'highlighter' || saTool === 'eraser') {
-                    saCtx.beginPath();
-                    saCtx.moveTo(saStartX, saStartY);
+                    saCtx.beginPath(); saCtx.moveTo(saStartX, saStartY);
                 }
             }
 
             function move(e) {
                 if (!saIsDrawing) return;
                 const pos = getSaPos(e);
+                saCurrentX = pos.x; saCurrentY = pos.y;
+                
                 const baseScale = Math.max(1, saCanvas.width / 1000);
                 const actualWidth = saCurrentSize * baseScale;
                 
@@ -2577,22 +2576,34 @@
                     saCtx.stroke();
                 } else {
                     saTempCtx.clearRect(0, 0, saTempCanvas.width, saTempCanvas.height);
-                    saTempCtx.lineCap = 'round';
-                    saTempCtx.lineJoin = 'round';
-                    saTempCtx.lineWidth = actualWidth;
-                    saTempCtx.strokeStyle = saTool === 'highlighter' ? hexToRgba(saCurrentColor, 0.35) : saCurrentColor;
-                    saTempCtx.beginPath();
                     
-                    if (saTool === 'rect') {
-                        saTempCtx.rect(saStartX, saStartY, pos.x - saStartX, pos.y - saStartY);
-                    } else if (saTool === 'circle') { 
-                        const radius = Math.sqrt(Math.pow(pos.x - saStartX, 2) + Math.pow(pos.y - saStartY, 2)); 
-                        saTempCtx.arc(saStartX, saStartY, radius, 0, 2 * Math.PI); 
-                    } else if (saTool === 'arrow') {
-                        drawSaArrow(saTempCtx, saStartX, saStartY, pos.x, pos.y, actualWidth);
+                    if (saTool === 'crop') {
+                        saTempCtx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+                        saTempCtx.fillRect(0, 0, saTempCanvas.width, saTempCanvas.height);
+                        
+                        const x = Math.min(saStartX, pos.x), y = Math.min(saStartY, pos.y);
+                        const w = Math.abs(pos.x - saStartX), h = Math.abs(pos.y - saStartY);
+                        
+                        saTempCtx.clearRect(x, y, w, h);
+                        
+                        saTempCtx.setLineDash([8, 8]);
+                        saTempCtx.lineWidth = Math.max(2, baseScale * 2);
+                        saTempCtx.strokeStyle = 'white';
+                        saTempCtx.strokeRect(x, y, w, h);
+                        saTempCtx.setLineDash([]);
+                    } else {
+                        saTempCtx.lineCap = 'round'; saTempCtx.lineJoin = 'round'; saTempCtx.lineWidth = actualWidth;
+                        saTempCtx.strokeStyle = saTool === 'highlighter' ? hexToRgba(saCurrentColor, 0.35) : saCurrentColor;
+                        saTempCtx.beginPath();
+                        
+                        if (saTool === 'rect') saTempCtx.rect(saStartX, saStartY, pos.x - saStartX, pos.y - saStartY);
+                        else if (saTool === 'circle') { 
+                            const radius = Math.sqrt(Math.pow(pos.x - saStartX, 2) + Math.pow(pos.y - saStartY, 2)); 
+                            saTempCtx.arc(saStartX, saStartY, radius, 0, 2 * Math.PI); 
+                        } else if (saTool === 'arrow') drawSaArrow(saTempCtx, saStartX, saStartY, pos.x, pos.y, actualWidth);
+                        
+                        if (saTool !== 'arrow') saTempCtx.stroke();
                     }
-                    
-                    if (saTool !== 'arrow') saTempCtx.stroke();
                 }
             }
 
@@ -2600,12 +2611,28 @@
                 if (!saIsDrawing) return;
                 saIsDrawing = false;
                 
-                if (saTool === 'rect' || saTool === 'circle' || saTool === 'arrow') {
+                if (saTool === 'crop') {
+                    const x = Math.min(saStartX, saCurrentX), y = Math.min(saStartY, saCurrentY);
+                    const w = Math.abs(saCurrentX - saStartX), h = Math.abs(saCurrentY - saStartY);
+                    
+                    saTempCtx.clearRect(0, 0, saTempCanvas.width, saTempCanvas.height);
+                    
+                    if (w > 20 && h > 20) {
+                        const croppedData = saCtx.getImageData(x, y, w, h);
+                        saCanvas.width = w; saCanvas.height = h;
+                        saTempCanvas.width = w; saTempCanvas.height = h;
+                        saCtx.putImageData(croppedData, 0, 0);
+                        recalculateSaCanvasScale();
+                        saveSaState();
+                    }
+                } else if (saTool === 'rect' || saTool === 'circle' || saTool === 'arrow') {
                     saCtx.globalCompositeOperation = 'source-over';
                     saCtx.drawImage(saTempCanvas, 0, 0);
                     saTempCtx.clearRect(0, 0, saTempCanvas.width, saTempCanvas.height);
+                    saveSaState();
+                } else {
+                    saveSaState();
                 }
-                saveSaState();
             }
 
             saTempCanvas.addEventListener('mousedown', (e) => { if (e.button === 0) start(e); });
@@ -2696,9 +2723,15 @@
             if (!saCanvas) return;
             const img = new Image();
             img.onload = () => {
+                saCanvas.width = img.naturalWidth;
+                saCanvas.height = img.naturalHeight;
+                saTempCanvas.width = img.naturalWidth;
+                saTempCanvas.height = img.naturalHeight;
+
                 saCtx.clearRect(0, 0, saCanvas.width, saCanvas.height);
                 saCtx.globalCompositeOperation = 'source-over'; 
                 saCtx.drawImage(img, 0, 0);
+                recalculateSaCanvasScale();
             };
             img.src = dataUrl;
         }
