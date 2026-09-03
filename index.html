@@ -1502,16 +1502,45 @@
 
             document.addEventListener('paste', (event) => { 
                 const clipboardData = event.clipboardData || event.originalEvent.clipboardData;
-                const items = clipboardData.items; let isImagePaste = false;
+                const items = clipboardData.items; 
+                let isImagePaste = false;
+                
                 for (let index in items) { 
                     if (items[index].kind === 'file' && items[index].type.includes('image')) {
-                        isImagePaste = true; processFile(items[index].getAsFile(), 'blocks'); 
+                        isImagePaste = true; 
+                        const file = items[index].getAsFile();
+                        
+                        // Check if the Standalone Image Editor is open
+                        const saEditor = document.getElementById('standaloneImageEditor');
+                        if (saEditor && !saEditor.classList.contains('hidden')) {
+                            // Route image to the Image Editor Studio
+                            const reader = new FileReader();
+                            reader.onload = function(evt) {
+                                saImg = new Image();
+                                saImg.onload = function() {
+                                    loadSaImageIntoCanvas(saImg);
+                                };
+                                saImg.src = evt.target.result;
+                            };
+                            reader.readAsDataURL(file);
+                        } else {
+                            // Default behavior: add to card blocks
+                            processFile(file, 'blocks'); 
+                        }
                     }
                 } 
-                if (isImagePaste) { event.preventDefault(); return; }
+                
+                if (isImagePaste) { 
+                    event.preventDefault(); 
+                    return; 
+                }
+                
                 if (event.target && event.target.isContentEditable) {
                     const text = clipboardData.getData('text/plain');
-                    if (text) { event.preventDefault(); document.execCommand('insertText', false, text); }
+                    if (text) { 
+                        event.preventDefault(); 
+                        document.execCommand('insertText', false, text); 
+                    }
                 }
             });
             
